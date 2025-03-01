@@ -5,7 +5,8 @@ DROP TABLE IF EXISTS gen_table;
 CREATE TABLE gen_table (
   table_id            bigserial PRIMARY KEY,
   table_name          varchar(200)    DEFAULT '' ,
-  table_comment       varchar(500)    DEFAULT '' ,
+  table_comment       varchar(500)    NOT NULL ,
+  table_alias         varchar(200)    NOT NULL ,
   have_sub_column     char(1)         DEFAULT '0',
   sub_table_name      varchar(64)     DEFAULT NULL,
   sub_table_fk_name   varchar(64)     DEFAULT NULL,
@@ -30,6 +31,7 @@ CREATE TABLE gen_table (
 COMMENT ON TABLE gen_table IS '代码生成业务表';
 COMMENT ON COLUMN gen_table.table_id IS '编号';
 COMMENT ON COLUMN gen_table.table_name IS '表名称';
+COMMENT ON COLUMN gen_table.table_alias IS '表别名';
 COMMENT ON COLUMN gen_table.table_comment IS '表描述';
 COMMENT ON COLUMN gen_table.have_sub_column IS '是否含有关联字段';
 COMMENT ON COLUMN gen_table.sub_table_name IS '关联子表的表名';
@@ -113,6 +115,35 @@ COMMENT ON COLUMN gen_table_column.create_by IS '创建者';
 COMMENT ON COLUMN gen_table_column.create_time IS '创建时间';
 COMMENT ON COLUMN gen_table_column.update_by IS '更新者';
 COMMENT ON COLUMN gen_table_column.update_time IS '更新时间';
+
+DROP TABLE IF EXISTS gen_join_table;
+CREATE TABLE gen_join_table (
+  table_id            bigserial,
+  left_table_id       bigint          DEFAULT NULL,
+  right_table_id      bigint          DEFAULT NULL,
+  left_table_alias    varchar(200)    DEFAULT NULL,
+  right_table_alias   varchar(200)    DEFAULT NULL,
+  left_table_fk       varchar(200)    DEFAULT NULL,
+  right_table_fk      varchar(200)    DEFAULT NULL,
+  join_type           varchar(200)    DEFAULT NULL,
+  join_columns        varchar(500)    DEFAULT NULL,
+  order_num           varchar(64)     DEFAULT NULL,
+  new_table_id        bigint          DEFAULT NULL,
+  PRIMARY KEY (table_id, right_table_id, left_table_id)
+);
+
+COMMENT ON TABLE gen_table_column IS '代码生成关联表';
+COMMENT ON COLUMN gen_table_column.table_id IS '表编号';
+COMMENT ON COLUMN gen_table_column.left_table_id IS '左表名称';
+COMMENT ON COLUMN gen_table_column.right_table_id IS '右表编号';
+COMMENT ON COLUMN gen_table_column.left_table_alias IS '左表别名';
+COMMENT ON COLUMN gen_table_column.right_table_alias IS '右表别名';
+COMMENT ON COLUMN gen_table_column.left_table_fk IS '左表关联键';
+COMMENT ON COLUMN gen_table_column.right_table_fk IS '右表关联键';
+COMMENT ON COLUMN gen_table_column.join_type IS '关联类型';
+COMMENT ON COLUMN gen_table_column.join_columns IS '关联字段';
+COMMENT ON COLUMN gen_table_column.order_num IS '序号';
+COMMENT ON COLUMN gen_table_column.new_table_id IS '新表编号';
 
 -- 插入菜单数据
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)

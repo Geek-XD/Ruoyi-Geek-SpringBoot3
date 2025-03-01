@@ -5,8 +5,8 @@
 DROP TABLE IF EXISTS `gen_table`;
 CREATE TABLE `gen_table`  (
   `table_id`            bigint(20)      NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `table_name`          varchar(200)    DEFAULT ''  COMMENT '表名称',
-  `table_alias`          varchar(200)    DEFAULT ''  COMMENT '表名称',
+  `table_name`          varchar(200)    NOT NULL  COMMENT '表名称',
+  `table_alias`          varchar(200)    NOT NULL  COMMENT '表别名',
   `table_comment`       varchar(500)    DEFAULT ''  COMMENT '表描述',
   `have_sub_column`     char(1)         DEFAULT '0' COMMENT '是否含有关联字段',
   `sub_table_name`      varchar(64)     DEFAULT NULL COMMENT '关联子表的表名',
@@ -70,17 +70,17 @@ CREATE TABLE `gen_table_column`  (
 
 DROP TABLE IF EXISTS `gen_join_table`;
 CREATE TABLE `gen_join_table` (
-  `table_id`         bigint NOT NULL COMMENT '表编号',
-  `left_table_id`  bigint  NOT NULL COMMENT '主表名称',
-  `right_table_id`    bigint NOT NULL COMMENT '关联表编号',
-  `left_table_alias` varchar(200) NOT NULL COMMENT '主表别名',
-  `right_table_alias` varchar(200) NOT NULL COMMENT '关联表别名',
-  `left_table_fk` varchar(200) NOT NULL COMMENT '主表别名',
-  `right_table_fk` varchar(200) NOT NULL COMMENT '关联表别名',
-  `join_type` varchar(200) NOT NULL COMMENT '关联类型',
-  `join_columns` varchar(500) DEFAULT '' COMMENT '关联字段',
-  `order_num` varchar(64) NOT NULL COMMENT '序号',
-  `new_table_id` bigint NOT NULL COMMENT '新表编号',
+  `table_id`          bigint       NOT NULL   COMMENT '表编号',
+  `left_table_id`     bigint       NOT NULL   COMMENT '左表名称',
+  `right_table_id`    bigint       NOT NULL   COMMENT '右表编号',
+  `left_table_alias`  varchar(200) NOT NULL   COMMENT '左表别名',
+  `right_table_alias` varchar(200) NOT NULL   COMMENT '右表别名',
+  `left_table_fk`     varchar(200) NOT NULL   COMMENT '左表关联键',
+  `right_table_fk`    varchar(200) NOT NULL   COMMENT '右表关联键',
+  `join_type`         varchar(200) NOT NULL   COMMENT '关联类型',
+  `join_columns`      varchar(500) DEFAULT '' COMMENT '关联字段',
+  `order_num`         varchar(64)  NOT NULL   COMMENT '序号',
+  `new_table_id`      bigint       NOT NULL   COMMENT '新表编号',
   PRIMARY KEY (`table_id`,`right_table_id`,`left_table_id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 COMMENT = '代码生成关联表';
 
