@@ -21,30 +21,36 @@
     "maven.executable.preferMavenWrapper": true,
     "java.import.maven.enabled": true,
     "java.dependency.packagePresentation": "hierarchical",
-    "sqltools.connections": [
+    "dbcode.connections": [
         {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "enableSsl": "Disabled"
-            },
-            "previewLimit": 50,
-            "server": "localhost",
+            "connectionId": "btr-_nFe7R0oOvCj0mMun",
+            "name": "ry",
+            "driver": "mysql",
+            "connectionType": "host",
+            "host": "127.0.0.1",
             "port": 3306,
-            "driver": "MySQL",
-            "name": "localhost-mysql",
-            "database": "ry",
+            "ssl": false,
             "username": "root",
-            "password": "123456"
+            "password": "",
+            "savePassword": "secretStorage",
+            "database": "ry",
+            "connectionTimeout": 30,
+            "driverOptions": {
+                "retrievePublickey": true
+            }
         },
         {
-            "previewLimit": 50,
-            "server": "localhost",
+            "connectionId": "7NX2UhXl__9t3Ca6TzEsB",
+            "name": "ry",
+            "driver": "postgres",
+            "connectionType": "host",
+            "host": "127.0.0.1",
             "port": 5432,
-            "driver": "PostgreSQL",
-            "name": "localhost-postgres",
-            "database": "ry",
+            "ssl": false,
             "username": "postgres",
-            "password": "123456"
+            "password": "123456",
+            "savePassword": "secretStorage",
+            "connectionTimeout": 30
         }
     ],
 }
