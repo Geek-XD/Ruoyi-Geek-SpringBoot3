@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -100,7 +102,29 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     @Override
     public List<GenTable> selectDbTableListByNames(String[] tableNames) {
-        return genTableMapper.selectDbTableListByNames(tableNames);
+        List<GenTable> genTables = genTableMapper.selectDbTableListByNames(tableNames);
+        genTables.forEach(i -> i.setTableAlias(generateTableAlias(i.getTableName())));
+        return genTables;
+    }
+
+    public static String generateTableAlias(String tableName) {
+        if (StringUtils.isEmpty(tableName)) {
+            return "t";
+        }
+        
+        // 改进的正则表达式，更准确地处理所有三种情况
+        Pattern pattern = Pattern.compile("([A-Z][a-z0-9]*)|([a-z0-9]+)(?=[A-Z])|([a-z0-9]+)(?=_)|([a-z0-9]+)$");
+        Matcher matcher = pattern.matcher(tableName);
+        StringBuilder alias = new StringBuilder();
+        
+        while (matcher.find()) {
+            String word = matcher.group();
+            if (!word.isEmpty()) {
+                alias.append(word.charAt(0));
+            }
+        }
+        
+        return alias.toString().toLowerCase();
     }
 
     /**
