@@ -1,7 +1,15 @@
 package com.ruoyi.pay.sqb.config;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,6 +41,28 @@ public class SqbConfig {
 
     @Value("${pay.sqb.proxy}")
     private String proxyPath;
+
+    @Value("${pay.sqb.publicKey}")
+    private String publicKey;
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    public String getPublicKey() throws Exception {
+        if (publicKey.startsWith("classpath")) {
+            Resource resource = applicationContext.getResource(publicKey);
+            InputStream inputStream = resource.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String alipayPublicKeyValue = bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+            bufferedReader.close();
+            publicKey = alipayPublicKeyValue;
+        }
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
 
     public String getDefaultNotifyUrl() {
         return defaultNotifyUrl;

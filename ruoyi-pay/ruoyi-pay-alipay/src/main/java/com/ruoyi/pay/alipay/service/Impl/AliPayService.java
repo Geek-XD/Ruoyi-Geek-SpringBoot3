@@ -16,7 +16,7 @@ import com.ruoyi.pay.service.IPayOrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Service
+@Service("alipayPayService")
 public class AliPayService implements IAliPayService {
     public void callback(Map<String, String> params) {
     }
@@ -39,7 +39,7 @@ public class AliPayService implements IAliPayService {
     }
 
     @Override
-    public void notify(HttpServletRequest request, HttpServletResponse response) {
+    public String notify(HttpServletRequest request, HttpServletResponse response) {
         if (request.getParameter("trade_status").equals("TRADE_SUCCESS")) {
 
             Map<String, String> params = new HashMap<>();
@@ -52,9 +52,23 @@ public class AliPayService implements IAliPayService {
                 if (Factory.Payment.Common().verifyNotify(params)) {
                     payOrderService.updateStatus(orderNumber, "已支付");
                 }
+                return "success";
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        return "fail";
+    }
+
+    @Override
+    public String query(PayOrder payOrder) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'query'");
+    }
+
+    @Override
+    public String refund(PayOrder payOrder) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'refund'");
     }
 }

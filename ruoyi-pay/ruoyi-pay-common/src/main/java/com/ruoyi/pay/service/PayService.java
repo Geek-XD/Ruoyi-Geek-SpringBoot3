@@ -8,5 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface PayService {
     String payUrl(PayOrder payOrder);
 
-    void notify(HttpServletRequest servletRequest, HttpServletResponse response);
+    String notify(HttpServletRequest servletRequest, HttpServletResponse response);
+
+    String query(PayOrder payOrder);
+
+    String refund(PayOrder payOrder);
 }

@@ -21,7 +21,7 @@ import com.wechat.pay.java.service.wexinpayscoreparking.model.Transaction;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Service
+@Service("wechatPayService")
 public class WxPayService implements IWxPayService {
 
     @Autowired
@@ -56,13 +56,13 @@ public class WxPayService implements IWxPayService {
     }
 
     @Override
-    public void notify(HttpServletRequest servletRequest, HttpServletResponse response) {
-        String timeStamp = servletRequest.getHeader("Wechatpay-Timestamp");
-        String nonce = servletRequest.getHeader("Wechatpay-Nonce");
-        String signature = servletRequest.getHeader("Wechatpay-Signature");
-        String certSn = servletRequest.getHeader("Wechatpay-Serial");
+    public String notify(HttpServletRequest request, HttpServletResponse response) {
+        String timeStamp = request.getHeader("Wechatpay-Timestamp");
+        String nonce = request.getHeader("Wechatpay-Nonce");
+        String signature = request.getHeader("Wechatpay-Signature");
+        String certSn = request.getHeader("Wechatpay-Serial");
         try {
-            String requestBody = StreamUtils.copyToString(servletRequest.getInputStream(), StandardCharsets.UTF_8);
+            String requestBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
             RequestParam requestParam = new RequestParam.Builder()
                     .serialNumber(certSn)
                     .nonce(nonce)
@@ -77,9 +77,23 @@ public class WxPayService implements IWxPayService {
             System.out.println("orderNumber: " + orderNumber);
             System.out.println("otherOrderNumber: " + otherOrderNumber);
             System.out.println("orderState: " + orderState);
+            return "success";
         } catch (Exception e) {
             e.printStackTrace();
+            return "fail";
         }
+    }
+
+    @Override
+    public String query(PayOrder payOrder) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'query'");
+    }
+
+    @Override
+    public String refund(PayOrder payOrder) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'refund'");
     }
 
 }

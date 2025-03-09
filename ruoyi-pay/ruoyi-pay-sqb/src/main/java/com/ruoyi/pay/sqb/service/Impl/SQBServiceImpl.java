@@ -1,17 +1,25 @@
 package com.ruoyi.pay.sqb.service.Impl;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.security.UnrecoverableKeyException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
@@ -27,7 +35,7 @@ import com.ruoyi.pay.sqb.service.ISqbPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Service
+@Service("sqbPayService")
 @ConditionalOnProperty(prefix = "pay.sqb", name = "enabled", havingValue = "true")
 public class SQBServiceImpl implements ISqbPayService {
     @Autowired
@@ -164,7 +172,7 @@ public class SQBServiceImpl implements ISqbPayService {
      * @return
      */
 
-    public JSONObject query(PayOrder payOrder) {
+    public String query(PayOrder payOrder) {
         String url = sqbConfig.getApiDomain() + "/upay/v2/query";
         JSONObject params = new JSONObject();
         try {
@@ -179,7 +187,7 @@ public class SQBServiceImpl implements ISqbPayService {
                 return null;
             }
             String responseStr = retObj.get("biz_response").toString();
-            return JSONObject.parseObject(responseStr);
+            return responseStr;
         } catch (Exception e) {
             return null;
         }
@@ -281,10 +289,45 @@ public class SQBServiceImpl implements ISqbPayService {
         }
     }
 
+    public boolean validateSign(String data, String sign) {
+        try {
+            // 使用SHA256WithRSA算法
+            Signature signature = Signature.getInstance("SHA256WithRSA");
+
+            // 获取公钥
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey localPublicKey = keyFactory
+                    .generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(sqbConfig.getPublicKey())));
+            // 初始化验证过程
+            signature.initVerify(localPublicKey);
+            signature.update(data.getBytes());
+
+            // 解码签名
+            byte[] bytesSign = Base64.getDecoder().decode(sign);
+
+            // 验证签名
+            return signature.verify(bytesSign);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     @Override
-    public void notify(HttpServletRequest servletRequest, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'notify'");
+    public String notify(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String requestBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
+            JSONObject jsonObject = JSONObject.parseObject(requestBody);
+            String sign = request.getHeader("Authorization");
+            if (!validateSign(requestBody, sign)) {
+                throw new ServiceException("收钱吧支付回调验签失败");
+            }
+            System.out.println(jsonObject);
+            return "success";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "fail";
+        }
     }
 
 }
