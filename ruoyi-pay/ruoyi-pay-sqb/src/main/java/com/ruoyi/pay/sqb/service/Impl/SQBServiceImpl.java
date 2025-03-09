@@ -25,7 +25,6 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.http.HttpClientUtil;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.pay.domain.PayOrder;
@@ -202,20 +201,7 @@ public class SQBServiceImpl implements ISqbPayService {
         if (payOrder.getRemark() == null) {
             payOrder.setRemark("支付");
         }
-        String orderNotifyUrl;
-        String defaultNotifyUrl = sqbConfig.getDefaultNotifyUrl();
-        String defaultNotifyBaseUrl = sqbConfig.getDefaultNotifyBaseUrl();
-        String proxyPath = sqbConfig.getProxyPath();
-        if (notifyBaseUrl != null && !notifyBaseUrl.trim().equals("")) {
-            orderNotifyUrl = notifyBaseUrl + defaultNotifyUrl;
-        } else {
-            if (defaultNotifyBaseUrl != null && !defaultNotifyBaseUrl.trim().equals("")) {
-                orderNotifyUrl = defaultNotifyBaseUrl + proxyPath + defaultNotifyUrl;
-            } else {
-                orderNotifyUrl = "http://" + ServletUtils.getRequest().getServerName() + proxyPath + defaultNotifyUrl;
-            }
-        }
-
+        String orderNotifyUrl = sqbConfig.getNotifyUrl();
         String param = "" +
                 "client_sn=" + payOrder.getOrderNumber() +
                 "&notify_url=" + orderNotifyUrl +

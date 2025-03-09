@@ -8,12 +8,11 @@ pay:
     vendorSn: "vendorSn"
     vendorKey: "vendorKey"
     publicKey: classpath:pay/sqb/sqb_public_key.pem
+    notifyUrl: http://e2vca6.natappfree.cc/pay/sqb/notify
   alipay:
     enabled: false
     appId: appid
-    # 应用私钥
     appPrivateKey: classpath:pay/alipay/alipay_private_key.pem
-    # 支付宝公钥
     alipayPublicKey: classpath:pay/alipay/alipay_public_key.pem
     notifyUrl: http://e2vca6.natappfree.cc/alipay/notify
   wechat:
