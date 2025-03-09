@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.ruoyi.auth.common.domain.OauthUser;
+import com.ruoyi.auth.common.service.IOauthUserService;
 import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -25,9 +27,7 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
-import com.ruoyi.auth.common.domain.OauthUser;
-import com.ruoyi.auth.common.service.IOauthUserService;
-import com.ruoyi.oauth.justauth.utils.AuthUtils;
+import com.ruoyi.oauth.justauth.utils.JustAuthUtils;
 import com.ruoyi.system.service.ISysUserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -91,7 +91,7 @@ public class SysAuthController extends BaseController
             return error(source + "平台账号暂不支持");
         }
         JSONObject json = JSONObject.parseObject(obj);
-        AuthRequest authRequest = AuthUtils.getAuthRequest(source, json.getString("clientId"), json.getString("clientSecret"), json.getString("redirectUri"), authStateCache);
+        AuthRequest authRequest = JustAuthUtils.getAuthRequest(source, json.getString("clientId"), json.getString("clientSecret"), json.getString("redirectUri"), authStateCache);
         String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
         return success(authorizeUrl);
     }
@@ -114,7 +114,7 @@ public class SysAuthController extends BaseController
             return AjaxResult.error(10002, "第三方平台系统不支持或未提供来源");
         }
         JSONObject json = JSONObject.parseObject(obj);
-        AuthRequest authRequest = AuthUtils.getAuthRequest(source, json.getString("clientId"), json.getString("clientSecret"), json.getString("redirectUri"), authStateCache);
+        AuthRequest authRequest = JustAuthUtils.getAuthRequest(source, json.getString("clientId"), json.getString("clientSecret"), json.getString("redirectUri"), authStateCache);
         AuthResponse<AuthUser> response = authRequest.login(callback);
         if (response.ok())
         {

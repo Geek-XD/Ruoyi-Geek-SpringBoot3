@@ -38,7 +38,7 @@ import me.zhyd.oauth.request.AuthWeiboRequest;
  * 
  * @author ruoyi
  */
-public class AuthUtils
+public class JustAuthUtils
 {
     @SuppressWarnings("deprecation")
     public static AuthRequest getAuthRequest(String source, String clientId, String clientSecret, String redirectUri,

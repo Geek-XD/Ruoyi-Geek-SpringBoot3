@@ -24,14 +24,14 @@
     "dbcode.connections": [
         {
             "connectionId": "btr-_nFe7R0oOvCj0mMun",
-            "name": "ry",
+            "name": "ry-mysql",
             "driver": "mysql",
             "connectionType": "host",
             "host": "127.0.0.1",
             "port": 3306,
             "ssl": false,
             "username": "root",
-            "password": "",
+            "password": "123456",
             "savePassword": "secretStorage",
             "database": "ry",
             "connectionTimeout": 30,
@@ -41,7 +41,7 @@
         },
         {
             "connectionId": "7NX2UhXl__9t3Ca6TzEsB",
-            "name": "ry",
+            "name": "ry-postgres",
             "driver": "postgres",
             "connectionType": "host",
             "host": "127.0.0.1",

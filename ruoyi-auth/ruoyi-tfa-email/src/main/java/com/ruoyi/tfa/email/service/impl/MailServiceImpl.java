@@ -24,7 +24,7 @@ import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.tfa.email.service.IMailService;
 import com.ruoyi.tfa.email.utils.EmailUtil;
 
-@Service
+@Service("mailAuthService")
 public class MailServiceImpl implements IMailService {
 
     @Autowired

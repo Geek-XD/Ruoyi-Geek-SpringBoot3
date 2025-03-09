@@ -1,4 +1,4 @@
-package com.ruoyi.auth.common.controller;
+package com.ruoyi.auth.controller;
 
 import java.util.List;
 
@@ -35,8 +35,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/system/oauth")
 @Tag(name = "【第三方认证】管理")
-public class OauthUserController extends BaseController
-{
+public class OauthUserController extends BaseController {
     @Autowired
     private IOauthUserService oauthUserService;
 
@@ -46,8 +45,7 @@ public class OauthUserController extends BaseController
     @Operation(summary = "查询第三方认证列表")
     @PreAuthorize("@ss.hasPermi('system:oauth:list')")
     @GetMapping("/list")
-    public TableDataInfo list(OauthUser oauthUser)
-    {
+    public TableDataInfo list(OauthUser oauthUser) {
         startPage();
         List<OauthUser> list = oauthUserService.selectOauthUserList(oauthUser);
         return getDataTable(list);
@@ -60,8 +58,7 @@ public class OauthUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:oauth:export')")
     @Log(title = "第三方认证", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, OauthUser oauthUser)
-    {
+    public void export(HttpServletResponse response, OauthUser oauthUser) {
         List<OauthUser> list = oauthUserService.selectOauthUserList(oauthUser);
         ExcelUtil<OauthUser> util = new ExcelUtil<OauthUser>(OauthUser.class);
         util.exportExcel(response, list, "第三方认证数据");
@@ -73,8 +70,7 @@ public class OauthUserController extends BaseController
     @Operation(summary = "获取第三方认证详细信息")
     @PreAuthorize("@ss.hasPermi('system:oauth:query')")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
-    {
+    public AjaxResult getInfo(@PathVariable("id") Long id) {
         return success(oauthUserService.selectOauthUserById(id));
     }
 
@@ -85,8 +81,7 @@ public class OauthUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:oauth:add')")
     @Log(title = "第三方认证", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody OauthUser oauthUser)
-    {
+    public AjaxResult add(@RequestBody OauthUser oauthUser) {
         return toAjax(oauthUserService.insertOauthUser(oauthUser));
     }
 
@@ -97,8 +92,7 @@ public class OauthUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:oauth:edit')")
     @Log(title = "第三方认证", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody OauthUser oauthUser)
-    {
+    public AjaxResult edit(@RequestBody OauthUser oauthUser) {
         return toAjax(oauthUserService.updateOauthUser(oauthUser));
     }
 
@@ -108,9 +102,8 @@ public class OauthUserController extends BaseController
     @Operation(summary = "删除第三方认证")
     @PreAuthorize("@ss.hasPermi('system:oauth:remove')")
     @Log(title = "第三方认证", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable( name = "ids" ) Long[] ids) 
-    {
+    @DeleteMapping("/{ids}")
+    public AjaxResult remove(@PathVariable(name = "ids") Long[] ids) {
         return toAjax(oauthUserService.deleteOauthUserByIds(ids));
     }
 }

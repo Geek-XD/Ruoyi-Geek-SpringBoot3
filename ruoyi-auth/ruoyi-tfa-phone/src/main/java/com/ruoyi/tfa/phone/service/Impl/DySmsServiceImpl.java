@@ -32,7 +32,7 @@ import com.ruoyi.tfa.phone.utils.DySmsUtil;
  * @author zlh
  * @date 2024-04-16
  */
-@Service
+@Service("dySmsAuthService")
 public class DySmsServiceImpl implements DySmsService {
 
     @Autowired
@@ -114,14 +114,14 @@ public class DySmsServiceImpl implements DySmsService {
         }
     }
 
-    public boolean doRegisterVerify(RegisterBody registerBody) {
+    public void doRegisterVerify(RegisterBody registerBody) {
         if (checkCode(registerBody.getPhonenumber(), registerBody.getCode(), OauthVerificationUse.REGISTER)) {
             SysUser sysUser = new SysUser();
             sysUser.setUserName(registerBody.getPhonenumber());
             sysUser.setNickName(registerBody.getUsername());
             sysUser.setPassword(SecurityUtils.encryptPassword(registerBody.getPassword()));
             sysUser.setPhonenumber(registerBody.getPhonenumber());
-            return userService.registerUser(sysUser);
+            userService.registerUser(sysUser);
         } else {
             throw new ServiceException("验证码错误");
         }
@@ -158,14 +158,14 @@ public class DySmsServiceImpl implements DySmsService {
         sendCode(loginBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.BIND);
     }
 
-    public int doBindVerify(LoginBody loginBody) {
+    public void doBindVerify(LoginBody loginBody) {
         if (checkCode(loginBody.getPhonenumber(), loginBody.getCode(), OauthVerificationUse.BIND)) {
             SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());
             if (!SecurityUtils.matchesPassword(loginBody.getPassword(), sysUser.getPassword())) {
                 throw new ServiceException("密码错误");
             }
             sysUser.setPhonenumber(loginBody.getPhonenumber());
-            return userService.updateUser(sysUser);
+            userService.updateUser(sysUser);
         } else {
             throw new ServiceException("验证码错误");
         }
