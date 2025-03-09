@@ -3,6 +3,7 @@ package com.ruoyi.pay.wx.service.Impl;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
@@ -22,6 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Service("wechatPayService")
+@ConditionalOnProperty(prefix = "pay.wechat", name = "enabled", havingValue = "true")
 public class WxPayService implements IWxPayService {
 
     @Autowired

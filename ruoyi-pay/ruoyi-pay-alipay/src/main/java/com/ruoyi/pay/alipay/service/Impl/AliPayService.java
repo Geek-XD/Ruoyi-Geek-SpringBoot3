@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import com.alipay.easysdk.factory.Factory;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Service("alipayPayService")
+@ConditionalOnProperty(prefix = "pay.alipay", name = "enabled", havingValue = "true")
 public class AliPayService implements IAliPayService {
     public void callback(Map<String, String> params) {
     }
