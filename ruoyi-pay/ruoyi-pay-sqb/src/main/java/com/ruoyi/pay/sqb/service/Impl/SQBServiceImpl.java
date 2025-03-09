@@ -15,16 +15,21 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.http.HttpClientUtil;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.pay.domain.PayOrder;
 import com.ruoyi.pay.sqb.config.SqbConfig;
+import com.ruoyi.pay.sqb.service.ISqbPayService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 @ConditionalOnProperty(prefix = "pay.sqb", name = "enabled", havingValue = "true")
-public class SQBServiceImpl {
+public class SQBServiceImpl implements ISqbPayService {
     @Autowired
     private SqbConfig sqbConfig;
 
@@ -115,12 +120,12 @@ public class SQBServiceImpl {
             String result = httpPost(url, params.toString(), sign, sqbConfig.getTerminalSn());
             JSONObject retObj = JSON.parseObject(result);
             String resCode = retObj.get("result_code").toString();
-            if (!"200".equals(resCode)){
+            if (!"200".equals(resCode)) {
                 return null;
             }
             String responseStr = retObj.get("biz_response").toString();
             JSONObject terminal = JSON.parseObject(responseStr);
-            if (terminal.get("terminal_sn") == null || terminal.get("terminal_key") == null){
+            if (terminal.get("terminal_sn") == null || terminal.get("terminal_key") == null) {
                 return null;
             }
             return terminal;
@@ -170,7 +175,7 @@ public class SQBServiceImpl {
             String result = httpPost(url, params, sign, sqbConfig.getTerminalSn());
             JSONObject retObj = JSON.parseObject(result);
             String resCode = retObj.get("result_code").toString();
-            if (!"200".equals(resCode)){
+            if (!"200".equals(resCode)) {
                 return null;
             }
             String responseStr = retObj.get("biz_response").toString();
@@ -180,11 +185,12 @@ public class SQBServiceImpl {
         }
     }
 
-    public String payUrl(PayOrder payOrder) throws UnsupportedEncodingException {
+    @Override
+    public String payUrl(PayOrder payOrder) {
         return payUrl(payOrder, null);
     }
 
-    public String payUrl(PayOrder payOrder, String notifyBaseUrl) throws UnsupportedEncodingException {
+    public String payUrl(PayOrder payOrder, String notifyBaseUrl) {
         if (payOrder.getRemark() == null) {
             payOrder.setRemark("支付");
         }
@@ -201,6 +207,7 @@ public class SQBServiceImpl {
                 orderNotifyUrl = "http://" + ServletUtils.getRequest().getServerName() + proxyPath + defaultNotifyUrl;
             }
         }
+
         String param = "" +
                 "client_sn=" + payOrder.getOrderNumber() +
                 "&notify_url=" + orderNotifyUrl +
@@ -209,16 +216,22 @@ public class SQBServiceImpl {
                 "&subject=" + payOrder.getRemark() +
                 "&terminal_sn=" + sqbConfig.getTerminalSn() +
                 "&total_amount=" + Long.valueOf(payOrder.getTotalAmount().toString());
-        String urlParam = "" +
-                "client_sn=" + payOrder.getOrderNumber() +
-                "&notify_url=" + URLEncoder.encode(orderNotifyUrl, "UTF-8") +
-                "&operator=" + URLEncoder.encode(payOrder.getCreateBy(), "UTF-8") +
-                "&return_url=" + "https://www.shouqianba.com/" +
-                "&subject=" + URLEncoder.encode(payOrder.getRemark(), "UTF-8") +
-                "&terminal_sn=" + sqbConfig.getTerminalSn() +
-                "&total_amount=" + Long.valueOf(payOrder.getTotalAmount().toString());
-        String sign = getSign(param + "&key=" + sqbConfig.getTerminalKey());
-        return "https://qr.shouqianba.com/gateway?" + urlParam + "&sign=" + sign.toUpperCase();
+        String urlParam;
+        try {
+            urlParam = "" +
+                    "client_sn=" + payOrder.getOrderNumber() +
+                    "&notify_url=" + URLEncoder.encode(orderNotifyUrl, "UTF-8") +
+                    "&operator=" + URLEncoder.encode(payOrder.getCreateBy(), "UTF-8") +
+                    "&return_url=" + "https://www.shouqianba.com/" +
+                    "&subject=" + URLEncoder.encode(payOrder.getRemark(), "UTF-8") +
+                    "&terminal_sn=" + sqbConfig.getTerminalSn() +
+                    "&total_amount=" + Long.valueOf(payOrder.getTotalAmount().toString());
+
+            String sign = getSign(param + "&key=" + sqbConfig.getTerminalKey());
+            return "https://qr.shouqianba.com/gateway?" + urlParam + "&sign=" + sign.toUpperCase();
+        } catch (Exception e) {
+            throw new ServiceException("生成收钱吧支付链接失败");
+        }
     }
 
     /**
@@ -266,6 +279,12 @@ public class SQBServiceImpl {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public void notify(HttpServletRequest servletRequest, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'notify'");
     }
 
 }

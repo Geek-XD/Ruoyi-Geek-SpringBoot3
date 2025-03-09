@@ -78,9 +78,6 @@ public class SQBController extends BaseController {
         // 验签
         // 修改订单状态
         // 用户自定义行为
-        if (sqbPayService != null) {
-            sqbPayService.callback(jsonObject);
-        }
         return AjaxResult.success();
     }
 
