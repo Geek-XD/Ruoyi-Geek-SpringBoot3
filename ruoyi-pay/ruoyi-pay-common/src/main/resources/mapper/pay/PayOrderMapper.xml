@@ -3,21 +3,21 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.pay.mapper.PayOrderMapper">
-    
+
     <resultMap type="PayOrder" id="PayOrderResult">
-        <result property="orderId"    column="order_id"    />
-        <result property="orderNumber"    column="order_number"    />
-        <result property="thirdNumber"    column="third_number"    />
-        <result property="orderStatus"    column="order_status"    />
-        <result property="totalAmount"    column="total_amount"    />
-        <result property="actualAmount"    column="actual_amount"    />
-        <result property="orderContent"    column="order_content"    />
-        <result property="orderMessage"    column="order_message"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateBy"    column="update_by"    />
-        <result property="updateTime"    column="update_time"    />
-        <result property="remark"    column="remark"    />
+        <result property="orderId" column="order_id" />
+        <result property="orderNumber" column="order_number" />
+        <result property="thirdNumber" column="third_number" />
+        <result property="orderStatus" column="order_status" />
+        <result property="totalAmount" column="total_amount" />
+        <result property="actualAmount" column="actual_amount" />
+        <result property="orderContent" column="order_content" />
+        <result property="orderMessage" column="order_message" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
     </resultMap>
 
     <sql id="selectPayOrderVo">
@@ -26,7 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectPayOrderList" parameterType="PayOrder" resultMap="PayOrderResult">
         <include refid="selectPayOrderVo"/>
-        <where>  
+        <where>
             <if test="orderNumber != null  and orderNumber != ''"> and order_number = #{orderNumber}</if>
             <if test="thirdNumber != null  and thirdNumber != ''"> and third_number = #{thirdNumber}</if>
             <if test="orderStatus != null  and orderStatus != ''"> and order_status = #{orderStatus}</if>
@@ -36,12 +36,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderMessage != null  and orderMessage != ''"> and order_message = #{orderMessage}</if>
         </where>
     </select>
-    
+
     <select id="selectPayOrderByOrderId" parameterType="Long" resultMap="PayOrderResult">
         <include refid="selectPayOrderVo"/>
         where pay_order.order_id = #{orderId}
     </select>
-        
+
+    <select id="selectPayOrderByOrderNumber" parameterType="String" resultMap="PayOrderResult">
+        <include refid="selectPayOrderVo"/>
+        where pay_order.order_number = #{orderNumber}
+    </select>
+
     <insert id="insertPayOrder" parameterType="PayOrder" useGeneratedKeys="true" keyProperty="orderId">
         insert into pay_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -57,7 +62,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="remark != null">remark,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="orderNumber != null">#{orderNumber},</if>
             <if test="thirdNumber != null">#{thirdNumber},</if>
@@ -71,7 +76,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updatePayOrder" parameterType="PayOrder">
