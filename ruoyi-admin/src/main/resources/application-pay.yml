@@ -27,5 +27,4 @@ pay:
     privateKeyPath: classpath:pay/wx/apiclient_key.pem
     merchantId: merchantId
     merchantSerialNumber: merchantSerialNumber
-
     notifyUrl: http://e2vca6.natappfree.cc/pay/wechat/notify

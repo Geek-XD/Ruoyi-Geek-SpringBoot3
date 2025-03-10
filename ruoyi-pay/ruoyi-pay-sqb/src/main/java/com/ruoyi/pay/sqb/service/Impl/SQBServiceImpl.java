@@ -195,9 +195,11 @@ public class SQBServiceImpl implements ISqbPayService {
             JSONObject retObj = JSON.parseObject(result);
             String resCode = retObj.get("result_code").toString();
             if (!"200".equals(resCode)) {
-                return null;
+                throw new ServiceException("查询支付订单失败");
+            } else {
+                JSONObject response = retObj.getJSONObject("biz_response");
+                System.out.println(response);
             }
-            // String responseStr = retObj.get("biz_response").toString();
             return payOrder;
         } catch (Exception e) {
             return null;
