@@ -28,17 +28,23 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.http.HttpClientUtil;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.pay.domain.PayOrder;
+import com.ruoyi.pay.service.IPayOrderService;
 import com.ruoyi.pay.sqb.config.SqbConfig;
 import com.ruoyi.pay.sqb.service.ISqbPayService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service("sqbPayService")
 @ConditionalOnProperty(prefix = "pay.sqb", name = "enabled", havingValue = "true")
 public class SQBServiceImpl implements ISqbPayService {
     @Autowired
     private SqbConfig sqbConfig;
+
+    @Autowired
+    private IPayOrderService payOrderService;
 
     /**
      * http POST 请求
@@ -146,7 +152,7 @@ public class SQBServiceImpl implements ISqbPayService {
      *
      * @return
      */
-    public String refund(PayOrder payOrder) {
+    public PayOrder refund(PayOrder payOrder) {
         String url = sqbConfig.getApiDomain() + "/upay/v2/refund";
         JSONObject params = new JSONObject();
         try {
@@ -158,8 +164,14 @@ public class SQBServiceImpl implements ISqbPayService {
 
             String sign = getSign(params.toString() + sqbConfig.getTerminalKey());
             String result = httpPost(url, params, sign, sqbConfig.getTerminalSn());
-
-            return result;
+            JSONObject retObj = JSON.parseObject(result);
+            JSONObject bizResponse = retObj.getJSONObject("biz_response");
+            if ("REFUNDED".equals(bizResponse.getString("order_status"))) {
+                payOrderService.updateStatus(payOrder.getOrderNumber(), "已退款");
+            } else {
+                log.error("退款失败");
+            }
+            return payOrder;
         } catch (Exception e) {
             return null;
         }
@@ -170,8 +182,8 @@ public class SQBServiceImpl implements ISqbPayService {
      *
      * @return
      */
-
-    public String query(PayOrder payOrder) {
+    @Override
+    public PayOrder query(PayOrder payOrder) {
         String url = sqbConfig.getApiDomain() + "/upay/v2/query";
         JSONObject params = new JSONObject();
         try {
@@ -185,8 +197,8 @@ public class SQBServiceImpl implements ISqbPayService {
             if (!"200".equals(resCode)) {
                 return null;
             }
-            String responseStr = retObj.get("biz_response").toString();
-            return responseStr;
+            // String responseStr = retObj.get("biz_response").toString();
+            return payOrder;
         } catch (Exception e) {
             return null;
         }

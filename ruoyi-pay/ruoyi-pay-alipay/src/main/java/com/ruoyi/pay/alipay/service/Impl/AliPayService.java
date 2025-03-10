@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import com.alipay.easysdk.factory.Factory;
+import com.alipay.easysdk.payment.common.models.AlipayTradeRefundResponse;
 import com.alipay.easysdk.payment.page.models.AlipayTradePagePayResponse;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.pay.alipay.service.IAliPayService;
@@ -63,14 +64,63 @@ public class AliPayService implements IAliPayService {
     }
 
     @Override
-    public String query(PayOrder payOrder) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+    public PayOrder query(PayOrder payOrder) {
+        try {
+            // 使用支付宝SDK查询订单状态
+            com.alipay.easysdk.payment.common.models.AlipayTradeQueryResponse response = Factory.Payment.Common()
+                    .query(payOrder.getOrderNumber());
+
+            // 根据查询结果更新订单状态
+            if ("10000".equals(response.code)) {
+                String tradeStatus = response.tradeStatus;
+                String orderStatus = "";
+
+                // 根据支付宝交易状态映射到系统订单状态
+                switch (tradeStatus) {
+                    case "TRADE_SUCCESS":
+                    case "TRADE_FINISHED":
+                        orderStatus = "已支付";
+                        break;
+                    case "WAIT_BUYER_PAY":
+                        orderStatus = "待支付";
+                        break;
+                    case "TRADE_CLOSED":
+                        orderStatus = "已关闭";
+                        break;
+                    default:
+                        orderStatus = "未知状态";
+                }
+
+                // 更新订单信息
+                payOrderService.updateStatus(payOrder.getOrderNumber(), orderStatus);
+            } else {
+                throw new ServiceException("查询支付宝订单失败：" + response.subMsg);
+            }
+
+            return payOrder;
+        } catch (Exception e) {
+            throw new ServiceException("查询支付宝订单异常：" + e.getMessage());
+        }
     }
 
     @Override
-    public String refund(PayOrder payOrder) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'refund'");
+    public PayOrder refund(PayOrder payOrder) {
+        try {
+            // 使用支付宝SDK进行退款
+            AlipayTradeRefundResponse response = Factory.Payment.Common().refund(
+                    payOrder.getOrderNumber(),
+                    payOrder.getActualAmount());
+
+            // 处理退款结果
+            if ("10000".equals(response.code)) {
+                payOrderService.updateStatus(payOrder.getOrderNumber(), "已退款");
+            } else {
+                throw new ServiceException("支付宝退款失败：" + response.subMsg);
+            }
+
+            return payOrder;
+        } catch (Exception e) {
+            throw new ServiceException("支付宝退款异常：" + e.getMessage());
+        }
     }
 }

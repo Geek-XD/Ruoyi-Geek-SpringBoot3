@@ -1,4 +1,7 @@
+# 当前支付模块写的并不完善，请根据自己的业务需求进行修改
+# 回调地址使用的内网穿透http://e2vca6.natappfree.cc
 pay:
+  # https://doc.shouqianba.com/zh-cn/
   sqb:
     enabled: false
     appId: "appId"
@@ -9,12 +12,14 @@ pay:
     vendorKey: "vendorKey"
     publicKey: classpath:pay/sqb/sqb_public_key.pem
     notifyUrl: http://e2vca6.natappfree.cc/pay/sqb/notify
+  # https://opendocs.alipay.com/open/02np95
   alipay:
     enabled: false
     appId: appid
     appPrivateKey: classpath:pay/alipay/alipay_private_key.pem
     alipayPublicKey: classpath:pay/alipay/alipay_public_key.pem
     notifyUrl: http://e2vca6.natappfree.cc/alipay/notify
+  # https://github.com/wechatpay-apiv3/wechatpay-java
   wechat:
     enabled: false
     appId: appid
@@ -22,5 +27,5 @@ pay:
     privateKeyPath: classpath:pay/wx/apiclient_key.pem
     merchantId: merchantId
     merchantSerialNumber: merchantSerialNumber
-    # 回调地址，此处使用的内网穿透http://e2vca6.natappfree.cc
+
     notifyUrl: http://e2vca6.natappfree.cc/pay/wechat/notify

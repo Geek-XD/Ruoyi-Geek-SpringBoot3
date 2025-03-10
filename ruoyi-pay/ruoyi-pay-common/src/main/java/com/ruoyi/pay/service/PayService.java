@@ -10,7 +10,7 @@ public interface PayService {
 
     String notify(HttpServletRequest servletRequest, HttpServletResponse response);
 
-    String query(PayOrder payOrder);
+    PayOrder query(PayOrder payOrder);
 
-    String refund(PayOrder payOrder);
+    PayOrder refund(PayOrder payOrder);
 }

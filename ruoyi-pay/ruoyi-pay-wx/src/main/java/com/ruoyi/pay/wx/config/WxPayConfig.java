@@ -16,6 +16,7 @@ import org.springframework.core.io.Resource;
 import com.wechat.pay.java.core.RSAAutoCertificateConfig;
 import com.wechat.pay.java.core.notification.NotificationParser;
 import com.wechat.pay.java.service.payments.nativepay.NativePayService;
+import com.wechat.pay.java.service.refund.RefundService;
 
 /**
  * 配置我们自己的信息
@@ -26,79 +27,54 @@ import com.wechat.pay.java.service.payments.nativepay.NativePayService;
 @ConditionalOnProperty(prefix = "pay.wechat", name = "enabled", havingValue = "true")
 public class WxPayConfig {
 
+    /** 商户号 */
     @Value("${pay.wechat.merchantId}")
-    private String wxchantId;
+    private String merchantId;
+
+    /** 商户证书序列号 */
     @Value("${pay.wechat.merchantSerialNumber}")
-    private String wxchantSerialNumber;
+    private String merchantSerialNumber;
+
+    /** 商户APIV3密钥 */
     @Value("${pay.wechat.apiV3Key}")
-    private String wxapiV3Key;
+    private String apiV3Key;
+
+    /** 商户API私钥路径 */
     @Value("${pay.wechat.privateKeyPath}")
-    private String wxcertPath;
+    private String privateKeyPath;
+
     @Value("${pay.wechat.appId}")
     private String appId;
+
     @Value("${pay.wechat.notifyUrl}")
     private String notifyUrl;
 
-    @Bean
-    public RSAAutoCertificateConfig wxpayBaseConfig() throws Exception {
-        return new RSAAutoCertificateConfig.Builder()
-                .merchantId(getWxchantId())
-                .privateKeyFromPath(getWxcertPath())
-                .merchantSerialNumber(getWxchantSerialNumber())
-                .apiV3Key(getWxapiV3Key())
-                .build();
+    public String getMerchantId() {
+        return merchantId;
     }
 
-    @Bean
-    public NativePayService nativePayService() throws Exception {
-        return new NativePayService.Builder().config(wxpayBaseConfig()).build();
+    public void setMerchantId(String merchantId) {
+        this.merchantId = merchantId;
     }
 
-    @Bean
-    public NotificationParser notificationParser() throws Exception {
-        return new NotificationParser(wxpayBaseConfig());
+    public String getMerchantSerialNumber() {
+        return merchantSerialNumber;
     }
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
-    public String getWxcertPath() throws Exception {
-        if (wxcertPath.startsWith("classpath:")) {
-            Resource resource = applicationContext.getResource(wxcertPath);
-            String tempFilePath = System.getProperty("java.io.tmpdir") + "/temp_wxcert.pem";
-            try (InputStream inputStream = resource.getInputStream()) {
-                Files.copy(inputStream, Paths.get(tempFilePath), StandardCopyOption.REPLACE_EXISTING);
-                wxcertPath = tempFilePath;
-            } catch (Exception e) {
-                Files.deleteIfExists(Paths.get(tempFilePath));
-                throw new RuntimeException("微信支付证书文件读取失败", e);
-            }
-        }
-        return wxcertPath;
+    public void setMerchantSerialNumber(String merchantSerialNumber) {
+        this.merchantSerialNumber = merchantSerialNumber;
     }
 
-    public String getWxchantId() {
-        return wxchantId;
+    public String getApiV3Key() {
+        return apiV3Key;
     }
 
-    public void setWxchantId(String wxchantId) {
-        this.wxchantId = wxchantId;
+    public void setApiV3Key(String apiV3Key) {
+        this.apiV3Key = apiV3Key;
     }
 
-    public String getWxchantSerialNumber() {
-        return wxchantSerialNumber;
-    }
-
-    public void setWxchantSerialNumber(String wxchantSerialNumber) {
-        this.wxchantSerialNumber = wxchantSerialNumber;
-    }
-
-    public String getWxapiV3Key() {
-        return wxapiV3Key;
-    }
-
-    public void setWxapiV3Key(String wxapiV3Key) {
-        this.wxapiV3Key = wxapiV3Key;
+    public void setPrivateKeyPath(String privateKeyPath) {
+        this.privateKeyPath = privateKeyPath;
     }
 
     public String getAppId() {
@@ -116,4 +92,48 @@ public class WxPayConfig {
     public void setNotifyUrl(String notifyUrl) {
         this.notifyUrl = notifyUrl;
     }
+
+    @Bean
+    public RSAAutoCertificateConfig wxpayBaseConfig() throws Exception {
+        return new RSAAutoCertificateConfig.Builder()
+                .merchantId(getMerchantId())
+                .privateKeyFromPath(getPrivateKeyPath())
+                .merchantSerialNumber(getMerchantSerialNumber())
+                .apiV3Key(getApiV3Key())
+                .build();
+    }
+
+    @Bean
+    public NativePayService nativePayService() throws Exception {
+        return new NativePayService.Builder().config(wxpayBaseConfig()).build();
+    }
+
+    @Bean
+    public RefundService refundService() throws Exception {
+        return new RefundService.Builder().config(wxpayBaseConfig()).build();
+    }
+
+    @Bean
+    public NotificationParser notificationParser() throws Exception {
+        return new NotificationParser(wxpayBaseConfig());
+    }
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    public String getPrivateKeyPath() throws Exception {
+        if (privateKeyPath.startsWith("classpath:")) {
+            Resource resource = applicationContext.getResource(privateKeyPath);
+            String tempFilePath = System.getProperty("java.io.tmpdir") + "/temp_wxcert.pem";
+            try (InputStream inputStream = resource.getInputStream()) {
+                Files.copy(inputStream, Paths.get(tempFilePath), StandardCopyOption.REPLACE_EXISTING);
+                privateKeyPath = tempFilePath;
+            } catch (Exception e) {
+                Files.deleteIfExists(Paths.get(tempFilePath));
+                throw new RuntimeException("微信支付证书文件读取失败", e);
+            }
+        }
+        return privateKeyPath;
+    }
+
 }

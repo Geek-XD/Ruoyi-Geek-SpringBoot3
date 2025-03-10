@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS `pay_order`;
 CREATE TABLE `pay_order`  (
   order_id         bigint          NOT NULL AUTO_INCREMENT    COMMENT '订单id',
   order_number     varchar(255)    NULL DEFAULT NULL          COMMENT '订单号',
+  third_number     varchar(255)    NULL DEFAULT NULL          COMMENT '第三方订单号',
   order_status     varchar(255)    NULL DEFAULT NULL          COMMENT '订单状态',
   total_amount     varchar(255)    NULL DEFAULT NULL          COMMENT '订单总金额',
   actual_amount    varchar(255)    NULL DEFAULT NULL          COMMENT '实际支付金额',

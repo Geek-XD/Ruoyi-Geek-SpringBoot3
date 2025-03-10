@@ -11,13 +11,20 @@ import com.ruoyi.pay.domain.PayOrder;
 import com.ruoyi.pay.service.IPayOrderService;
 import com.ruoyi.pay.wx.config.WxPayConfig;
 import com.ruoyi.pay.wx.service.IWxPayService;
+import com.wechat.pay.java.core.exception.ServiceException;
 import com.wechat.pay.java.core.notification.NotificationParser;
 import com.wechat.pay.java.core.notification.RequestParam;
+import com.wechat.pay.java.service.payments.model.Transaction;
+import com.wechat.pay.java.service.payments.model.Transaction.TradeStateEnum;
 import com.wechat.pay.java.service.payments.nativepay.NativePayService;
 import com.wechat.pay.java.service.payments.nativepay.model.Amount;
 import com.wechat.pay.java.service.payments.nativepay.model.PrepayRequest;
 import com.wechat.pay.java.service.payments.nativepay.model.PrepayResponse;
-import com.wechat.pay.java.service.wexinpayscoreparking.model.Transaction;
+import com.wechat.pay.java.service.payments.nativepay.model.QueryOrderByIdRequest;
+import com.wechat.pay.java.service.refund.RefundService;
+import com.wechat.pay.java.service.refund.model.CreateRequest;
+import com.wechat.pay.java.service.refund.model.Refund;
+import com.wechat.pay.java.service.refund.model.Status;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,9 +45,8 @@ public class WxPayService implements IWxPayService {
     @Autowired
     private NotificationParser notificationParser;
 
-    public void callback(Transaction transaction) {
-
-    }
+    @Autowired
+    private RefundService refundService;
 
     @Override
     public String payUrl(PayOrder payOrder) {
@@ -49,7 +55,7 @@ public class WxPayService implements IWxPayService {
         amount.setTotal(Integer.parseInt(payOrder.getActualAmount()));
         request.setAmount(amount);
         request.setAppid(wxPayAppConfig.getAppId());
-        request.setMchid(wxPayAppConfig.getWxchantId());
+        request.setMchid(wxPayAppConfig.getMerchantId());
         request.setDescription(payOrder.getOrderContent());
         request.setNotifyUrl(wxPayAppConfig.getNotifyUrl());
         request.setOutTradeNo(payOrder.getOrderNumber());
@@ -75,7 +81,7 @@ public class WxPayService implements IWxPayService {
             Transaction transaction = notificationParser.parse(requestParam, Transaction.class);
             String orderNumber = transaction.getOutTradeNo();
             String otherOrderNumber = transaction.getTransactionId();
-            String orderState = transaction.getTradeState();
+            TradeStateEnum orderState = transaction.getTradeState();
             System.out.println("orderNumber: " + orderNumber);
             System.out.println("otherOrderNumber: " + otherOrderNumber);
             System.out.println("orderState: " + orderState);
@@ -87,15 +93,32 @@ public class WxPayService implements IWxPayService {
     }
 
     @Override
-    public String query(PayOrder payOrder) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+    public PayOrder query(PayOrder payOrder) {
+        QueryOrderByIdRequest queryRequest = new QueryOrderByIdRequest();
+        queryRequest.setMchid(wxPayAppConfig.getMerchantId());
+        queryRequest.setTransactionId(payOrder.getOrderNumber());
+        try {
+            Transaction result = nativePayService.queryOrderById(queryRequest);
+            System.out.println(result.getTradeState());
+        } catch (ServiceException e) {
+            System.out.printf("code=[%s], message=[%s]\n", e.getErrorCode(), e.getErrorMessage());
+            System.out.printf("reponse body=[%s]\n", e.getResponseBody());
+        }
+        return payOrder;
     }
 
     @Override
-    public String refund(PayOrder payOrder) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'refund'");
+    public PayOrder refund(PayOrder payOrder) {
+        CreateRequest request = new CreateRequest();
+        request.setTransactionId(payOrder.getOrderNumber());
+        request.setOutRefundNo(payOrder.getOrderNumber());
+        request.setOutTradeNo(payOrder.getOrderNumber());
+        Refund refund = refundService.create(request);
+        Status status = refund.getStatus();
+        if (status.equals(Status.SUCCESS)) {
+            payOrderService.updateStatus(payOrder.getOrderNumber(), "已退款");
+        }
+        return payOrder;
     }
 
 }

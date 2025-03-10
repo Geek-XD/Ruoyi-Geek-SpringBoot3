@@ -1,5 +1,6 @@
 package com.ruoyi.auth.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +17,26 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 
+import jakarta.annotation.PostConstruct;
+
 @RestController
-@RequestMapping("/auth/<channel>") // dySms mail
+@RequestMapping("/auth/{channel}") // dySms mail
 public class TfaController extends BaseController {
 
-    @Autowired
+    @Autowired(required = false)
     Map<String, TfaService> tfaServiceMap;
+
+    @PostConstruct
+    public void init() {
+        if (tfaServiceMap == null) {
+            tfaServiceMap = new HashMap<>();
+            logger.warn("请注意，没有加载任何双认证服务");
+        } else {
+            tfaServiceMap.forEach((k, v) -> {
+                logger.info("已加载双认证服务 {}", k);
+            });
+        }
+    }
 
     @PostMapping("/send/bind")
     public AjaxResult send(@PathVariable String channel, @RequestBody LoginBody loginBody) {

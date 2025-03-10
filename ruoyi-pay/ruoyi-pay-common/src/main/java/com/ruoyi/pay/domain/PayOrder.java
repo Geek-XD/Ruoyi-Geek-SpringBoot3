@@ -23,9 +23,14 @@ public class PayOrder extends BaseEntity {
     private Long orderId;
 
     /** 订单号 */
-    @Schema(title = "订单号")
-    @Excel(name = "订单号")
+    @Schema(title = "商户订单号")
+    @Excel(name = "商户订单号")
     private String orderNumber;
+
+    /** 第三方订单号 */
+    @Schema(title = "第三方订单号")
+    @Excel(name = "第三方订单号")
+    private String thirdNumber;
 
     /** 订单状态 */
     @Schema(title = "订单状态")
@@ -66,6 +71,14 @@ public class PayOrder extends BaseEntity {
 
     public String getOrderNumber() {
         return orderNumber;
+    }
+
+    public void setThirdNumber(String thirdNumber) {
+        this.thirdNumber = thirdNumber;
+    }
+
+    public String getThirdNumber() {
+        return thirdNumber;
     }
 
     public void setOrderStatus(String orderStatus) {
