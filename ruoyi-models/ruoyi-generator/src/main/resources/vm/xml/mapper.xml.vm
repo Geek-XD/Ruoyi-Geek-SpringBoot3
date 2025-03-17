@@ -87,7 +87,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 #if($table.haveSubColumn  == '1')
         where ${pkColumn.columnName} = #{${pkColumn.javaField}}
 #else
-        where ${tableName}.${pkColumn.columnName} = #{${pkColumn.javaField}}
+#set($tableAlias=$table.tableAlias)
+        where ${tableAlias}.${pkColumn.columnName} = #{${pkColumn.javaField}}
 #end
 #elseif($table.sub)
         select#foreach($column in $columns) a.$column.columnName#if($foreach.count != $columns.size()),#end#end,
