@@ -10,14 +10,19 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.auth.common.enums.OauthVerificationUse;
 import com.ruoyi.auth.common.utils.RandomCodeUtil;
 import com.ruoyi.common.constant.CacheConstants;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.CacheUtils;
+import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.manager.AsyncManager;
+import com.ruoyi.framework.manager.factory.AsyncFactory;
+import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.framework.web.service.UserDetailsServiceImpl;
 import com.ruoyi.system.service.ISysUserService;
@@ -33,6 +38,8 @@ public class MailServiceImpl implements IMailService {
     private TokenService tokenService;
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
+    @Autowired
+    private SysLoginService sysLoginService;
 
     private static final Logger log = LoggerFactory.getLogger(MailServiceImpl.class);
 
@@ -65,30 +72,25 @@ public class MailServiceImpl implements IMailService {
         return isValid;
     }
 
-    public void doLogin(LoginBody loginBody, boolean isRegister) {
+    public void doLogin(LoginBody loginBody) {
         SysUser sysUser = userService.selectUserByEmail(loginBody.getEmail());
-        if (sysUser == null && !isRegister) {
+        if (sysUser == null) {
             throw new ServiceException("该邮箱未绑定用户");
         } else {
             sendCode(loginBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.LOGIN);
         }
     }
 
-    public String doLoginVerify(LoginBody loginBody, boolean isRegister) {
+    public String doLoginVerify(LoginBody loginBody) {
         if (checkCode(loginBody.getEmail(), loginBody.getCode(), OauthVerificationUse.LOGIN)) {
             SysUser sysUser = userService.selectUserByEmail(loginBody.getEmail());
             if (sysUser == null) {
-                if (isRegister) {
-                    sysUser = new SysUser();
-                    sysUser.setUserName(loginBody.getEmail());
-                    sysUser.setPassword(SecurityUtils.encryptPassword(RandomCodeUtil.code(16)));
-                    sysUser.setEmail(loginBody.getEmail());
-                    userService.registerUser(sysUser);
-                } else {
-                    throw new ServiceException("该邮箱未绑定用户");
-                }
+                throw new ServiceException("该邮箱未绑定用户");
             }
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getUserName(), Constants.LOGIN_SUCCESS,
+                    MessageUtils.message("user.login.success")));
             LoginUser loginUser = (LoginUser) userDetailsServiceImpl.createLoginUser(sysUser);
+            sysLoginService.recordLoginInfo(loginUser.getUserId());
             return tokenService.createToken(loginUser);
         } else {
             throw new ServiceException("验证码错误");
@@ -112,6 +114,8 @@ public class MailServiceImpl implements IMailService {
             sysUser.setPassword(SecurityUtils.encryptPassword(registerBody.getPassword()));
             sysUser.setEmail(registerBody.getEmail());
             userService.registerUser(sysUser);
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getUserName(), Constants.REGISTER,
+                    MessageUtils.message("user.register.success")));
         } else {
             throw new ServiceException("验证码错误");
         }

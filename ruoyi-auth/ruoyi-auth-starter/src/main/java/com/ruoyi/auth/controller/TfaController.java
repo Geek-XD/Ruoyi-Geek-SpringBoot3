@@ -67,4 +67,19 @@ public class TfaController extends BaseController {
         tfaService.doRegisterVerify(registerBody);
         return success();
     }
+
+    @PostMapping("/send/login")
+    @Anonymous
+    public AjaxResult sendLogin(@PathVariable String channel, @RequestBody LoginBody loginBody) {
+        TfaService tfaService = tfaServiceMap.get(channel + "AuthService");
+        tfaService.doLogin(loginBody);
+        return success();
+    }
+
+    @PostMapping("/verify/login")
+    @Anonymous
+    public AjaxResult verifyLogin(@PathVariable String channel, @RequestBody LoginBody loginBody) {
+        TfaService tfaService = tfaServiceMap.get(channel + "AuthService");
+        return success(tfaService.doLoginVerify(loginBody));
+    }
 }

@@ -11,4 +11,8 @@ public interface TfaService {
     public void doRegister(RegisterBody registerBody);
 
     public void doRegisterVerify(RegisterBody registerBody);
+
+    public void doLogin(LoginBody loginBody);
+
+    public String doLoginVerify(LoginBody loginBody);
 }
