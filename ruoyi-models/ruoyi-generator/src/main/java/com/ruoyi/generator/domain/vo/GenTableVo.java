@@ -28,6 +28,7 @@ public class GenTableVo extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /** 业务表 */
+    @Valid
     private GenTable table;
 
     /** 业务表的列 */
@@ -39,11 +40,9 @@ public class GenTableVo extends BaseEntity {
     private List<GenJoinTable> joinTablesMate;
 
     /** 参与关联的表 */
-    @Valid
     private Collection<GenTable> joinTables;
 
     /** 参与关联的列 */
-    @Valid
     private List<GenTableColumn> joinColumns;
 
     public List<GenTable> getAllGenTables() {
