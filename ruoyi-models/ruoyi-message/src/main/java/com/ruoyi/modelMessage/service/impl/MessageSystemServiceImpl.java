@@ -24,7 +24,8 @@ import com.ruoyi.modelMessage.mapper.MessageSystemMapper;
 import com.ruoyi.modelMessage.service.IMessageSystemService;
 import com.ruoyi.modelMessage.utils.MessageSystemUtils;
 import com.ruoyi.tfa.email.utils.EmailUtil;
-import com.ruoyi.tfa.phone.enums.DySmsTemplate;
+import com.ruoyi.tfa.phone.config.DySmsConfig;
+import com.ruoyi.tfa.phone.domain.DySmsTemplate;
 import com.ruoyi.tfa.phone.utils.DySmsUtil;
 
 /**
@@ -35,6 +36,9 @@ import com.ruoyi.tfa.phone.utils.DySmsUtil;
 public class MessageSystemServiceImpl implements IMessageSystemService {
 
     private static final Logger log = LoggerFactory.getLogger(MessageSystemServiceImpl.class);
+
+    @Autowired
+    private DySmsConfig dySmsConfig;
 
     @Autowired
     private MessageSystemMapper messageSystemMapper;
@@ -280,7 +284,7 @@ public class MessageSystemServiceImpl implements IMessageSystemService {
             String templateCode = (String) parsedParams.get("templateCode");
             DySmsTemplate dySmsTemplate = null;
             if (templateCode != null) {
-                dySmsTemplate = DySmsTemplate.toEnum(templateCode);
+                dySmsTemplate = dySmsConfig.getTemplate().get(templateCode);
                 Map<String, String> params = (Map<String, String>) parsedParams.get("params");
                 // 提取模板中的变量名并填充内置变量
                 List<String> variableNames = (List<String>) parsedParams.get("variableNames");

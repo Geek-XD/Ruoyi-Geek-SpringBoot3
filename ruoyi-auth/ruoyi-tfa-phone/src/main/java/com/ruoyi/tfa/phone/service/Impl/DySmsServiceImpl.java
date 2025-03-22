@@ -27,7 +27,7 @@ import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.framework.web.service.UserDetailsServiceImpl;
 import com.ruoyi.system.service.ISysUserService;
-import com.ruoyi.tfa.phone.enums.DySmsTemplate;
+import com.ruoyi.tfa.phone.config.DySmsConfig;
 import com.ruoyi.tfa.phone.service.DySmsService;
 import com.ruoyi.tfa.phone.utils.DySmsUtil;
 
@@ -48,6 +48,8 @@ public class DySmsServiceImpl implements DySmsService {
     private TokenService tokenService;
     @Autowired
     private SysLoginService sysLoginService;
+    @Autowired
+    private DySmsConfig dySmsConfig;
 
     private static final Logger log = LoggerFactory.getLogger(DySmsServiceImpl.class);
 
@@ -60,7 +62,7 @@ public class DySmsServiceImpl implements DySmsService {
         try {
             JSONObject templateParams = new JSONObject();
             templateParams.put("code", code);
-            DySmsUtil.sendSms(DySmsTemplate.Test_TEMPLATE_CODE, templateParams, phone);
+            DySmsUtil.sendSms(dySmsConfig.getTemplate().get("VerificationCode"), templateParams, phone);
             CacheUtils.put(CacheConstants.PHONE_CODES, use.getValue() + phone, code, 1, TimeUnit.MINUTES);
             log.info("发送手机验证码成功:{ phone: " + phone + " code:" + code + "}");
             return true;

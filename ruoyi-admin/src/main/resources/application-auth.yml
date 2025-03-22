@@ -13,10 +13,20 @@ oauth:
 tfa:
   phone:
     dysms:
-      # 阿里云短信 AccessKey ID
-      appId: appId
-      # 阿里云短信 AccessKey Secret
-      appSecret: appSecret
+      # 阿里云 AccessKey ID
+      accessKeyId: appId
+      # 阿里云 AccessKey Secret
+      accessKeySecret: appSecret
+      # 短信模板
+      template:
+          VerificationCode:
+            # 短信模板编码
+            templateCode: SMS_123456789
+            # 短信签名
+            signName: 阿里云短信测试
+            # 短信模板必需的数据名称，多个key以逗号分隔，此处配置作为校验
+            keys: code
+
 
 spring:
   mail:

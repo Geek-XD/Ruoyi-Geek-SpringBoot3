@@ -14,7 +14,7 @@ import com.aliyun.teautil.models.RuntimeOptions;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.tfa.phone.config.DySmsConfig;
-import com.ruoyi.tfa.phone.enums.DySmsTemplate;
+import com.ruoyi.tfa.phone.domain.DySmsTemplate;
 
 public class DySmsUtil {
     protected final static Logger logger = LoggerFactory.getLogger(DySmsUtil.class);
