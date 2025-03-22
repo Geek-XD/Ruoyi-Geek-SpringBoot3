@@ -13,24 +13,21 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.oauth.wx.constant.WxMiniAppConstant;
-import com.ruoyi.oauth.wx.constant.WxPubConstant;
-import com.ruoyi.oauth.wx.service.Impl.WxLoginServiceImpl;
+import com.ruoyi.oauth.wx.service.Impl.WxMiniAppLoginServiceImpl;
+import com.ruoyi.oauth.wx.service.Impl.WxPubLoginServiceImpl;
 
 @RestController
 @RequestMapping("/oauth/wx")
 public class WxLoginController extends BaseController {
-    @Autowired
-    public WxPubConstant wxH5AppConstant;
 
     @Autowired
-    public WxMiniAppConstant wxMiniAppConstant;
-
-    @Autowired
-    private WxLoginServiceImpl wxLoginServiceImpl;
+    private WxMiniAppLoginServiceImpl wxMiniAppLoginServiceImpl;
 
     @Autowired
     private IOauthUserService oauthUserService;
+
+    @Autowired
+    private WxPubLoginServiceImpl wxPubLoginServiceImpl;
 
     @Anonymous
     @PostMapping("/login/{source}/{code}")
@@ -38,10 +35,9 @@ public class WxLoginController extends BaseController {
         String token = null;
         AjaxResult ajax = AjaxResult.success();
         if ("miniapp".equals(source)) {
-            token = wxLoginServiceImpl.doLoginMiniApp(code);
-
+            token = wxMiniAppLoginServiceImpl.doLogin(code);
         } else if ("pub".equals(source)) {
-            token = wxLoginServiceImpl.doLoginPub(code);
+            token = wxPubLoginServiceImpl.doLogin(code);
         } else {
             return error("错误的登录方式");
         }
@@ -60,9 +56,9 @@ public class WxLoginController extends BaseController {
             oauthUser.setUserId(getUserId());
             oauthUser.setCode(code);
             if ("miniapp".equals(source)) {
-                msg = wxLoginServiceImpl.doRegisterMiniApp(oauthUser);
+                msg = wxMiniAppLoginServiceImpl.doRegister(oauthUser);
             } else if ("pub".equals(source)) {
-                msg = wxLoginServiceImpl.doRegisterPub(oauthUser);
+                msg = wxPubLoginServiceImpl.doRegister(oauthUser);
             } else {
                 return error("错误的注册方式");
             }
