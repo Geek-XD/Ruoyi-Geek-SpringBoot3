@@ -48,7 +48,7 @@ public class PermitAllUrlProperties implements InitializingBean, ApplicationCont
 
     @Override
     public void afterPropertiesSet() {
-        RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
+        RequestMappingHandlerMapping mapping = applicationContext.getBean("requestMappingHandlerMapping",RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
         String matching = SpringUtils.getRequiredProperty("spring.mvc.pathmatch.matching-strategy").toLowerCase();
         map.keySet()
