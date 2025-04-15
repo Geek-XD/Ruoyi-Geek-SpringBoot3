@@ -3,15 +3,14 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>ruoyi</artifactId>
-        <groupId>com.ruoyi</groupId>
-        <version>3.8.8.3.1</version>
+        <groupId>com.ruoyi.geekxd</groupId>
+        <version>3.8.9-G</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ruoyi-middleware</artifactId>
 
     <properties>
-        <minio.version>8.2.1</minio.version>
     </properties>
 
     <description>
@@ -20,34 +19,15 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Minio 文件存储 -->
             <dependency>
-                <groupId>io.minio</groupId>
-                <artifactId>minio</artifactId>
-                <version>${minio.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-middleware-minio</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-middleware-redis</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-middleware-rabbitmq</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-middleware-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
@@ -56,7 +36,6 @@
 
 
     <modules>
-        <module>ruoyi-middleware-minio</module>
         <module>ruoyi-middleware-redis</module>
         <module>ruoyi-middleware-rabbitmq</module>
         <module>ruoyi-middleware-starter</module>

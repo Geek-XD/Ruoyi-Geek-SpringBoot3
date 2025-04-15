@@ -3,8 +3,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>ruoyi</artifactId>
-        <groupId>com.ruoyi</groupId>
-        <version>3.8.8.3.1</version>
+        <groupId>com.ruoyi.geekxd</groupId>
+        <version>3.8.9-G</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -35,36 +35,29 @@
 
             <!-- 支付基础模块 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-pay-common</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 收钱吧支付 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-pay-sqb</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 支付宝支付 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-pay-alipay</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 微信支付 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-pay-wx</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <!-- 第三方支付启动器 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-pay-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
         </dependencies>

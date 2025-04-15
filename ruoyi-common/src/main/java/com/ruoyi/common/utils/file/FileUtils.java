@@ -1,7 +1,5 @@
 package com.ruoyi.common.utils.file;
 
-import static com.ruoyi.common.utils.file.FileOperateUtils.*;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,6 +23,7 @@ import com.ruoyi.common.exception.file.FileSizeLimitExceededException;
 import com.ruoyi.common.exception.file.InvalidExtensionException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.common.utils.uuid.Seq;
 import com.ruoyi.common.utils.uuid.UUID;
@@ -44,6 +43,8 @@ public class FileUtils {
      * 默认的文件名最大长度 100
      */
     public static final int DEFAULT_FILE_NAME_LENGTH = 100;
+    public static final long DEFAULT_MAX_SIZE = Long.valueOf(SpringUtils.getRequiredProperty("ruoyi.fileMaxSize"))
+            * 1024 * 1024;
 
     /**
      * 输出指定文件的byte数组
@@ -301,7 +302,7 @@ public class FileUtils {
     public static final String getPathFileName(String filePath) throws IOException {
         int dirLastIndex = RuoYiConfig.getProfile().length() + 1;
         String currentDir = StringUtils.substring(filePath, dirLastIndex);
-        return Constants.RESOURCE_PREFIX + "/" + currentDir;
+        return Constants.RESOURCE_PREFIX + "/" + filePath.replace("\\", "/");
     }
 
     /**
@@ -372,7 +373,7 @@ public class FileUtils {
 
     public static final String getRelativePath(String filePath) {
         Path absolute = Paths.get(filePath);
-        if (!absolute.isAbsolute()){
+        if (!absolute.isAbsolute()) {
             return filePath;
         }
         Path root = absolute.getRoot();

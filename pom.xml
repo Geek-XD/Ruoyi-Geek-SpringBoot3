@@ -3,16 +3,16 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ruoyi</groupId>
+    <groupId>com.ruoyi.geekxd</groupId>
     <artifactId>ruoyi</artifactId>
-    <version>3.8.8.3.1</version>
+    <version>3.8.9-G</version>
 
     <name>ruoyi</name>
     <url>https://gitee.com/geek-xd/ruoyi-geek-springboot3.git</url>
     <description>若依Geek管理系统</description>
 
     <properties>
-        <ruoyi.version>3.8.8.3.1</ruoyi.version>
+        <ruoyi.version>3.8.9-G</ruoyi.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
@@ -244,56 +244,63 @@
 
             <!-- 核心模块-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-framework</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 系统模块-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-system</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 通用工具-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-common</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 集成第三方登录启动器 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-auth-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 集成支付启动器 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-pay-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 插件启动器 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-plugins-starter</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- file-->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-file-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 中间件启动器  -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-middleware-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 模块启动器 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-models-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
@@ -307,6 +314,7 @@
         <module>ruoyi-common</module>
         <module>ruoyi-auth</module>
         <module>ruoyi-pay</module>
+        <module>ruoyi-file</module>
         <module>ruoyi-middleware</module>
         <module>ruoyi-plugins</module>
         <module>ruoyi-models</module>

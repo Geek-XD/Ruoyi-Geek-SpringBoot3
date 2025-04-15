@@ -4,8 +4,8 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>ruoyi-models</artifactId>
-        <groupId>com.ruoyi</groupId>
-        <version>3.8.8.3.1</version>
+        <groupId>com.ruoyi.geekxd</groupId>
+        <version>3.8.9-G</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,25 +19,25 @@
 
         <!-- 通用工具-->
         <dependency>
-            <groupId>com.ruoyi</groupId>
+            <groupId>com.ruoyi.geekxd</groupId>
             <artifactId>ruoyi-framework</artifactId>
         </dependency>
 
          <!-- 系统框架 -->
         <dependency>
-            <groupId>com.ruoyi</groupId>
+            <groupId>com.ruoyi.geekxd</groupId>
             <artifactId>ruoyi-common</artifactId>
         </dependency>
 
         <!-- 手机号认证 -->
          <dependency>
-            <groupId>com.ruoyi</groupId>
+            <groupId>com.ruoyi.geekxd</groupId>
             <artifactId>ruoyi-tfa-phone</artifactId>
         </dependency>
 
         <!-- 邮箱认证 -->
         <dependency>
-            <groupId>com.ruoyi</groupId>
+            <groupId>com.ruoyi.geekxd</groupId>
             <artifactId>ruoyi-tfa-email</artifactId>
         </dependency>
     </dependencies>

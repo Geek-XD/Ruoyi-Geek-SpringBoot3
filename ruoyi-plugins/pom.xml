@@ -3,8 +3,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>ruoyi</artifactId>
-        <groupId>com.ruoyi</groupId>
-        <version>3.8.8.3.1</version>
+        <groupId>com.ruoyi.geekxd</groupId>
+        <version>3.8.9-G</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,7 +14,6 @@
         <ehcache.version>3.10.8</ehcache.version>
         <mybatis-plus.version>3.5.8</mybatis-plus.version>
         <netty.version>4.1.112.Final</netty.version>
-        <oss.version>3.18.1</oss.version>
         <transactions.version>6.0.0</transactions.version>
     </properties>
 
@@ -38,47 +37,47 @@
 
             <!-- ruoyi-ehcache-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-ehcache</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- mybatis-jpa-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-mybatis-jpa</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- mybatis-plus-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-mybatis-plus</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- websocket -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-websocket</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- plugins-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-plugins-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-mybatis-interceptor</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-netty</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
@@ -89,26 +88,15 @@
                 <version>${netty.version}</version>
             </dependency>
 
-            <!-- alibaba-oss -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-alibaba-oss</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
 
             <!-- atomikos-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-atomikos</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
-            <!-- oss-->
-            <dependency>
-                <groupId>com.aliyun.oss</groupId>
-                <artifactId>aliyun-sdk-oss</artifactId>
-                <version>${oss.version}</version>
-            </dependency>
+
 
             <!-- atomikos分布式事务 -->
             <dependency>
@@ -129,7 +117,6 @@
         <module>ruoyi-plugins-starter</module>
         <module>ruoyi-mybatis-interceptor</module>
         <module>ruoyi-netty</module>
-        <module>ruoyi-alibaba-oss</module>
         <module>ruoyi-atomikos</module>
     </modules>
     <packaging>pom</packaging>

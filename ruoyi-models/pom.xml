@@ -3,8 +3,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>ruoyi</artifactId>
-        <groupId>com.ruoyi</groupId>
-        <version>3.8.8.3.1</version>
+        <groupId>com.ruoyi.geekxd</groupId>
+        <version>3.8.9-G</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,49 +18,42 @@
         <dependencies>
             <!-- 定时任务模块 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-quartz</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 代码生成模块 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-generator</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 在线开发模块 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-online</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <!-- 模块启动器 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-models-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 消息模块-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-message</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 手机号认证-->
            <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-tfa-phone</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 邮箱认证 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
+                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-tfa-email</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
