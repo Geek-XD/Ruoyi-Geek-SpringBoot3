@@ -39,7 +39,7 @@
         <!-- druid 的 xa暂时不支持 mysql 9.0.0+ 连接速度:8.3.0>8.2.0>8.4.0 -->
         <mysql.version>8.3.0</mysql.version>
         <postgresql.version>42.7.4</postgresql.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <jaxb-api.version>4.0.2</jaxb-api.version>
         <jaxb.version>4.0.5</jaxb.version>
         <springdoc.version>2.8.4</springdoc.version>
     </properties>
@@ -194,8 +194,8 @@
 
             <!-- jaxb 处理xml -->
             <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
                 <version>${jaxb-api.version}</version>
             </dependency>
             <dependency>
