@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.file.oss.alibaba.domain.AliOssFileVO;
 import com.ruoyi.file.oss.alibaba.utils.AliOssUtil;
@@ -20,6 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/oss")
 public class AliOssController {
 
+    @Anonymous
     @Operation(summary = "下载接口oss")
     @GetMapping("/{client}")
     public void downLoadFile(HttpServletResponse response,

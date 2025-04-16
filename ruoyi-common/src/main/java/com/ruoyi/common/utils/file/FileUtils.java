@@ -296,13 +296,18 @@ public class FileUtils {
     public static final String getPathFileName(String uploadDir, String fileName) throws IOException {
         int dirLastIndex = RuoYiConfig.getProfile().length() + 1;
         String currentDir = StringUtils.substring(uploadDir, dirLastIndex);
-        return Constants.RESOURCE_PREFIX + "/" + currentDir + "/" + fileName;
+        StringBuilder sb = new StringBuilder();
+        sb.append(Constants.RESOURCE_PREFIX)
+                .append("/").append(currentDir)
+                .append("/").append(fileName);
+        return sb.toString().replace("\\", "/");
     }
 
     public static final String getPathFileName(String filePath) throws IOException {
-        int dirLastIndex = RuoYiConfig.getProfile().length() + 1;
-        String currentDir = StringUtils.substring(filePath, dirLastIndex);
-        return Constants.RESOURCE_PREFIX + "/" + filePath.replace("\\", "/");
+        StringBuilder sb = new StringBuilder();
+        sb.append(Constants.RESOURCE_PREFIX)
+                .append("/").append(filePath);
+        return sb.toString().replace("\\", "/");
     }
 
     /**
@@ -371,14 +376,25 @@ public class FileUtils {
         return extension;
     }
 
+    /**
+     * 获取相对路径
+     *
+     * @param filePath 文件路径，可以是绝对路径或相对路径
+     * @return 相对路径，将反斜杠替换为斜杠，如果输入是绝对路径则去除根路径部分。
+     */
     public static final String getRelativePath(String filePath) {
         Path absolute = Paths.get(filePath);
         if (!absolute.isAbsolute()) {
-            return filePath;
+            if (filePath.startsWith("/") || filePath.startsWith("\\")) {
+                return filePath.replace("\\", "/").substring(1);
+            } else {
+                return filePath.replace("\\", "/");
+            }
         }
         Path root = absolute.getRoot();
         Path normalize = absolute.normalize();
-        return normalize.subpath(root.getNameCount(), normalize.getNameCount()).toString().replace("\\", "/");
+        String relativePath = normalize.subpath(root.getNameCount(), normalize.getNameCount()).toString();
+        return relativePath.replace("\\", "/");
     }
 
     public static final boolean isAbsolutePath(String path) {

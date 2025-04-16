@@ -18,8 +18,8 @@ public interface FileService {
     /**
      * 文件上传
      *
-     * @param file 文件对象
-     * @return 返回上传成功的文路径
+     * @param file 上传的文件
+     * @return 返回上传成功的文路径： datepath/date_uuid[0:4].extension
      * @throws Exception 比如读写文件出错时
      *
      */
@@ -31,8 +31,8 @@ public interface FileService {
      * 文件上传
      *
      * @param file     上传的文件
-     * @param fileName 上传文件的名称
-     * @return 返回上传成功的文路径
+     * @param fileName 指定上传文件的名称
+     * @return 返回上传成功的文路径: datepath/fileName
      * @throws Exception 比如读写文件出错时
      *
      */
@@ -43,25 +43,13 @@ public interface FileService {
     /**
      * 文件上传
      *
-     * @param filePath 上传的文件路径
-     * @param file     文件对象
-     * @return 返回上传成功的文路径
+     * @param filePath 指定上传文件的路径
+     * @param file     上传的文件
+     * @return 返回上传成功的文路径: filePath
      * @throws Exception 比如读写文件出错时
      *
      */
     public String upload(String filePath, MultipartFile file) throws Exception;
-
-    /**
-     * 文件上传
-     *
-     * @param baseDir  上传文件的根坐标
-     * @param filePath 文件路径
-     * @param file     文件对象
-     * @return 返回上传成功的文路径
-     * @throws Exception 比如读写文件出错时
-     *
-     */
-    public String upload(String baseDir, String filePath, MultipartFile file) throws Exception;
 
     /**
      * 文件下载

@@ -30,18 +30,13 @@ public class AliOssFileService implements FileService {
 
     @Override
     public String upload(String filePath, MultipartFile file) throws Exception {
-        return upload(aliOssConfig.getPrimary(), filePath, file);
-    }
-
-    @Override
-    public String upload(String baseDir, String filePath, MultipartFile file) throws Exception {
         String relativePath = null;
         if (FileUtils.isAbsolutePath(filePath)) {
             relativePath = FileUtils.getRelativePath(filePath);
         } else {
             relativePath = filePath;
         }
-        return AliOssUtil.uploadFile(baseDir, relativePath, file);
+        return AliOssUtil.uploadFile(aliOssConfig.getPrimary(), relativePath, file);
     }
 
     @Override

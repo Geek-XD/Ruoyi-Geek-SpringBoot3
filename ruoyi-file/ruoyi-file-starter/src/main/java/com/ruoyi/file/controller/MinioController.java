@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.file.minio.domain.MinioFileVO;
 import com.ruoyi.file.minio.utils.MinioUtil;
@@ -20,6 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/minio")
 public class MinioController {
 
+    @Anonymous
     @Operation(summary = "上传接口minio")
     @GetMapping("/{client}")
     public void downLoadFile(HttpServletResponse response,

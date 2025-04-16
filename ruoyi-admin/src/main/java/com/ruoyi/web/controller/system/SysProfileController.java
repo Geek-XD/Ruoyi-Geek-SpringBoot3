@@ -132,9 +132,10 @@ public class SysProfileController extends BaseController {
             LoginUser loginUser = getLoginUser();
             String extractPath = loginUser.getUsername() + File.separator + loginUser.getUserId();
             String fileName = "avatar." + FileUtils.getExtension(file);
-            String avatar = FileOperateUtils.upload(RuoYiConfig.getAvatarPath() + File.separator +extractPath, fileName, file,
+            String avatar = FileOperateUtils.upload(
+                    RuoYiConfig.getAvatarPath() + File.separator + extractPath + File.separator + fileName, file,
                     MimeTypeUtils.IMAGE_EXTENSION);
-            String url = serverConfig.getUrl()  + "/profile/avatar/" + extractPath + "/" + avatar;
+            String url = serverConfig.getUrl() + "/profile/avatar/" + extractPath + "/" + avatar;
             url = url.replace("\\", "/");
             if (userService.updateUserAvatar(loginUser.getUsername(), url)) {
                 AjaxResult ajax = AjaxResult.success();

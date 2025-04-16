@@ -17,10 +17,11 @@
     <dependencies>
 
         <!-- 通用工具-->
-		<dependency>
-			<groupId>com.ruoyi.geekxd</groupId>
-			<artifactId>ruoyi-file-common</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.ruoyi.geekxd</groupId>
+            <artifactId>ruoyi-file-common</artifactId>
+        </dependency>
+
         <!-- Minio 文件存储 -->
         <dependency>
             <groupId>io.minio</groupId>

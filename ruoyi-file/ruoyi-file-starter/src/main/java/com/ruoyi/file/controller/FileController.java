@@ -1,5 +1,6 @@
 package com.ruoyi.file.controller;
 
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,23 +73,28 @@ public class FileController {
             @RequestParam("fileName") String fileName,
             @RequestParam(name = "delete", defaultValue = "false") Boolean delete,
             HttpServletResponse response,
-            HttpServletRequest request) {
+            HttpServletRequest request) throws Exception {
+        OutputStream outputStream = response.getOutputStream();
         try {
             if (!FileUtils.checkAllowDownload(fileName)) {
                 throw new Exception(StringUtils.format("文件名称({})非法，不允许下载。 ", fileName));
             }
             String realFileName = System.currentTimeMillis() + fileName.substring(fileName.indexOf("_") + 1);
-            String filePath = RuoYiConfig.getDownloadPath() + fileName;
-
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, realFileName);
-            // FileUtils.writeBytes(filePath, response.getOutputStream());
-            FileOperateUtils.downLoad(filePath, response.getOutputStream());
+            FileOperateUtils.downLoad(fileName, outputStream);
             if (delete) {
                 FileOperateUtils.deleteFile(fileName);
             }
         } catch (Exception e) {
-            log.error("下载文件失败", e);
+            response.reset();
+            response.setContentType(MediaType.TEXT_HTML_VALUE);
+            response.setCharacterEncoding("UTF-8");
+            String errorMessage = "下载文件失败: " + e.getMessage();
+            outputStream.write(errorMessage.getBytes("UTF-8"));
+            outputStream.flush();
+        } finally {
+            outputStream.close();
         }
     }
 
@@ -103,12 +109,12 @@ public class FileController {
             // 上传文件路径
             // String filePath = RuoYiConfig.getUploadPath();
             // 上传并返回新文件名称
-            String fileName = FileOperateUtils.upload(file);
-            String url = getUrl() + fileName;
+            String uri = FileOperateUtils.upload(file);
+            String url = getUrl() + uri;
             AjaxResult ajax = AjaxResult.success();
             ajax.put("url", url);
-            ajax.put("fileName", fileName);
-            ajax.put("newFileName", FileUtils.getName(fileName));
+            ajax.put("fileName", uri);
+            ajax.put("newFileName", FileUtils.getName(uri));
             ajax.put("originalFilename", file.getOriginalFilename());
             return ajax;
         } catch (Exception e) {
@@ -160,15 +166,23 @@ public class FileController {
     public void resourceDownload(@Parameter(name = "resource", description = "资源名称") String resource,
             HttpServletRequest request, HttpServletResponse response)
             throws Exception {
+        OutputStream outputStream = response.getOutputStream();
         try {
             if (!FileUtils.checkAllowDownload(resource)) {
                 throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", resource));
             }
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, resource);
-            FileOperateUtils.downLoad(resource, response.getOutputStream());
+            FileOperateUtils.downLoad(resource, outputStream);
         } catch (Exception e) {
-            log.error("下载文件失败", e);
+            response.reset();
+            response.setContentType(MediaType.TEXT_HTML_VALUE);
+            response.setCharacterEncoding("UTF-8");
+            String errorMessage = "下载文件失败: " + e.getMessage();
+            outputStream.write(errorMessage.getBytes("UTF-8"));
+            outputStream.flush();
+        } finally {
+            outputStream.close();
         }
     }
 

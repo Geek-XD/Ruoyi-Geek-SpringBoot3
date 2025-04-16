@@ -8,17 +8,14 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.exception.file.FileNameLengthLimitExceededException;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.file.domain.FileEntity;
 import com.ruoyi.file.utils.FileOperateUtils;
@@ -35,32 +32,16 @@ public class DiskFileService implements FileService {
 
     @Override
     public String upload(String filePath, MultipartFile file) throws Exception {
-        return upload(RuoYiConfig.getProfile(), filePath, file);
-    }
-
-    @Override
-    public String upload(String baseDir, String filePath, MultipartFile file) throws Exception {
-        int fileNamelength = Objects.requireNonNull(file.getOriginalFilename()).length();
-        if (fileNamelength > FileUtils.DEFAULT_FILE_NAME_LENGTH) {
-            throw new FileNameLengthLimitExceededException(FileUtils.DEFAULT_FILE_NAME_LENGTH);
-        }
-        String absPath = getAbsoluteFile(baseDir + File.separator + filePath).getAbsolutePath();
+        String absPath = getAbsoluteFile(RuoYiConfig.getProfile() + File.separator + filePath).getAbsolutePath();
         file.transferTo(Paths.get(absPath));
         return getPathFileName(filePath);
     }
 
     @Override
     public InputStream downLoad(String filePath) throws Exception {
-        // 标准化路径
-        String normalizedPath = normalizeFilePath(filePath);
-
-        // 获取本地存储根路径
-        String localPath = RuoYiConfig.getProfile();
-
-        // 拼接完整路径，确保分隔符正确
-        String fullPath = localPath + File.separator + normalizedPath;
-
-        // 创建文件对象并检查
+        String normalizedPath = normalizeFilePath(filePath); // 标准化路径
+        String localPath = RuoYiConfig.getProfile(); // 获取本地存储根路径
+        String fullPath = localPath + File.separator + normalizedPath; // 拼接完整路径，确保分隔符正确
         File file = new File(fullPath);
         if (!file.exists()) {
             throw new FileNotFoundException("文件不存在: " + fullPath);
@@ -68,19 +49,20 @@ public class DiskFileService implements FileService {
         if (!file.isFile()) {
             throw new FileNotFoundException("不是有效的文件: " + fullPath);
         }
-
         return new FileInputStream(file);
     }
 
     @Override
     public boolean deleteFile(String filePath) throws Exception {
-        String relivatePath = StringUtils.substringAfter(filePath, Constants.RESOURCE_PREFIX);
-        String fileAbs = RuoYiConfig.getProfile() + relivatePath;
+        String normalizedPath = normalizeFilePath(filePath); // 标准化路径
+        String localPath = RuoYiConfig.getProfile(); // 获取本地存储根路径
+        String fullPath = localPath + File.separator + normalizedPath; // 拼接完整路径，确保分隔符正确
         boolean flag = false;
-        File file = new File(fileAbs);
+        File file = new File(fullPath);
         // 路径为文件且不为空则进行删除
         if (file.isFile() && file.exists()) {
             String md5 = Md5Utils.getMd5(file);
+            System.gc();
             flag = file.delete();
             if (flag) {
                 FileOperateUtils.deleteFileAndMd5ByMd5(md5);
