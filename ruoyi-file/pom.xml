@@ -11,7 +11,7 @@
     <artifactId>ruoyi-file</artifactId>
 
     <properties>
-        <oss.version>3.18.1</oss.version>
+        <aliyunoss.version>3.18.1</aliyunoss.version>
         <minio.version>8.2.1</minio.version>
     </properties>
 
@@ -36,7 +36,7 @@
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
-                <version>${oss.version}</version>
+                <version>${aliyunoss.version}</version>
             </dependency>
 
             <dependency>
