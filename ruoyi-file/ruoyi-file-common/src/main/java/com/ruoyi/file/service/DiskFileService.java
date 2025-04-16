@@ -34,7 +34,7 @@ public class DiskFileService implements FileService {
     public String upload(String filePath, MultipartFile file) throws Exception {
         String absPath = getAbsoluteFile(RuoYiConfig.getProfile() + File.separator + filePath).getAbsolutePath();
         file.transferTo(Paths.get(absPath));
-        return getPathFileName(filePath);
+        return getURL(filePath);
     }
 
     @Override
