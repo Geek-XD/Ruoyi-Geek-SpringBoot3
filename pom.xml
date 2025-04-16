@@ -27,14 +27,15 @@
         <fastjson.version>2.0.53</fastjson.version>
         <jackson.version>2.18.0</jackson.version>
         <oshi.version>6.6.6</oshi.version>
-        <commons.io.version>2.18.0</commons.io.version>
-        <commons.collections.version>3.2.2</commons.collections.version>
-        <poi.version>5.4.0</poi.version>
+        <commons.io.version>2.19.0</commons.io.version>
+        <commons.collections.version>4.4</commons.collections.version>
+        <poi.version>5.4.1</poi.version>
         <httpclient.version>4.5.14</httpclient.version>
-        <velocity.version>2.3</velocity.version>
+        <velocity.version>2.4.1</velocity.version>
         <jwt.version>0.12.6</jwt.version>
         <knife4j.version>4.5.0</knife4j.version>
         <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
+        <mybatis.version>3.5.16</mybatis.version>
         <!-- druid 的 xa暂时不支持 mysql 9.0.0+ 连接速度:8.3.0>8.2.0>8.4.0 -->
         <mysql.version>8.3.0</mysql.version>
         <postgresql.version>42.7.4</postgresql.version>
@@ -53,35 +54,6 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <!-- mybatis -->
-            <dependency>
-                <groupId>org.mybatis.spring.boot</groupId>
-                <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis-spring-boot.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis</artifactId>
-                <version>3.5.16</version>
-            </dependency>
-
-            <!-- jaxb 处理xml -->
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${jaxb-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>${jaxb.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-core</artifactId>
-                <version>${jaxb.version}</version>
             </dependency>
 
             <!-- Mysql驱动包 -->
@@ -113,11 +85,16 @@
                 <version>${jta.version}</version>
             </dependency>
 
-            <!-- 解析客户端操作系统、浏览器等 -->
+            <!-- mybatis -->
             <dependency>
-                <groupId>eu.bitwalker</groupId>
-                <artifactId>UserAgentUtils</artifactId>
-                <version>${bitwalker.version}</version>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
             </dependency>
 
             <!-- pagehelper 分页插件 -->
@@ -177,8 +154,8 @@
 
             <!-- collections工具类 -->
             <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
                 <version>${commons.collections.version}</version>
             </dependency>
 
@@ -213,6 +190,30 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-jackson</artifactId>
                 <version>${jwt.version}</version>
+            </dependency>
+
+            <!-- jaxb 处理xml -->
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+
+            <!-- 解析客户端操作系统、浏览器等 -->
+            <dependency>
+                <groupId>eu.bitwalker</groupId>
+                <artifactId>UserAgentUtils</artifactId>
+                <version>${bitwalker.version}</version>
             </dependency>
 
             <!-- 验证码 -->

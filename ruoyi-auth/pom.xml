@@ -11,7 +11,7 @@
     <artifactId>ruoyi-auth</artifactId>
 
     <properties>
-        <justauth.version>1.16.6</justauth.version>
+        <justauth.version>1.16.7</justauth.version>
         <alipay.version>3.7.4.ALL</alipay.version>
         <dysmsapi.version>3.1.1</dysmsapi.version>
     </properties>
