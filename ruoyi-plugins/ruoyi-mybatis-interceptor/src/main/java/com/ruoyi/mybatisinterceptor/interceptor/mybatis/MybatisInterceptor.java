@@ -45,16 +45,16 @@ public class MybatisInterceptor implements Interceptor {
 
    @PostConstruct
    public void init() {
-      preHandlerBeans = preHandlerBeans.stream()
-            .sorted((item1, item2) -> {
-               MybatisHandlerOrder ann1 = item1.getClass().getAnnotation(MybatisHandlerOrder.class);
-               MybatisHandlerOrder ann2 = item2.getClass().getAnnotation(MybatisHandlerOrder.class);
-               int a = ann1 == null ? 0 : ann1.value();
-               int b = ann2 == null ? 0 : ann2.value();
-               return a - b;
-            }).collect(Collectors.toList());
+      // 对处理器按注解排序
+      preHandlersChain = sortHandlers(preHandlerBeans);
+      afterHandlersChain = sortHandlers(afterHandlerBeans);
+   }
 
-      afterHandlersChain = afterHandlerBeans.stream()
+   /**
+    * 通用的处理器排序方法
+    */
+   private <T> List<T> sortHandlers(List<T> handlers) {
+      return handlers.stream()
             .sorted((item1, item2) -> {
                MybatisHandlerOrder ann1 = item1.getClass().getAnnotation(MybatisHandlerOrder.class);
                MybatisHandlerOrder ann2 = item2.getClass().getAnnotation(MybatisHandlerOrder.class);
