@@ -31,6 +31,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 @RestController
 public class CaptchaController {
+
     @Resource(name = "captchaProducer")
     private Producer captchaProducer;
 
@@ -52,8 +53,7 @@ public class CaptchaController {
             return ajax;
         }
         // 保存验证码信息
-        String uuid = IdUtils.simpleUUID();
-        String capStr = null, code = null;
+        String uuid = IdUtils.simpleUUID(), capStr = null, code = null;
         BufferedImage image = null;
         // 生成验证码
         String captchaType = RuoYiConfig.getCaptchaType();

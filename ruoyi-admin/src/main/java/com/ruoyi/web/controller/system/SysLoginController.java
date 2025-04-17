@@ -32,6 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "登录验证")
 @RestController
 public class SysLoginController {
+
     @Autowired
     private SysLoginService loginService;
 
@@ -55,7 +56,10 @@ public class SysLoginController {
     public AjaxResult login(@RequestBody LoginBody loginBody) {
         AjaxResult ajax = AjaxResult.success();
         // 生成令牌
-        String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
+        String token = loginService.login(
+                loginBody.getUsername(),
+                loginBody.getPassword(),
+                loginBody.getCode(),
                 loginBody.getUuid());
         ajax.put(Constants.TOKEN, token);
         return ajax;

@@ -35,8 +35,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @Tag(name = "系统访问记录")
 @RestController
 @RequestMapping("/monitor/logininfor")
-public class SysLogininforController extends BaseController
-{
+public class SysLogininforController extends BaseController {
+
     @Autowired
     private ISysLogininforService logininforService;
 
@@ -46,8 +46,7 @@ public class SysLogininforController extends BaseController
     @Operation(summary = "获取系统访问记录列表")
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysLogininfor logininfor)
-    {
+    public TableDataInfo list(SysLogininfor logininfor) {
         startPage();
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
         return getDataTable(list);
@@ -57,8 +56,7 @@ public class SysLogininforController extends BaseController
     @Log(title = "登录日志", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:export')")
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysLogininfor logininfor)
-    {
+    public void export(HttpServletResponse response, SysLogininfor logininfor) {
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
         ExcelUtil<SysLogininfor> util = new ExcelUtil<SysLogininfor>(SysLogininfor.class);
         util.exportExcel(response, list, "登录日志");
@@ -66,13 +64,12 @@ public class SysLogininforController extends BaseController
 
     @Operation(summary = "删除系统访问记录")
     @Parameters({
-        @Parameter(name = "infoIds", description = "记录id数组", required = true),
+            @Parameter(name = "infoIds", description = "记录id数组", required = true),
     })
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
     @Log(title = "登录日志", businessType = BusinessType.DELETE)
     @DeleteMapping("/{infoIds}")
-    public AjaxResult remove(@PathVariable( name = "infoIds" ) Long[] infoIds) 
-    {
+    public AjaxResult remove(@PathVariable(name = "infoIds") Long[] infoIds) {
         return toAjax(logininforService.deleteLogininforByIds(infoIds));
     }
 
@@ -80,21 +77,19 @@ public class SysLogininforController extends BaseController
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
     @Log(title = "登录日志", businessType = BusinessType.CLEAN)
     @DeleteMapping("/clean")
-    public AjaxResult clean()
-    {
+    public AjaxResult clean() {
         logininforService.cleanLogininfor();
         return success();
     }
 
     @Operation(summary = "账户解锁")
     @Parameters({
-        @Parameter(name = "userName", description = "用户名", required = true),
+            @Parameter(name = "userName", description = "用户名", required = true),
     })
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:unlock')")
     @Log(title = "账户解锁", businessType = BusinessType.OTHER)
     @GetMapping("/unlock/{userName}")
-    public AjaxResult unlock(@PathVariable("userName") String userName)
-    {
+    public AjaxResult unlock(@PathVariable("userName") String userName) {
         passwordService.clearLoginRecordCache(userName);
         return success();
     }

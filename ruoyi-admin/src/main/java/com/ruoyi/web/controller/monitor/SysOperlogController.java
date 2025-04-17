@@ -37,16 +37,15 @@ import jakarta.servlet.http.HttpServletResponse;
 @Tag(name = "操作日志记录")
 @RestController
 @RequestMapping("/monitor/operlog")
-public class SysOperlogController extends BaseController
-{
+public class SysOperlogController extends BaseController {
+
     @Autowired
     private ISysOperLogService operLogService;
 
     @Operation(summary = "获取操作日志记录列表")
     @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysOperLog operLog)
-    {
+    public TableDataInfo list(SysOperLog operLog) {
         startPage();
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
         return getDataTable(list);
@@ -56,8 +55,7 @@ public class SysOperlogController extends BaseController
     @Log(title = "操作日志", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('monitor:operlog:export')")
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysOperLog operLog)
-    {
+    public void export(HttpServletResponse response, SysOperLog operLog) {
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
         ExcelUtil<SysOperLog> util = new ExcelUtil<SysOperLog>(SysOperLog.class);
         util.exportExcel(response, list, "操作日志");
@@ -65,13 +63,12 @@ public class SysOperlogController extends BaseController
 
     @Operation(summary = "删除操作日志记录")
     @Parameters({
-        @Parameter(name = "operIds", description = "记录id数组", required = true),
+            @Parameter(name = "operIds", description = "记录id数组", required = true),
     })
     @Log(title = "操作日志", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermi('monitor:operlog:remove')")
     @DeleteMapping("/{operIds}")
-    public AjaxResult remove(@PathVariable( name = "operIds" ) Long[] operIds) 
-    {
+    public AjaxResult remove(@PathVariable(name = "operIds") Long[] operIds) {
         return toAjax(operLogService.deleteOperLogByIds(operIds));
     }
 
@@ -79,8 +76,7 @@ public class SysOperlogController extends BaseController
     @Log(title = "操作日志", businessType = BusinessType.CLEAN)
     @PreAuthorize("@ss.hasPermi('monitor:operlog:remove')")
     @DeleteMapping("/clean")
-    public AjaxResult clean()
-    {
+    public AjaxResult clean() {
         operLogService.cleanOperLog();
         return success();
     }
@@ -99,7 +95,8 @@ public class SysOperlogController extends BaseController
         result.put("failureStats", failureStats);
         result.put("statusStats", statusStats);
         result.put("moduleOperationStats", moduleOperationStats);
-        result.put("total", successStats.size() + failureStats.size() + statusStats.size() + moduleOperationStats.size());
+        result.put("total",
+                successStats.size() + failureStats.size() + statusStats.size() + moduleOperationStats.size());
         return R.ok(result);
     }
 }

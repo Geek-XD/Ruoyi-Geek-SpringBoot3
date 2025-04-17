@@ -74,4 +74,20 @@ public class SwaggerConfig {
 				.build();
 	}
 
+	@Bean
+	public GroupedOpenApi fileApi() {
+		return GroupedOpenApi.builder()
+				.group("文件模块")
+				.packagesToScan("com.ruoyi.file.controller")
+				.build();
+	}
+
+	@Bean
+	public GroupedOpenApi authApi() {
+		return GroupedOpenApi.builder()
+				.group("认证模块")
+				.packagesToScan("com.ruoyi.auth.controller")
+				.build();
+	}
+
 }

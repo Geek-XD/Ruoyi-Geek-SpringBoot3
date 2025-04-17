@@ -32,10 +32,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "缓存监控")
 @RestController
 @RequestMapping("/monitor/cache")
-public class CacheController
-{
+public class CacheController {
+
     private static String tmpCacheName = "";
-    
+
     private final static List<SysCache> caches = new ArrayList<SysCache>();
     {
         caches.add(new SysCache(CacheConstants.LOGIN_TOKEN_KEY, "用户信息"));
@@ -52,23 +52,20 @@ public class CacheController
         caches.add(new SysCache(CacheConstants.FILE_PATH_MD5_KEY, "md5-path"));
     }
 
-
     @Operation(summary = "获取缓存名列表")
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @GetMapping("/getNames")
-    public AjaxResult cache()
-    {
+    public AjaxResult cache() {
         return AjaxResult.success(caches);
     }
 
     @Operation(summary = "获取缓存键列表")
     @Parameters({
-        @Parameter(name = "cacheName", description = "缓存名称", required = true),
+            @Parameter(name = "cacheName", description = "缓存名称", required = true),
     })
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @GetMapping("/getKeys/{cacheName}")
-    public AjaxResult getCacheKeys(@PathVariable String cacheName)
-    {
+    public AjaxResult getCacheKeys(@PathVariable String cacheName) {
         tmpCacheName = cacheName;
         Set<String> keyset = CacheUtils.getkeys(cacheName);
         return AjaxResult.success(keyset);
@@ -76,19 +73,17 @@ public class CacheController
 
     @Operation(summary = "获取缓存值列表")
     @Parameters({
-        @Parameter(name = "cacheName", description = "缓存名称", required = true),
-        @Parameter(name = "cacheKey", description = "缓存键名", required = true)
+            @Parameter(name = "cacheName", description = "缓存名称", required = true),
+            @Parameter(name = "cacheKey", description = "缓存键名", required = true)
     })
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @GetMapping("/getValue/{cacheName}/{cacheKey}")
-    public AjaxResult getCacheValue(@PathVariable String cacheName, @PathVariable String cacheKey)
-    {
+    public AjaxResult getCacheValue(@PathVariable String cacheName, @PathVariable String cacheKey) {
         ValueWrapper valueWrapper = CacheUtils.get(cacheName, cacheKey);
         SysCache sysCache = new SysCache();
         sysCache.setCacheName(cacheName);
         sysCache.setCacheKey(cacheKey);
-        if (StringUtils.isNotNull(valueWrapper))
-        {
+        if (StringUtils.isNotNull(valueWrapper)) {
             sysCache.setCacheValue(Convert.toStr(valueWrapper.get(), ""));
         }
         return AjaxResult.success(sysCache);
@@ -96,34 +91,30 @@ public class CacheController
 
     @Operation(summary = "清除缓存")
     @Parameters({
-        @Parameter(name = "cacheName", description = "缓存名称", required = true)
+            @Parameter(name = "cacheName", description = "缓存名称", required = true)
     })
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @DeleteMapping("/clearCacheName/{cacheName}")
-    public AjaxResult clearCacheName(@PathVariable String cacheName)
-    {
+    public AjaxResult clearCacheName(@PathVariable String cacheName) {
         CacheUtils.clear(cacheName);
         return AjaxResult.success();
     }
 
     @Operation(summary = "清除缓存值")
     @Parameters({
-        @Parameter(name = "cacheKey", description = "缓存键名", required = true)
+            @Parameter(name = "cacheKey", description = "缓存键名", required = true)
     })
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @DeleteMapping("/clearCacheKey/{cacheKey}")
-    public AjaxResult clearCacheKey(@PathVariable String cacheKey)
-    {
+    public AjaxResult clearCacheKey(@PathVariable String cacheKey) {
         CacheUtils.removeIfPresent(tmpCacheName, cacheKey);
         return AjaxResult.success();
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @DeleteMapping("/clearCacheAll")
-    public AjaxResult clearCacheAll()
-    {
-        for (String cacheName : CacheUtils.getCacheManager().getCacheNames())
-        {
+    public AjaxResult clearCacheAll() {
+        for (String cacheName : CacheUtils.getCacheManager().getCacheNames()) {
             CacheUtils.clear(cacheName);
         }
         return AjaxResult.success();

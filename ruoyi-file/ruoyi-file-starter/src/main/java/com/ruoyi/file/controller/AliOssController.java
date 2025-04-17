@@ -15,8 +15,10 @@ import com.ruoyi.file.oss.alibaba.domain.AliOssFileVO;
 import com.ruoyi.file.oss.alibaba.utils.AliOssUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Tag(name = "AliOss文件存储")
 @RestController
 @RequestMapping("/oss")
 public class AliOssController {

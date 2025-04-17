@@ -15,8 +15,10 @@ import com.ruoyi.file.minio.domain.MinioFileVO;
 import com.ruoyi.file.minio.utils.MinioUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Tag(name = "Minio文件存储")
 @RestController
 @RequestMapping("/minio")
 public class MinioController {

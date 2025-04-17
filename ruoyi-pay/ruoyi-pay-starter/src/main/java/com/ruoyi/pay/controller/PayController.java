@@ -21,10 +21,12 @@ import com.ruoyi.pay.service.PayService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Tag(name = "支付业务")
 @RequestMapping("/pay/{channel}")
 @RestController
 public class PayController extends BaseController {
@@ -47,7 +49,7 @@ public class PayController extends BaseController {
     @Autowired
     private IPayOrderService payOrderService;
 
-    @Operation(summary = "微信支付")
+    @Operation(summary = "支付")
     @Parameters({
             @Parameter(name = "channel", description = "支付方式", required = true),
             @Parameter(name = "orderNumber", description = "订单号", required = true)
@@ -60,7 +62,7 @@ public class PayController extends BaseController {
     }
 
     @Anonymous
-    @Operation(summary = "微信支付查询订单")
+    @Operation(summary = "支付查询订单")
     @Parameters({
             @Parameter(name = "channel", description = "支付方式", required = true)
     })
@@ -84,6 +86,7 @@ public class PayController extends BaseController {
         return success(payService.query(payOrder));
     }
 
+    @Operation(summary = "退款")
     @PostMapping("/refund")
     @Parameters({
             @Parameter(name = "channel", description = "支付方式", required = true),

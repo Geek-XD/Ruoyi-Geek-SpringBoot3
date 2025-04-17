@@ -19,13 +19,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "服务器监控")
 @RestController
 @RequestMapping("/monitor/server")
-public class ServerController
-{
+public class ServerController {
+
     @Operation(summary = "获取服务器监控信息")
     @PreAuthorize("@ss.hasPermi('monitor:server:list')")
     @GetMapping()
-    public AjaxResult getInfo() throws Exception
-    {
+    public AjaxResult getInfo() throws Exception {
         Server server = new Server();
         server.copyTo();
         return AjaxResult.success(server);

@@ -40,6 +40,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/system/user/profile")
 public class SysProfileController extends BaseController {
+
     @Autowired
     private ISysUserService userService;
 

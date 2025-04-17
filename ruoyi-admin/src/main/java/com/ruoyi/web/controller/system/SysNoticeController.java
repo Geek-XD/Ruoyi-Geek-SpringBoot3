@@ -30,11 +30,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * 
  * @author ruoyi
  */
-@Tag(name = "公告" , description = "信息操作处理")
+@Tag(name = "公告", description = "信息操作处理")
 @RestController
 @RequestMapping("/system/notice")
-public class SysNoticeController extends BaseController
-{
+public class SysNoticeController extends BaseController {
+
     @Autowired
     private ISysNoticeService noticeService;
 
@@ -44,8 +44,7 @@ public class SysNoticeController extends BaseController
     @Operation(summary = "获取通知公告列表")
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysNotice notice)
-    {
+    public TableDataInfo list(SysNotice notice) {
         startPage();
         List<SysNotice> list = noticeService.selectNoticeList(notice);
         return getDataTable(list);
@@ -57,8 +56,7 @@ public class SysNoticeController extends BaseController
     @Operation(summary = "根据通知公告编号获取详细信息")
     @PreAuthorize("@ss.hasPermi('system:notice:query')")
     @GetMapping(value = "/{noticeId}")
-    public AjaxResult getInfo(@PathVariable( name = "noticeId" ) Long noticeId) 
-    {
+    public AjaxResult getInfo(@PathVariable(name = "noticeId") Long noticeId) {
         return success(noticeService.selectNoticeById(noticeId));
     }
 
@@ -69,8 +67,7 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:add')")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@Validated @RequestBody SysNotice notice)
-    {
+    public AjaxResult add(@Validated @RequestBody SysNotice notice) {
         notice.setCreateBy(getUsername());
         return toAjax(noticeService.insertNotice(notice));
     }
@@ -82,8 +79,7 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:edit')")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@Validated @RequestBody SysNotice notice)
-    {
+    public AjaxResult edit(@Validated @RequestBody SysNotice notice) {
         notice.setUpdateBy(getUsername());
         return toAjax(noticeService.updateNotice(notice));
     }
@@ -95,8 +91,7 @@ public class SysNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public AjaxResult remove(@PathVariable( name = "noticeIds" ) Long[] noticeIds) 
-    {
+    public AjaxResult remove(@PathVariable(name = "noticeIds") Long[] noticeIds) {
         return toAjax(noticeService.deleteNoticeByIds(noticeIds));
     }
 }
