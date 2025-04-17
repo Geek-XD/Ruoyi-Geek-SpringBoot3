@@ -22,9 +22,7 @@ spring:
           max-active: 8
           # #连接池最大阻塞等待时间（使用负值表示没有限制）
           max-wait: -1ms
-  #给项目来个名字
-  application:
-    name: ruoyi
+
   #配置rabbitMq 服务器
   rabbitmq:
     enable: false
@@ -33,18 +31,4 @@ spring:
     username: guest
     password: guest
 
-# Minio配置
-minio:
-  enable: false
-  primary: MASTER
-  client:
-    MASTER:
-      url: http://localhost:9000
-      accessKey:
-      secretKey:
-      bucketName: ruoyi
-    # SLAVE:
-    #   url: http://127.0.0.1:9000
-    #   accessKey:
-    #   secretKey:
-    #   bucketName: ry
+

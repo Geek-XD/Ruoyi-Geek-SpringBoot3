@@ -1,0 +1,26 @@
+# Minio配置
+minio:
+  enable: false
+  primary: MASTER
+  client:
+    MASTER:
+      url: http://localhost:9000
+      accessKey:
+      secretKey:
+      bucketName: ruoyi
+    # SLAVE:
+    #   url: http://127.0.0.1:9000
+    #   accessKey:
+    #   secretKey:
+    #   bucketName: ry
+
+# oss配置
+oss:
+  enable: false
+  primary: MASTER
+  client:
+    MASTER:
+      accessKeyId: 
+      accessKeySecret: 
+      bucketName: 
+      endpoint: 

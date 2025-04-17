@@ -103,7 +103,6 @@ public class SysAuthController extends BaseController
      * @param request
      * @return
      */
-    @SuppressWarnings("unchecked")
     @Anonymous
     @GetMapping("/social-login/{source}")
     public AjaxResult socialLogin(@PathVariable("source") String source, AuthCallback callback, HttpServletRequest request)
