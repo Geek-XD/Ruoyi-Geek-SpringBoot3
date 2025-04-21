@@ -93,14 +93,12 @@ public class DiskFileService implements FileService {
             String normalizedPath = normalizeFilePath(filePath);
             long expireTime = System.currentTimeMillis() + URL_EXPIRATION;
             String toHex = Md5Utils.hash(normalizedPath + expireTime);
-
-            // 构建访问URL
-            String urlString = getUrl() +
-                    "/common/download/resource?resource=" +
-                    normalizedPath +
-                    "&toHex=" + toHex +
-                    "&expires=" + expireTime;
-            return new URL(urlString);
+            StringBuilder sb = new StringBuilder();
+            sb.append(getUrl()).append("/common/download/resource")
+                    .append("?resource=").append(normalizedPath)
+                    .append("&toHex=").append(toHex)
+                    .append("&expires=").append(expireTime);
+            return new URL(sb.toString());
         } catch (Exception e) {
             throw new RuntimeException("生成访问URL失败: " + e.getMessage(), e);
         }
