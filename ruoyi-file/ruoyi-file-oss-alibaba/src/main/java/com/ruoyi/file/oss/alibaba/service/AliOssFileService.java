@@ -40,6 +40,11 @@ public class AliOssFileService implements FileService {
     }
 
     @Override
+    public String generatePublicURL(String filePath) {
+        return AliOssUtil.getURL(aliOssConfig.getPrimary(), filePath);
+    }
+
+    @Override
     public InputStream downLoad(String filePath) throws Exception {
         AliOssFileVO file = AliOssUtil.getFile(filePath);
         return file.getFileInputSteam();

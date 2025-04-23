@@ -1,11 +1,10 @@
 package com.ruoyi.file.service;
 
-import static com.ruoyi.common.utils.file.FileUtils.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 
@@ -16,6 +15,7 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.file.domain.FileEntity;
 import com.ruoyi.file.utils.FileOperateUtils;
@@ -32,9 +32,18 @@ public class DiskFileService implements FileService {
 
     @Override
     public String upload(String filePath, MultipartFile file) throws Exception {
-        String absPath = getAbsoluteFile(RuoYiConfig.getProfile() + File.separator + filePath).getAbsolutePath();
+        String absPath = FileUtils.getAbsoluteFile(RuoYiConfig.getProfile() + File.separator + filePath)
+                .getAbsolutePath();
         file.transferTo(Paths.get(absPath));
-        return getURL(filePath);
+        return generatePublicURL(filePath);
+    }
+
+    @Override
+    public String generatePublicURL(String filePath) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Constants.RESOURCE_PREFIX)
+                .append("/").append(filePath);
+        return sb.toString().replace("\\", "/");
     }
 
     @Override
@@ -96,9 +105,8 @@ public class DiskFileService implements FileService {
             StringBuilder sb = new StringBuilder();
             sb.append(getUrl()).append("/common/download/resource")
                     .append("?resource=").append(normalizedPath)
-                    .append("&toHex=").append(toHex)
-                    .append("&expires=").append(expireTime);
-            return new URL(sb.toString());
+                    .append("&toHex=").append(toHex);
+            return URI.create(sb.toString()).toURL();
         } catch (Exception e) {
             throw new RuntimeException("生成访问URL失败: " + e.getMessage(), e);
         }

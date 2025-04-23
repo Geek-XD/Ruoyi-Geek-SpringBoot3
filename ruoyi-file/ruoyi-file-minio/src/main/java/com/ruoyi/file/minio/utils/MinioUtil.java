@@ -12,7 +12,6 @@ import com.ruoyi.common.utils.uuid.UUID;
 import com.ruoyi.file.minio.config.MinioConfig;
 import com.ruoyi.file.minio.domain.MinioBucket;
 import com.ruoyi.file.minio.domain.MinioFileVO;
-import com.ruoyi.file.minio.exception.MinioClientErrorException;
 
 /**
  * Minio工具
@@ -67,16 +66,11 @@ public class MinioUtil {
      * @param filePath 文件路径
      * @return 返回上传成功的文件路径
      */
-    public static String getURL(String client, String filePath) throws Exception {
-        try {
-            StringBuilder url = new StringBuilder();
-            url.append(getMinioConfig().getPrefix()).append("/").append(client)
-                    .append("?").append("fileName=").append(filePath);
-            return url.toString();
-        } catch (Exception e) {
-            throw new MinioClientErrorException(e.getMessage());
-        }
-
+    public static String getURL(String client, String filePath) {
+        StringBuilder url = new StringBuilder();
+        url.append(getMinioConfig().getPrefix()).append("/").append(client)
+                .append("?").append("fileName=").append(filePath);
+        return url.toString();
     }
 
     /**
@@ -123,9 +117,7 @@ public class MinioUtil {
         return getMinioConfig().getBucket(client).get(filePath);
     }
 
-
-
-    public static URL generatePresignedUrl(String filePath) throws Exception{
+    public static URL generatePresignedUrl(String filePath) throws Exception {
         MinioBucket minioBucket = getMinioConfig().getMasterBucket();
         return minioBucket.generatePresignedUrl(filePath);
     }

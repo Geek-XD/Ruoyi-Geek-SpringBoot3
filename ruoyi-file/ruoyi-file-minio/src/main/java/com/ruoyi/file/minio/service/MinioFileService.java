@@ -31,7 +31,13 @@ public class MinioFileService implements FileService {
     @Override
     public String upload(String filePath, MultipartFile file) throws Exception {
         String relativePath = FileUtils.getRelativePath(filePath);
-        return MinioUtil.uploadFile(minioConfig.getPrimary(), relativePath, file);
+        MinioUtil.uploadFile(minioConfig.getPrimary(), relativePath, file);
+        return generatePublicURL(relativePath);
+    }
+
+    @Override
+    public String generatePublicURL(String filePath) {
+        return MinioUtil.getURL(minioConfig.getPrimary(), filePath);
     }
 
     @Override

@@ -70,6 +70,10 @@ public class FileOperateUtils {
         }
     }
 
+    public static final String generatePublicURL(String filePath) {
+        return fileService.generatePublicURL(filePath);
+    }
+
     /**
      * 根据文件路径上传
      *

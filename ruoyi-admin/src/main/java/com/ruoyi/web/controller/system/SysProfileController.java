@@ -21,7 +21,6 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.file.utils.FileOperateUtils;
-import com.ruoyi.framework.config.ServerConfig;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.service.ISysUserService;
 
@@ -43,9 +42,6 @@ public class SysProfileController extends BaseController {
 
     @Autowired
     private TokenService tokenService;
-
-    @Autowired
-    private ServerConfig serverConfig;
 
     /**
      * 个人信息
@@ -134,7 +130,7 @@ public class SysProfileController extends BaseController {
             String filepath = FileOperateUtils.upload(
                     "avatar/" + extractPath + "/" + fileName,
                     file, MimeTypeUtils.IMAGE_EXTENSION);
-            String url = "/profile/" + filepath;
+            String url = FileOperateUtils.generatePublicURL(filepath);
             if (userService.updateUserAvatar(loginUser.getUsername(), url)) {
                 AjaxResult ajax = AjaxResult.success();
                 ajax.put("imgUrl", url);

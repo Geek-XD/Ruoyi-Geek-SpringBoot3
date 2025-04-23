@@ -88,4 +88,12 @@ public interface FileService {
      * @throws Exception 如果生成过程中出现错误
      */
     public URL generatePresignedUrl(String filePath) throws Exception;
+
+    /**
+     * 获取文件公开访问URL
+     *
+     * @param filePath 文件路径
+     * @return 存储路径
+     */
+    public String generatePublicURL(String filePath);
 }

@@ -303,13 +303,6 @@ public class FileUtils {
         return sb.toString().replace("\\", "/");
     }
 
-    public static final String getURL(String filePath) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append(Constants.RESOURCE_PREFIX)
-                .append("/").append(filePath);
-        return sb.toString().replace("\\", "/");
-    }
-
     /**
      * 文件大小校验
      *

@@ -67,15 +67,11 @@ public class AliOssUtil {
      * @param filePath 文件路径
      * @return 返回上传成功的文件路径
      */
-    public static String getURL(String client, String filePath) throws Exception {
-        try {
-            StringBuilder url = new StringBuilder();
-            url.append(getAliOssConfig().getPrefix()).append("/").append(client)
-                    .append("?").append("fileName=").append(filePath);
-            return url.toString();
-        } catch (Exception e) {
-            throw new AliOssClientErrorException(e.getMessage());
-        }
+    public static String getURL(String client, String filePath) {
+        StringBuilder url = new StringBuilder();
+        url.append(getAliOssConfig().getPrefix()).append("/").append(client)
+                .append("?").append("fileName=").append(filePath);
+        return url.toString();
     }
 
     /**

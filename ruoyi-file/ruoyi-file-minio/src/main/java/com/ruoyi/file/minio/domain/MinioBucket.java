@@ -2,6 +2,7 @@ package com.ruoyi.file.minio.domain;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -109,6 +110,7 @@ public class MinioBucket {
                 .object(filePath)
                 .expiry(1, TimeUnit.HOURS) // 设置过期时间为1小时
                 .build();
-        return new URL(client.getPresignedObjectUrl(request));
+        String urlString = client.getPresignedObjectUrl(request);
+        return URI.create(urlString).toURL();
     }
 }
