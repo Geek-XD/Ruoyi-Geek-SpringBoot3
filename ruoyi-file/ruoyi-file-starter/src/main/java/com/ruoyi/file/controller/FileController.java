@@ -1,13 +1,20 @@
 package com.ruoyi.file.controller;
 
 import java.io.OutputStream;
-import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +28,12 @@ import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
-import com.ruoyi.file.service.DiskFileService;
+import com.ruoyi.file.domain.FileEntity;
+import com.ruoyi.file.domain.SysFileInfo;
+import com.ruoyi.file.service.ISysFileInfoService;
+import com.ruoyi.file.storage.StorageBucket;
+import com.ruoyi.file.storage.StorageConfig;
+import com.ruoyi.file.storage.StorageManagement;
 import com.ruoyi.file.utils.FileOperateUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +48,12 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/file")
 public class FileController {
+
+    @Autowired
+    private ISysFileInfoService sysFileInfoService;
+
+    @Autowired
+    StorageManagement storageManagement;
 
     private static final String FILE_DELIMETER = ",";
 
@@ -98,30 +116,6 @@ public class FileController {
     }
 
     /**
-     * 通用上传请求（单个）
-     */
-    @Operation(summary = "通用上传请求（单个）")
-    @PostMapping("/upload")
-    @Anonymous
-    public AjaxResult uploadFile(@RequestBody MultipartFile file) throws Exception {
-        try {
-            // 上传文件路径
-            // String filePath = RuoYiConfig.getUploadPath();
-            // 上传并返回新文件名称
-            String uri = FileOperateUtils.upload(file);
-            String url = getUrl() + uri;
-            AjaxResult ajax = AjaxResult.success();
-            ajax.put("url", url);
-            ajax.put("fileName", uri);
-            ajax.put("newFileName", FileUtils.getName(uri));
-            ajax.put("originalFilename", file.getOriginalFilename());
-            return ajax;
-        } catch (Exception e) {
-            return AjaxResult.error(e.getMessage());
-        }
-    }
-
-    /**
      * 通用上传请求（多个）
      */
     @Operation(summary = "通用上传请求（多个）")
@@ -157,6 +151,112 @@ public class FileController {
     }
 
     /**
+     * 获取所有可用存储渠道及其client列表
+     */
+    @GetMapping("/client-list")
+    public AjaxResult getClientList() {
+        Map<String, List<String>> result = new HashMap<>();
+        Map<String, StorageConfig> configs = storageManagement.getStorageTypes();
+        for (String storageType : configs.keySet()) {
+            StorageConfig config = configs.get(storageType);
+            result.put(storageType, new ArrayList<>(config.getClient().keySet()));
+        }
+        return AjaxResult.success(result);
+    }
+
+    /**
+     * 统一上传接口：/file/{storageType}/{clientName}/upload
+     */
+    @PostMapping("/{storageType}/{clientName}/upload")
+    public AjaxResult uploadUnified(
+            @PathVariable("storageType") String storageType,
+            @PathVariable("clientName") String clientName,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            String filePath = null;
+            String url = null;
+            String md5 = DigestUtils.md5Hex(file.getInputStream());
+            String fileType = null;
+            if (file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")) {
+                fileType = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
+            }
+            StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
+            String objectName = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            storageBucket.put(objectName, file);
+            url = storageBucket.generatePresignedUrl(objectName).toString();
+            filePath = objectName;
+            SysFileInfo info = new SysFileInfo();
+            info.setFileName(file.getOriginalFilename());
+            info.setFilePath(filePath);
+            info.setStorageType(storageType);
+            info.setFileType(fileType);
+            info.setFileSize(file.getSize());
+            info.setMd5(md5);
+            info.setDelFlag("0");
+            sysFileInfoService.insertSysFileInfo(info);
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put("url", url);
+            ajax.put("fileName", filePath);
+            ajax.put("originalFilename", file.getOriginalFilename());
+            ajax.put("fileId", info.getFileId());
+            ajax.put("storageType", storageType);
+            ajax.put("md5", md5);
+            return ajax;
+        } catch (Exception e) {
+            return AjaxResult.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 统一下载接口：/file/{storageType}/{clientName}/download?filePath=xxx
+     */
+    @GetMapping("/{storageType}/{clientName}/download")
+    public void downloadUnified(
+            @PathVariable("storageType") String storageType,
+            @PathVariable("clientName") String clientName,
+            @RequestParam("filePath") String filePath,
+            HttpServletResponse response) throws Exception {
+        try {
+            StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
+            FileEntity fileEntity = storageBucket.get(filePath);
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=" + URLEncoder.encode(filePath, "UTF-8"));
+            IOUtils.copy(fileEntity.getFileInputSteam(), response.getOutputStream());
+        } catch (Exception e) {
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("下载失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 统一预览接口：/file/{storageType}/{clientName}/preview?filePath=xxx
+     */
+    @Anonymous
+    @GetMapping("/{storageType}/{clientName}/preview")
+    public void preview(
+            @PathVariable("storageType") String storageType,
+            @PathVariable("clientName") String clientName,
+            @RequestParam("filePath") String filePath,
+            HttpServletResponse response) throws Exception {
+        try {
+            filePath = URLDecoder.decode(filePath, "UTF-8");
+            StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
+            FileEntity fileEntity = storageBucket.get(filePath);
+            String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(filePath));
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+            response.setContentType(contentType);
+            IOUtils.copy(fileEntity.getFileInputSteam(), response.getOutputStream());
+            response.flushBuffer();
+        } catch (Exception e) {
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("预览失败: " + e.getMessage());
+        }
+    }
+
+    /**
      * 本地资源通用下载
      */
     @Operation(summary = "本地资源通用下载")
@@ -182,29 +282,6 @@ public class FileController {
             outputStream.flush();
         } finally {
             outputStream.close();
-        }
-    }
-
-    @Autowired
-    private DiskFileService diskFileService;
-
-    /**
-     * 获取文件访问URL
-     */
-    @Operation(summary = "获取本地文件访问URL")
-    @GetMapping("/getUrl")
-    @Anonymous
-    public AjaxResult getFileUrl(@RequestParam("filePath") String filePath) throws Exception {
-        try {
-            // 检查文件路径是否合法
-            if (!FileUtils.checkAllowDownload(filePath)) {
-                return AjaxResult.error("非法的文件路径");
-            }
-            // 生成访问URL
-            URL url = diskFileService.generatePresignedUrl(filePath);
-            return AjaxResult.success("本地磁盘URL获取成功", url.toString());
-        } catch (Exception e) {
-            return AjaxResult.error("获取URL失败: " + e.getMessage());
         }
     }
 }

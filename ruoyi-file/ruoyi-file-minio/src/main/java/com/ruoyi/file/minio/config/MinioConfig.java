@@ -17,15 +17,16 @@ import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.file.minio.domain.MinioBucket;
 import com.ruoyi.file.minio.exception.MinioClientErrorException;
 import com.ruoyi.file.minio.exception.MinioClientNotFundException;
+import com.ruoyi.file.storage.StorageConfig;
 
 import io.minio.BucketExistsArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 
-@Configuration("MinioConfiguration")
+@Configuration("minio")
 @ConditionalOnProperty(prefix = "minio", name = { "enable" }, havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties("minio")
-public class MinioConfig implements InitializingBean {
+public class MinioConfig implements InitializingBean, StorageConfig {
     private static final Logger logger = LoggerFactory.getLogger(MinioConfig.class);
     public static int maxSize;
     private String prefix = "/minio";

@@ -12,8 +12,8 @@ ruoyi:
   addressEnabled: false
   # 验证码类型 math 数组计算 char 字符验证
   captchaType: math
-  # 指定默认文件服务类型(值为disk代表使用磁盘作为文件操作服务,minio代表使用minio作为文件操作服务,oss代表使用oss作为文件操作服务)
-  fileServer: disk
+  # 指定默认文件服务类型(值为local代表使用本地作为文件操作服务,minio代表使用minio作为文件操作服务,oss代表使用oss作为文件操作服务)
+  fileServer: local
   # 指定默认文件上传方法最大文件大小(MB)
   fileMaxSize: 50
 

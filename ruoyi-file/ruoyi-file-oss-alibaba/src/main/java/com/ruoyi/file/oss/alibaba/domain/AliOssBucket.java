@@ -17,8 +17,9 @@ import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.ruoyi.file.oss.alibaba.exception.AliOssClientErrorException;
+import com.ruoyi.file.storage.StorageBucket;
 
-public class AliOssBucket {
+public class AliOssBucket implements StorageBucket{
 
     private static final Logger logger = LoggerFactory.getLogger(AliOssBucket.class);
 

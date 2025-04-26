@@ -1,6 +1,6 @@
 # Minio配置
 minio:
-  enable: false
+  enable: true
   primary: MASTER
   client:
     MASTER:
@@ -23,4 +23,19 @@ oss:
       accessKeyId: 
       accessKeySecret: 
       bucketName: 
-      endpoint: 
+      endpoint:
+    # SLAVE:
+    #   accessKeyId: 
+    #   accessKeySecret: 
+    #   bucketName: 
+    #   endpoint:
+
+# local配置
+local:
+  enable: true
+  primary: MASTER
+  client:
+    MASTER:
+      path: /data/files/master
+    # SLAVE:
+    #   path: /data/files/slave

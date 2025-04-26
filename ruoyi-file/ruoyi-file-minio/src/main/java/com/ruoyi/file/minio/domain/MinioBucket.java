@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.file.minio.exception.MinioClientErrorException;
+import com.ruoyi.file.storage.StorageBucket;
 
 import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
@@ -19,7 +20,7 @@ import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 
-public class MinioBucket {
+public class MinioBucket implements StorageBucket {
 
     private MinioClient client;
     private String bucketName;

@@ -25,8 +25,8 @@ import jakarta.servlet.http.HttpServletRequest;
 /**
  * 磁盘文件操作实现类
  */
-@Component("file:strategy:disk")
-public class DiskFileService implements FileService {
+@Component("file:strategy:local")
+public class LocalFileService implements FileService {
 
     private static final long URL_EXPIRATION = 3600 * 1000; // URL有效期1小时
 

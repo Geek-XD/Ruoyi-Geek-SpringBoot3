@@ -17,14 +17,15 @@ import com.aliyun.oss.OSSException;
 import com.ruoyi.file.oss.alibaba.domain.AliOssBucket;
 import com.ruoyi.file.oss.alibaba.exception.AliOssClientErrorException;
 import com.ruoyi.file.oss.alibaba.exception.AliOssClientNotFundException;
+import com.ruoyi.file.storage.StorageConfig;
 
 /**
  * 配置类用于管理阿里云OSS客户端实例及其相关属性。
  */
-@Configuration("AliOssConfiguration")
+@Configuration("oss")
 @ConditionalOnProperty(prefix = "oss", name = "enable", havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties(prefix = "oss")
-public class AliOssConfig implements InitializingBean {
+public class AliOssConfig implements InitializingBean, StorageConfig {
     private static final Logger logger = LoggerFactory.getLogger(AliOssConfig.class);
 
     public static int maxSize; // 最大文件大小或其他配置项
