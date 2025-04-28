@@ -18,22 +18,7 @@ public class LocalBucket implements StorageBucket {
     private String clientName;
     private String basePath;
 
-    public LocalBucket(String clientName, String basePath) {
-        this.clientName = clientName;
-        this.basePath = basePath;
-    }
-
-    public String getClientName() {
-        return clientName;
-    }
-
-    public String getBasePath() {
-        return basePath;
-    }
-
-    /**
-     * 上传文件
-     */
+    @Override
     public void put(String filePath, MultipartFile file) throws IOException {
         Path dest = Paths.get(basePath, filePath);
         Files.createDirectories(dest.getParent());
@@ -46,9 +31,7 @@ public class LocalBucket implements StorageBucket {
         }
     }
 
-    /**
-     * 获取文件输入流
-     */
+    @Override
     public FileEntity get(String filePath) throws IOException {
         Path file = Paths.get(basePath, filePath);
         FileEntity fileEntity = new FileEntity();
@@ -58,21 +41,31 @@ public class LocalBucket implements StorageBucket {
         return fileEntity;
     }
 
-    /**
-     * 删除文件
-     */
-    public boolean remove(String filePath) throws IOException {
+    @Override
+    public void remove(String filePath) throws IOException {
         Path file = Paths.get(basePath, filePath);
-        return Files.deleteIfExists(file);
+        Files.deleteIfExists(file);
     }
 
+    @Override
     public URL generatePresignedUrl(String filePath) throws Exception {
         // 这里仅示例，实际应结合你的静态资源映射规则
-
         // 如 http://localhost:8080/file/download/resource?resource=xxx
         URI uri = new URI("http://localhost:8080/file/download/resource?resource=" +
                 java.net.URLEncoder.encode(filePath, "UTF-8"));
         return uri.toURL();
     }
 
+    public LocalBucket(String clientName, String basePath) {
+        this.clientName = clientName;
+        this.basePath = basePath;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public String getBasePath() {
+        return basePath;
+    }
 }

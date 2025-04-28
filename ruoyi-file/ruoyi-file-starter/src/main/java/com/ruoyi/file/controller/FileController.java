@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -28,6 +27,7 @@ import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
+import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.file.domain.FileEntity;
 import com.ruoyi.file.domain.SysFileInfo;
 import com.ruoyi.file.service.ISysFileInfoService;
@@ -71,6 +71,20 @@ public class FileController {
         StringBuffer url = request.getRequestURL();
         String contextPath = request.getSession().getServletContext().getContextPath();
         return url.delete(url.length() - request.getRequestURI().length(), url.length()).append(contextPath).toString();
+    }
+
+    /**
+     * 获取所有可用存储渠道及其client列表
+     */
+    @GetMapping("/client-list")
+    public AjaxResult getClientList() {
+        Map<String, List<String>> result = new HashMap<>();
+        Map<String, StorageConfig> configs = storageManagement.getStorageTypes();
+        for (String storageType : configs.keySet()) {
+            StorageConfig config = configs.get(storageType);
+            result.put(storageType, new ArrayList<>(config.getClient().keySet()));
+        }
+        return AjaxResult.success(result);
     }
 
     /**
@@ -151,20 +165,6 @@ public class FileController {
     }
 
     /**
-     * 获取所有可用存储渠道及其client列表
-     */
-    @GetMapping("/client-list")
-    public AjaxResult getClientList() {
-        Map<String, List<String>> result = new HashMap<>();
-        Map<String, StorageConfig> configs = storageManagement.getStorageTypes();
-        for (String storageType : configs.keySet()) {
-            StorageConfig config = configs.get(storageType);
-            result.put(storageType, new ArrayList<>(config.getClient().keySet()));
-        }
-        return AjaxResult.success(result);
-    }
-
-    /**
      * 统一上传接口：/file/{storageType}/{clientName}/upload
      */
     @PostMapping("/{storageType}/{clientName}/upload")
@@ -173,18 +173,16 @@ public class FileController {
             @PathVariable("clientName") String clientName,
             @RequestParam("file") MultipartFile file) {
         try {
-            String filePath = null;
-            String url = null;
-            String md5 = DigestUtils.md5Hex(file.getInputStream());
+            String md5 = Md5Utils.getMd5(file);
             String fileType = null;
             if (file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")) {
                 fileType = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
             }
-            StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
             String objectName = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
             storageBucket.put(objectName, file);
-            url = storageBucket.generatePresignedUrl(objectName).toString();
-            filePath = objectName;
+            String url = storageBucket.generatePresignedUrl(objectName).toString();
+            String filePath = objectName;
             SysFileInfo info = new SysFileInfo();
             info.setFileName(file.getOriginalFilename());
             info.setFilePath(filePath);

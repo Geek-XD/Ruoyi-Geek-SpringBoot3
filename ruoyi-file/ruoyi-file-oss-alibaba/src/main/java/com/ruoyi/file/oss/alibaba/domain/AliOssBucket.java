@@ -19,12 +19,77 @@ import com.aliyun.oss.model.PutObjectRequest;
 import com.ruoyi.file.oss.alibaba.exception.AliOssClientErrorException;
 import com.ruoyi.file.storage.StorageBucket;
 
-public class AliOssBucket implements StorageBucket{
+public class AliOssBucket implements StorageBucket {
 
     private static final Logger logger = LoggerFactory.getLogger(AliOssBucket.class);
-
     private String bucketName;
     private OSS ossClient;
+
+    @Override
+    public void put(String fileName, MultipartFile file) throws Exception {
+        put(fileName, file.getContentType(), file.getInputStream());
+    }
+
+    @Override
+    public void remove(String filePath) throws Exception {
+        ossClient.deleteObject(bucketName, filePath);
+    }
+
+    @Override
+    public AliOssFileVO get(String filePath) throws Exception {
+        GetObjectRequest request = new GetObjectRequest(this.bucketName, filePath);
+        OSSObject ossObject = this.ossClient.getObject(request);
+        if (ossObject == null) {
+            throw new Exception("Failed to retrieve object from OSS.");
+        }
+        AliOssFileVO fileVO = new AliOssFileVO();
+        fileVO.setFileInputSteam(ossObject.getObjectContent());
+        fileVO.setKey(ossObject.getKey());
+        fileVO.setBucketName(ossObject.getBucketName());
+        fileVO.setByteCount(ossObject.getObjectMetadata().getContentLength());
+        fileVO.setFilePath(filePath);
+        return fileVO;
+    }
+
+    @Override
+    public URL generatePresignedUrl(String filePath) {
+        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, filePath);
+        Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000); // 设置过期时间为1小时
+        request.setExpiration(expiration);
+        return ossClient.generatePresignedUrl(request);
+    }
+
+    public void put(String filePath, String contentType, InputStream inputStream) throws Exception {
+        try {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(contentType);
+            metadata.setContentLength(inputStream.available()); // 使用 InputStream 的 available 方法
+            PutObjectRequest putRequest = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
+            ossClient.putObject(putRequest);
+        } catch (Exception e) {
+            logger.error("Error uploading file: {}", e.getMessage(), e);
+            throw new AliOssClientErrorException("Error uploading file: " + e.getMessage(), e);
+        }
+    }
+
+    public void put(PutObjectRequest putObjectRequest) throws Exception {
+        try {
+            this.ossClient.putObject(putObjectRequest);
+        } catch (Exception e) {
+            logger.error("Error uploading file: {}", e.getMessage(), e);
+            throw new AliOssClientErrorException("Error uploading file: " + e.getMessage(), e);
+        }
+    }
+
+    public void removeMultiple(List<String> filePaths) throws Exception {
+        try {
+            DeleteObjectsRequest deleteRequest = new DeleteObjectsRequest(bucketName).withKeys(filePaths);
+            ossClient.deleteObjects(deleteRequest);
+        } catch (Exception e) {
+            logger.error("Error deleting files: {}", e.getMessage(), e);
+            throw new AliOssClientErrorException("Error deleting files: " + e.getMessage(), e);
+        }
+    }
 
     public AliOssBucket() {
     }
@@ -51,81 +116,4 @@ public class AliOssBucket implements StorageBucket{
         this.bucketName = bucketName;
     }
 
-    public void put(String fileName, MultipartFile file) throws Exception {
-        put(fileName, file.getContentType(), file.getInputStream());
-    }
-
-    // 上传文件
-    public void put(String filePath, String contentType, InputStream inputStream) throws Exception {
-        try {
-            // 创建 ObjectMetadata 对象，并设置内容类型
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(contentType);
-            metadata.setContentLength(inputStream.available()); // 使用 InputStream 的 available 方法
-
-            // 创建 PutObjectRequest 对象
-            PutObjectRequest putRequest = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
-
-            // 上传对象
-            ossClient.putObject(putRequest);
-        } catch (Exception e) {
-            logger.error("Error uploading file: {}", e.getMessage(), e);
-            throw new AliOssClientErrorException("Error uploading file: " + e.getMessage(), e);
-        }
-    }
-
-    public void put(PutObjectRequest putObjectRequest) throws Exception {
-        try {
-            this.ossClient.putObject(putObjectRequest);
-        } catch (Exception e) {
-            logger.error("Error uploading file: {}", e.getMessage(), e);
-            throw new AliOssClientErrorException("Error uploading file: " + e.getMessage(), e);
-        }
-    }
-
-    public void remove(String filePath) throws Exception {
-        // 删除单个对象
-        ossClient.deleteObject(bucketName, filePath);
-    }
-
-    public void removeMultiple(List<String> filePaths) throws Exception {
-        // 删除多个对象
-        try {
-            DeleteObjectsRequest deleteRequest = new DeleteObjectsRequest(bucketName).withKeys(filePaths);
-            ossClient.deleteObjects(deleteRequest);
-        } catch (Exception e) {
-            logger.error("Error deleting files: {}", e.getMessage(), e);
-            throw new AliOssClientErrorException("Error deleting files: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * 文件下载
-     *
-     * @param filePath 文件路径
-     * @return 返回封装的OSS下载文件对象
-     * @throws Exception 如果下载过程中出现问题
-     */
-    public AliOssFileVO get(String filePath) throws Exception {
-        GetObjectRequest request = new GetObjectRequest(this.bucketName, filePath);
-        OSSObject ossObject = this.ossClient.getObject(request);
-        if (ossObject == null) {
-            throw new Exception("Failed to retrieve object from OSS.");
-        }
-        // 设置 AliOssFileVO 对象的属性
-        AliOssFileVO fileVO = new AliOssFileVO();
-        fileVO.setFileInputSteam(ossObject.getObjectContent());
-        fileVO.setKey(ossObject.getKey());
-        fileVO.setBucketName(ossObject.getBucketName());
-        fileVO.setByteCount(ossObject.getObjectMetadata().getContentLength());
-        fileVO.setFilePath(filePath);
-        return fileVO;
-    }
-
-    public URL generatePresignedUrl(String filePath){
-        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, filePath);
-        Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000); // 设置过期时间为1小时
-        request.setExpiration(expiration);
-        return ossClient.generatePresignedUrl(request);
-    }
 }

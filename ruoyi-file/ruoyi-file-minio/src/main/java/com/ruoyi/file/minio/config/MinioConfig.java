@@ -15,8 +15,6 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.file.minio.domain.MinioBucket;
-import com.ruoyi.file.minio.exception.MinioClientErrorException;
-import com.ruoyi.file.minio.exception.MinioClientNotFundException;
 import com.ruoyi.file.storage.StorageConfig;
 
 import io.minio.BucketExistsArgs;
@@ -33,7 +31,7 @@ public class MinioConfig implements InitializingBean, StorageConfig {
     private Map<String, MinioClientProperties> client;
     private String primary;
     private Map<String, MinioBucket> targetMinioBucket = new HashMap<>();
-    private MinioBucket masterBucket;
+    private MinioBucket primaryBucket;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -51,7 +49,7 @@ public class MinioConfig implements InitializingBean, StorageConfig {
         if (targetMinioBucket.get(primary) == null) {
             throw new RuntimeException("Primary client " + primary + " does not exist");
         }
-        masterBucket = targetMinioBucket.get(primary);
+        primaryBucket = targetMinioBucket.get(primary);
     }
 
     private static void validateMinioBucket(MinioBucket minioBucket) {
@@ -90,38 +88,17 @@ public class MinioConfig implements InitializingBean, StorageConfig {
         return minioBucket;
     }
 
-    /**
-     * 根据主配置信息创建并返回MinIO客户端实例。
-     *
-     * @return MinioClient 实例
-     * @throws MinioClientNotFundException 如果找不到对应的配置时抛出
-     * @throws MinioClientErrorException   如果在创建过程中发生错误时抛出
-     */
-    public MinioClient getPrimaryMinioClient() throws MinioClientNotFundException, MinioClientErrorException {
-        MinioClientProperties primaryClientProps = this.getClient().get(this.getPrimary());
-        if (primaryClientProps == null) {
-            throw new MinioClientNotFundException("未找到该Minio对象存储服务！");
-        }
-        try {
-            return MinioClient.builder()
-                    .endpoint(primaryClientProps.getUrl())
-                    .credentials(primaryClientProps.getAccessKey(), primaryClientProps.getSecretKey())
-                    .build();
-        } catch (Exception e) {
-            throw new MinioClientErrorException("创建MinIO客户端失败: " + e.getMessage(), e);
-        }
+    @Override
+    public MinioBucket getBucket(String clent) {
+        return targetMinioBucket.get(clent);
     }
 
     public int getMaxSize() {
         return maxSize;
     }
 
-    public MinioBucket getMasterBucket() {
-        return this.masterBucket;
-    }
-
-    public MinioBucket getBucket(String clent) {
-        return targetMinioBucket.get(clent);
+    public MinioBucket getPrimaryBucket() {
+        return this.primaryBucket;
     }
 
     public Map<String, MinioClientProperties> getClient() {

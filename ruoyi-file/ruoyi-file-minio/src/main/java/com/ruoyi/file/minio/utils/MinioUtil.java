@@ -80,7 +80,7 @@ public class MinioUtil {
      * @throws IOException 比如读写文件出错时
      */
     public static void removeFile(String filePath) throws Exception {
-        getMinioConfig().getMasterBucket().remove(filePath);
+        getMinioConfig().getPrimaryBucket().remove(filePath);
     }
 
     /**
@@ -102,7 +102,7 @@ public class MinioUtil {
      * @throws IOException 比如读写文件出错时
      */
     public static MinioFileVO getFile(String filePath) throws Exception {
-        return getMinioConfig().getMasterBucket().get(filePath);
+        return getMinioConfig().getPrimaryBucket().get(filePath);
     }
 
     /**
@@ -118,7 +118,7 @@ public class MinioUtil {
     }
 
     public static URL generatePresignedUrl(String filePath) throws Exception {
-        MinioBucket minioBucket = getMinioConfig().getMasterBucket();
+        MinioBucket minioBucket = getMinioConfig().getPrimaryBucket();
         return minioBucket.generatePresignedUrl(filePath);
     }
 

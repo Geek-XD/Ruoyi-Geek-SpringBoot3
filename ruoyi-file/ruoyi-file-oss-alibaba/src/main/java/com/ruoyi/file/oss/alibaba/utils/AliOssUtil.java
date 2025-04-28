@@ -81,7 +81,7 @@ public class AliOssUtil {
      * @throws IOException 比如读写文件出错时
      */
     public static void removeFile(String filePath) throws Exception {
-        getAliOssConfig().getMasterBucket().remove(filePath);
+        getAliOssConfig().getPrimaryBucket().remove(filePath);
     }
 
     /**
@@ -103,7 +103,7 @@ public class AliOssUtil {
      * @throws IOException 比如读写文件出错时
      */
     public static AliOssFileVO getFile(String filePath) throws Exception {
-        return getAliOssConfig().getMasterBucket().get(filePath);
+        return getAliOssConfig().getPrimaryBucket().get(filePath);
     }
 
     /**
@@ -116,8 +116,7 @@ public class AliOssUtil {
      */
     public static AliOssFileVO getFile(String client, String filePath) throws Exception {
         AliOssBucket ossBucket = getAliOssConfig().getBucket(client);
-        String bucketName = getAliOssConfig().getBucketName(client);
-
+        String bucketName = ossBucket.getBucketName();
         if (bucketName == null) {
             throw new AliOssClientErrorException("参数 \"bucketName\" 为空指针");
         }
@@ -125,7 +124,7 @@ public class AliOssUtil {
     }
 
     public static URL generatePresignedUrl(String filePath) {
-        AliOssBucket ossBucket = getAliOssConfig().getMasterBucket();
+        AliOssBucket ossBucket = getAliOssConfig().getPrimaryBucket();
         return ossBucket.generatePresignedUrl(filePath);
     }
 

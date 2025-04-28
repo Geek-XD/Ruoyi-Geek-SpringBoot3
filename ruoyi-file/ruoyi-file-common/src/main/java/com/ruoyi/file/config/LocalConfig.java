@@ -21,7 +21,7 @@ public class LocalConfig implements InitializingBean, StorageConfig {
     private Map<String, LocalClientProperties> client;
     private String primary;
     private Map<String, LocalBucket> targetLocalBucket = new HashMap<>();
-    private LocalBucket masterBucket;
+    private LocalBucket primaryBucket;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -35,11 +35,11 @@ public class LocalConfig implements InitializingBean, StorageConfig {
         if (targetLocalBucket.get(primary) == null) {
             throw new RuntimeException("Primary local client " + primary + " does not exist");
         }
-        masterBucket = targetLocalBucket.get(primary);
+        primaryBucket = targetLocalBucket.get(primary);
     }
 
-    public LocalBucket getMasterBucket() {
-        return this.masterBucket;
+    public LocalBucket getPrimaryBucket() {
+        return this.primaryBucket;
     }
 
     @Override
