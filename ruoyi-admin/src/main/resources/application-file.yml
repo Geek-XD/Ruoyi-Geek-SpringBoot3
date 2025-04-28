@@ -1,6 +1,6 @@
 # Minio配置
 minio:
-  enable: true
+  enable: false
   primary: MASTER
   client:
     MASTER:
