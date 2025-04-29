@@ -1,9 +1,22 @@
+# local配置
+local:
+  enable: true
+  primary: MASTER
+  client:
+    MASTER:
+      permission: public
+      path: /data/files/master
+      api: /file/download/resource
+    # SLAVE:
+    #   path: /data/files/slave
+
 # Minio配置
 minio:
   enable: false
   primary: MASTER
   client:
     MASTER:
+      permission: public
       url: http://localhost:9000
       accessKey:
       secretKey:
@@ -20,22 +33,15 @@ oss:
   primary: MASTER
   client:
     MASTER:
-      accessKeyId: 
-      accessKeySecret: 
-      bucketName: 
-      endpoint:
+      permission: public
+      accessKeyId: accessKeyId
+      accessKeySecret: accessKeySecret
+      bucketName: ruoyi
+      endpoint: oss-cn-beijing.aliyuncs.com
     # SLAVE:
     #   accessKeyId: 
     #   accessKeySecret: 
     #   bucketName: 
     #   endpoint:
 
-# local配置
-local:
-  enable: true
-  primary: MASTER
-  client:
-    MASTER:
-      path: /data/files/master
-    # SLAVE:
-    #   path: /data/files/slave
+

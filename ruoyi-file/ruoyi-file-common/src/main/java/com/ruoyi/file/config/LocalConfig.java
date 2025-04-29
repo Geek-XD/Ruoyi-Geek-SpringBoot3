@@ -29,7 +29,7 @@ public class LocalConfig implements InitializingBean, StorageConfig {
             throw new RuntimeException("Local client properties cannot be null or empty");
         }
         client.forEach((name, props) -> {
-            targetLocalBucket.put(name, new LocalBucket(name, props.getPath()));
+            targetLocalBucket.put(name, new LocalBucket(name, props.getPath(), props.getPermission(), props.getApi()));
             logger.info("本地存储目录：{} - 配置成功，路径:{}", name, props.getPath());
         });
         if (targetLocalBucket.get(primary) == null) {

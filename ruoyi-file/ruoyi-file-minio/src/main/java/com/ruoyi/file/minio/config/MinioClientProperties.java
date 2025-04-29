@@ -1,8 +1,10 @@
 package com.ruoyi.file.minio.config;
+
 import io.minio.MinioClient;
 
 public class MinioClientProperties {
 
+    private String permission;
     private String url;
     private String accessKey;
     private String secretKey;
@@ -58,5 +60,13 @@ public class MinioClientProperties {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
     }
 }

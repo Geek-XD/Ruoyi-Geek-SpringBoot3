@@ -57,7 +57,7 @@ public class MinioUtil {
      */
     public static String uploadFile(String client, String fileName, MultipartFile file) throws Exception {
         getMinioConfig().getBucket(client).put(fileName, file);
-        return getURL(client, fileName);
+        return generatePublicURL(client, fileName);
     }
 
     /**
@@ -66,7 +66,7 @@ public class MinioUtil {
      * @param filePath 文件路径
      * @return 返回上传成功的文件路径
      */
-    public static String getURL(String client, String filePath) {
+    public static String generatePublicURL(String client, String filePath) {
         StringBuilder url = new StringBuilder();
         url.append(getMinioConfig().getPrefix()).append("/").append(client)
                 .append("?").append("fileName=").append(filePath);
@@ -119,12 +119,12 @@ public class MinioUtil {
 
     public static URL generatePresignedUrl(String filePath) throws Exception {
         MinioBucket minioBucket = getMinioConfig().getPrimaryBucket();
-        return minioBucket.generatePresignedUrl(filePath);
+        return minioBucket.generatePresignedUrl(filePath, 3600);
     }
 
     public static URL generatePresignedUrl(String client, String filePath) throws Exception {
         MinioBucket minioBucket = getMinioConfig().getBucket(client);
-        return minioBucket.generatePresignedUrl(filePath);
+        return minioBucket.generatePresignedUrl(filePath, 3600);
     }
 
 }

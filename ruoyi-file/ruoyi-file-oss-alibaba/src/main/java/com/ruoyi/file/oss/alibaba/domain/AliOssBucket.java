@@ -1,6 +1,7 @@
 package com.ruoyi.file.oss.alibaba.domain;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +25,8 @@ public class AliOssBucket implements StorageBucket {
     private static final Logger logger = LoggerFactory.getLogger(AliOssBucket.class);
     private String bucketName;
     private OSS ossClient;
+    private String permission;
+    private String endpoint;
 
     @Override
     public void put(String fileName, MultipartFile file) throws Exception {
@@ -52,11 +55,20 @@ public class AliOssBucket implements StorageBucket {
     }
 
     @Override
-    public URL generatePresignedUrl(String filePath) {
+    public URL generatePresignedUrl(String filePath, int expireTime) {
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, filePath);
-        Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000); // 设置过期时间为1小时
+        Date expiration = new Date(System.currentTimeMillis() + expireTime * 1000); // 设置过期时间为1小时
         request.setExpiration(expiration);
         return ossClient.generatePresignedUrl(request);
+    }
+
+    @Override
+    public URL generatePublicURL(String filePath) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append("https://").append(getBucketName())
+                .append(".").append(getEndpoint())
+                .append("/").append(filePath);
+        return URI.create(sb.toString()).toURL();
     }
 
     public void put(String filePath, String contentType, InputStream inputStream) throws Exception {
@@ -114,6 +126,14 @@ public class AliOssBucket implements StorageBucket {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
     }
 
 }

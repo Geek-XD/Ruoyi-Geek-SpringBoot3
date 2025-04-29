@@ -41,5 +41,13 @@ public interface StorageBucket {
      * @return
      * @throws Exception
      */
-    URL generatePresignedUrl(String filePath) throws Exception;
+    URL generatePresignedUrl(String filePath, int expireTime) throws Exception;
+
+    /**
+     * 获取文件的公开访问方式的URL
+     *
+     * @param filePath 文件路径
+     * @return 公开访问URL
+     */
+    URL generatePublicURL(String filePath) throws Exception;
 }

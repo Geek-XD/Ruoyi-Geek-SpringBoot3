@@ -70,7 +70,7 @@ public class FileOperateUtils {
         }
     }
 
-    public static final String generatePublicURL(String filePath) {
+    public static final String generatePublicURL(String filePath) throws Exception {
         return fileService.generatePublicURL(filePath);
     }
 

@@ -16,10 +16,10 @@ import com.ruoyi.file.domain.FileEntity;
 public interface FileService {
 
     /**
-     * 文件上传
+     * 上传文件
      *
      * @param file 上传的文件
-     * @return 返回上传成功的文路径： datepath/date_uuid[0:4].extension
+     * @return
      * @throws Exception 比如读写文件出错时
      *
      */
@@ -28,11 +28,11 @@ public interface FileService {
     };
 
     /**
-     * 文件上传
+     * 上传文件（指定文件名称）
      *
      * @param file     上传的文件
      * @param fileName 指定上传文件的名称
-     * @return 返回上传成功的文路径: datepath/fileName
+     * @return
      * @throws Exception 比如读写文件出错时
      *
      */
@@ -41,38 +41,28 @@ public interface FileService {
     };
 
     /**
-     * 文件上传
+     * 上传文件（指定文件路径）
      *
      * @param filePath 指定上传文件的路径
      * @param file     上传的文件
-     * @return 返回上传成功的文路径: filePath
+     * @return
      * @throws Exception 比如读写文件出错时
      *
      */
     public String upload(String filePath, MultipartFile file) throws Exception;
 
     /**
-     * 文件下载
+     * 下载文件
      *
-     * @param filePath 下载的文件路径
-     * @return 返回上传成功的文路径
+     * @param filePath 文件路径
+     * @return 返回文件输入流
      * @throws Exception 比如读写文件出错时
      *
      */
     public InputStream downLoad(String filePath) throws Exception;
 
     /**
-     * 文件下载
-     *
-     * @param filePath 删除的文件路径
-     * @return 返回上传成功的文路径
-     * @throws Exception 比如读写文件出错时
-     *
-     */
-    public boolean deleteFile(String filePath) throws Exception;
-
-    /**
-     * 获取文件
+     * 获取文件实体对象
      * 
      * @param filePath 文件路径
      * @return 文件对象
@@ -81,7 +71,17 @@ public interface FileService {
     public FileEntity getFile(String filePath) throws Exception;
 
     /**
-     * 生成预签名URL
+     * 删除文件
+     *
+     * @param filePath 文件路径
+     * @return 返回是否删除成功
+     * @throws Exception 比如读写文件出错时
+     *
+     */
+    public boolean deleteFile(String filePath) throws Exception;
+
+    /**
+     * 获取文件的临时访问方式的URL
      *
      * @param filePath 文件路径
      * @return 预签名URL
@@ -90,10 +90,10 @@ public interface FileService {
     public URL generatePresignedUrl(String filePath) throws Exception;
 
     /**
-     * 获取文件公开访问URL
+     * 获取文件的公开访问方式的URL
      *
      * @param filePath 文件路径
-     * @return 存储路径
+     * @return 公开访问URL
      */
-    public String generatePublicURL(String filePath);
+    public String generatePublicURL(String filePath) throws Exception;
 }

@@ -2,33 +2,32 @@ package com.ruoyi.file.domain;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.file.storage.StorageBucket;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class LocalBucket implements StorageBucket {
     private String clientName;
     private String basePath;
+    private String permission;
+    private String api;
 
     @Override
     public void put(String filePath, MultipartFile file) throws IOException {
         Path dest = Paths.get(basePath, filePath);
         Files.createDirectories(dest.getParent());
-        try (InputStream in = file.getInputStream(); OutputStream out = Files.newOutputStream(dest)) {
-            byte[] buffer = new byte[8192];
-            int len;
-            while ((len = in.read(buffer)) != -1) {
-                out.write(buffer, 0, len);
-            }
-        }
+        file.transferTo(dest);
     }
 
     @Override
@@ -48,17 +47,38 @@ public class LocalBucket implements StorageBucket {
     }
 
     @Override
-    public URL generatePresignedUrl(String filePath) throws Exception {
-        // 这里仅示例，实际应结合你的静态资源映射规则
-        // 如 http://localhost:8080/file/download/resource?resource=xxx
-        URI uri = new URI("http://localhost:8080/file/download/resource?resource=" +
-                java.net.URLEncoder.encode(filePath, "UTF-8"));
-        return uri.toURL();
+    public URL generatePresignedUrl(String filePath, int expireTime) throws Exception {
+        HttpServletRequest request = ServletUtils.getRequest();
+        StringBuffer url = request.getRequestURL();
+        String contextPath = request.getSession().getServletContext().getContextPath();
+        String toHex = Md5Utils.hash(filePath + expireTime);
+        StringBuilder sb = new StringBuilder();
+        sb.append(url.delete(url.length() - request.getRequestURI().length(), url.length())
+                .append(contextPath).toString())
+                .append(getApi())
+                .append("/").append(URLEncoder.encode(filePath, "UTF-8"))
+                .append("?").append("&toHex=").append(toHex);
+        return URI.create(sb.toString()).toURL();
     }
 
-    public LocalBucket(String clientName, String basePath) {
+    @Override
+    public URL generatePublicURL(String filePath) throws Exception {
+        HttpServletRequest request = ServletUtils.getRequest();
+        StringBuffer url = request.getRequestURL();
+        String contextPath = request.getSession().getServletContext().getContextPath();
+        StringBuilder sb = new StringBuilder();
+        sb.append(url.delete(url.length() - request.getRequestURI().length(), url.length())
+                .append(contextPath).toString())
+                .append(getApi())
+                .append("/").append(URLEncoder.encode(filePath, "UTF-8"));
+        return new URI(sb.toString()).toURL();
+    }
+
+    public LocalBucket(String clientName, String basePath, String permission, String api) {
         this.clientName = clientName;
         this.basePath = basePath;
+        this.permission = permission;
+        this.api = api;
     }
 
     public String getClientName() {
@@ -67,5 +87,13 @@ public class LocalBucket implements StorageBucket {
 
     public String getBasePath() {
         return basePath;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
+
+    public String getApi() {
+        return api;
     }
 }

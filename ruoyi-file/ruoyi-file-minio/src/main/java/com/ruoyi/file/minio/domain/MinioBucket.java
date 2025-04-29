@@ -21,6 +21,8 @@ import io.minio.http.Method;
 
 public class MinioBucket implements StorageBucket {
 
+    private String url;
+    private String permission;
     private MinioClient client;
     private String bucketName;
 
@@ -52,15 +54,24 @@ public class MinioBucket implements StorageBucket {
     }
 
     @Override
-    public URL generatePresignedUrl(String filePath) throws Exception {
+    public URL generatePresignedUrl(String filePath, int expireTime) throws Exception {
         GetPresignedObjectUrlArgs request = GetPresignedObjectUrlArgs.builder()
                 .method(Method.GET)
                 .bucket(bucketName)
                 .object(filePath)
-                .expiry(1, TimeUnit.HOURS) // 设置过期时间为1小时
+                .expiry(expireTime, TimeUnit.SECONDS) // 设置过期时间为1小时
                 .build();
         String urlString = client.getPresignedObjectUrl(request);
         return URI.create(urlString).toURL();
+    }
+
+    @Override
+    public URL generatePublicURL(String filePath) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getUrl())
+                .append("/").append(getBucketName())
+                .append("/").append(filePath);
+        return URI.create(sb.toString()).toURL();
     }
 
     public void put(String filePath, String contentType, InputStream inputStream) throws Exception {
@@ -85,9 +96,11 @@ public class MinioBucket implements StorageBucket {
     public MinioBucket() {
     }
 
-    public MinioBucket(MinioClient client, String bucketName) {
+    public MinioBucket(MinioClient client, String bucketName, String permission, String url) {
         this.client = client;
         this.bucketName = bucketName;
+        this.permission = permission;
+        this.url = url;
     }
 
     public String getName() {
@@ -108,6 +121,14 @@ public class MinioBucket implements StorageBucket {
 
     public void setClient(MinioClient client) {
         this.client = client;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
+
+    public String getUrl() {
+        return url;
     }
 
 }

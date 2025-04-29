@@ -181,7 +181,7 @@ public class FileController {
             String objectName = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
             storageBucket.put(objectName, file);
-            String url = storageBucket.generatePresignedUrl(objectName).toString();
+            String url = storageBucket.generatePublicURL(objectName).toString();
             String filePath = objectName;
             SysFileInfo info = new SysFileInfo();
             info.setFileName(file.getOriginalFilename());
@@ -258,19 +258,19 @@ public class FileController {
      * 本地资源通用下载
      */
     @Operation(summary = "本地资源通用下载")
-    @GetMapping("/download/resource")
+    @GetMapping("/download/resource/{filePath}")
     @Anonymous
-    public void resourceDownload(@Parameter(name = "resource", description = "资源名称") String resource,
+    public void resourceDownload(@PathVariable String filePath,
             HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         OutputStream outputStream = response.getOutputStream();
         try {
-            if (!FileUtils.checkAllowDownload(resource)) {
-                throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", resource));
+            if (!FileUtils.checkAllowDownload(filePath)) {
+                throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", filePath));
             }
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            FileUtils.setAttachmentResponseHeader(response, resource);
-            FileOperateUtils.downLoad(resource, outputStream);
+            FileUtils.setAttachmentResponseHeader(response, filePath);
+            FileOperateUtils.downLoad(filePath, outputStream);
         } catch (Exception e) {
             response.reset();
             response.setContentType(MediaType.TEXT_HTML_VALUE);

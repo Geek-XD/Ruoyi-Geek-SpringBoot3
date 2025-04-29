@@ -57,7 +57,7 @@ public class AliOssUtil {
      */
     public static String uploadFile(String client, String fileName, MultipartFile file) throws Exception {
         getAliOssConfig().getBucket(client).put(fileName, file);
-        return getURL(client, fileName);
+        return generatePublicURL(client, fileName);
     }
 
     /**
@@ -67,7 +67,7 @@ public class AliOssUtil {
      * @param filePath 文件路径
      * @return 返回上传成功的文件路径
      */
-    public static String getURL(String client, String filePath) {
+    public static String generatePublicURL(String client, String filePath) {
         StringBuilder url = new StringBuilder();
         url.append(getAliOssConfig().getPrefix()).append("/").append(client)
                 .append("?").append("fileName=").append(filePath);
@@ -125,11 +125,11 @@ public class AliOssUtil {
 
     public static URL generatePresignedUrl(String filePath) {
         AliOssBucket ossBucket = getAliOssConfig().getPrimaryBucket();
-        return ossBucket.generatePresignedUrl(filePath);
+        return ossBucket.generatePresignedUrl(filePath, 3600);
     }
 
     public static URL generatePresignedUrl(String client, String filePath) {
         AliOssBucket ossBucket = getAliOssConfig().getBucket(client);
-        return ossBucket.generatePresignedUrl(filePath);
+        return ossBucket.generatePresignedUrl(filePath, 3600);
     }
 }

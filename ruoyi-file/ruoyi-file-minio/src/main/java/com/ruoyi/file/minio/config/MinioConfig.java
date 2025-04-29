@@ -82,7 +82,7 @@ public class MinioConfig implements InitializingBean, StorageConfig {
                     .credentials(props.getAccessKey(), props.getSecretKey())
                     .build();
         }
-        MinioBucket minioBucket = new MinioBucket(client, props.getBucketName());
+        MinioBucket minioBucket = new MinioBucket(client, props.getBucketName(), props.getPermission(), props.getUrl());
         validateMinioBucket(minioBucket);
         logger.info("数据桶：{}  - 链接成功", name);
         return minioBucket;
