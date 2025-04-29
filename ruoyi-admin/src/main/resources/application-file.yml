@@ -8,7 +8,9 @@ local:
       path: /data/files/master
       api: /file/download/resource
     # SLAVE:
+    #   permission: public
     #   path: /data/files/slave
+    #   api: 
 
 # Minio配置
 minio:
@@ -22,6 +24,7 @@ minio:
       secretKey:
       bucketName: ruoyi
     # SLAVE:
+    #   permission: public
     #   url: http://127.0.0.1:9000
     #   accessKey:
     #   secretKey:
@@ -39,6 +42,7 @@ oss:
       bucketName: ruoyi
       endpoint: oss-cn-beijing.aliyuncs.com
     # SLAVE:
+    #   permission: public
     #   accessKeyId: 
     #   accessKeySecret: 
     #   bucketName: 
