@@ -55,9 +55,9 @@ public class LocalBucket implements StorageBucket {
         StringBuilder sb = new StringBuilder();
         sb.append(url.delete(url.length() - request.getRequestURI().length(), url.length())
                 .append(contextPath).toString())
-                .append(getApi())
-                .append("/").append(URLEncoder.encode(filePath, "UTF-8"))
-                .append("?").append("&toHex=").append(toHex);
+                .append(getApi()).append("?")
+                .append("filePath=").append(URLEncoder.encode(filePath, "UTF-8"))
+                .append("&toHex=").append(toHex);
         return URI.create(sb.toString()).toURL();
     }
 
@@ -69,8 +69,8 @@ public class LocalBucket implements StorageBucket {
         StringBuilder sb = new StringBuilder();
         sb.append(url.delete(url.length() - request.getRequestURI().length(), url.length())
                 .append(contextPath).toString())
-                .append(getApi())
-                .append("/").append(URLEncoder.encode(filePath, "UTF-8"));
+                .append(getApi()).append("?")
+                .append("filePath=").append(URLEncoder.encode(filePath, "UTF-8"));
         return new URI(sb.toString()).toURL();
     }
 

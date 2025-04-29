@@ -6,7 +6,7 @@ local:
     MASTER:
       permission: public
       path: /data/files/master
-      api: /file/download/resource
+      api: /file/resource
     # SLAVE:
     #   permission: public
     #   path: /data/files/slave
@@ -14,7 +14,7 @@ local:
 
 # Minio配置
 minio:
-  enable: false
+  enable: true
   primary: MASTER
   client:
     MASTER:

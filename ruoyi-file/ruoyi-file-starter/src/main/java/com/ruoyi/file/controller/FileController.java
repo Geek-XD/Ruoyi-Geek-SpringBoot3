@@ -258,9 +258,9 @@ public class FileController {
      * 本地资源通用下载
      */
     @Operation(summary = "本地资源通用下载")
-    @GetMapping("/download/resource/{filePath}")
+    @GetMapping("/resource")
     @Anonymous
-    public void resourceDownload(@PathVariable String filePath,
+    public void resourceDownload(@RequestParam String filePath,
             HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         OutputStream outputStream = response.getOutputStream();
