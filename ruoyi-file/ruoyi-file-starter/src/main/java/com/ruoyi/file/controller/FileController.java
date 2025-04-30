@@ -178,11 +178,10 @@ public class FileController {
             if (file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")) {
                 fileType = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
             }
-            String objectName = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            String filePath = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
-            storageBucket.put(objectName, file);
-            String url = storageBucket.generatePublicURL(objectName).toString();
-            String filePath = objectName;
+            storageBucket.put(filePath, file);
+            String url = storageBucket.generatePublicURL(filePath).toString();
             SysFileInfo info = new SysFileInfo();
             info.setFileName(file.getOriginalFilename());
             info.setFilePath(filePath);

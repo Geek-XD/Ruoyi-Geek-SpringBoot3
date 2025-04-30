@@ -52,7 +52,7 @@ public class MinioConfig implements InitializingBean, StorageConfig {
         primaryBucket = targetMinioBucket.get(primary);
     }
 
-    private static void validateMinioBucket(MinioBucket minioBucket) {
+    private void validateMinioBucket(MinioBucket minioBucket) {
         BucketExistsArgs bucketExistArgs = BucketExistsArgs.builder().bucket(minioBucket.getBucketName()).build();
         boolean b = false;
         try {

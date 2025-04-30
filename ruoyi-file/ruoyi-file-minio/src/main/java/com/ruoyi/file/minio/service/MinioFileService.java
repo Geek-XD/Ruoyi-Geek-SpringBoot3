@@ -1,7 +1,6 @@
 package com.ruoyi.file.minio.service;
 
 import java.io.InputStream;
-import java.net.URL;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,7 +26,7 @@ public class MinioFileService implements FileService {
     public String upload(String filePath, MultipartFile file) throws Exception {
         MinioBucket minioBucket = minioConfig.getPrimaryBucket();
         minioBucket.put(filePath, file);
-        return minioBucket.generatePublicURL(filePath).toString();
+        return generateUrl(filePath);
     }
 
     @Override
@@ -50,15 +49,13 @@ public class MinioFileService implements FileService {
     }
 
     @Override
-    public URL generatePresignedUrl(String filePath) throws Exception {
+    public String generateUrl(String filePath) throws Exception {
         MinioBucket minioBucket = minioConfig.getPrimaryBucket();
-        return minioBucket.generatePresignedUrl(filePath, 3600);
-    }
-
-    @Override
-    public String generatePublicURL(String filePath) throws Exception {
-        MinioBucket minioBucket = minioConfig.getPrimaryBucket();
-        return minioBucket.generatePublicURL(filePath).toString();
+        if (minioBucket.getPermission() == "public") {
+            return minioBucket.generatePublicURL(filePath).toString();
+        } else {
+            return minioBucket.generatePresignedUrl(filePath, 3600).toString();
+        }
     }
 
 }

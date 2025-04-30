@@ -1,7 +1,6 @@
 package com.ruoyi.file.oss.alibaba.service;
 
 import java.io.InputStream;
-import java.net.URL;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,7 +26,7 @@ public class AliOssFileService implements FileService {
     public String upload(String filePath, MultipartFile file) throws Exception {
         AliOssBucket aliOssBucket = aliOssConfig.getPrimaryBucket();
         aliOssBucket.put(filePath, file);
-        return aliOssBucket.generatePublicURL(filePath).toString();
+        return generateUrl(filePath);
     }
 
     @Override
@@ -50,14 +49,13 @@ public class AliOssFileService implements FileService {
     }
 
     @Override
-    public URL generatePresignedUrl(String filePath) {
+    public String generateUrl(String filePath) throws Exception {
         AliOssBucket aliOssBucket = aliOssConfig.getPrimaryBucket();
-        return aliOssBucket.generatePresignedUrl(filePath, 3600);
+        if (aliOssBucket.getPermission() == "public") {
+            return aliOssBucket.generatePublicURL(filePath).toString();
+        } else {
+            return aliOssBucket.generatePresignedUrl(filePath, 3600).toString();
+        }
     }
 
-    @Override
-    public String generatePublicURL(String filePath) throws Exception {
-        AliOssBucket aliOssBucket = aliOssConfig.getPrimaryBucket();
-        return aliOssBucket.generatePublicURL(filePath).toString();
-    }
 }

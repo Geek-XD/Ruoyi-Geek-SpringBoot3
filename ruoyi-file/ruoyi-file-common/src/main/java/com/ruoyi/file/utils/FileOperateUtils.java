@@ -28,11 +28,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class FileOperateUtils {
 
     private static FileService fileService = SpringUtils.getBean("file:strategy:" + RuoYiConfig.getFileServer());
-    /**
-     * 默认大小 50M
-     */
-    public static final long DEFAULT_MAX_SIZE = Long.valueOf(SpringUtils.getRequiredProperty("ruoyi.fileMaxSize"))
-            * 1024 * 1024;
 
     /**
      * 以默认配置进行文件上传
@@ -70,10 +65,6 @@ public class FileOperateUtils {
         }
     }
 
-    public static final String generatePublicURL(String filePath) throws Exception {
-        return fileService.generatePublicURL(filePath);
-    }
-
     /**
      * 根据文件路径上传
      *
@@ -92,7 +83,7 @@ public class FileOperateUtils {
      * @param filePath         上传文件的路径
      * @param file             上传的文件
      * @param allowedExtension 允许的扩展名
-     * @return 文件名称
+     * @return 访问链接
      * @throws IOException
      */
     public static final String upload(String filePath, MultipartFile file, String[] allowedExtension)
@@ -104,9 +95,9 @@ public class FileOperateUtils {
                 return pathForMd5;
             }
             FileUtils.assertAllowed(file, allowedExtension);
-            fileService.upload(filePath, file);
-            FileOperateUtils.saveFilePathAndMd5(filePath, md5);
-            return filePath;
+            String url = fileService.upload(filePath, file);
+            FileOperateUtils.saveFilePathAndMd5(url, md5);
+            return url;
         } catch (Exception e) {
             throw new IOException(e.getMessage(), e);
         }
@@ -210,5 +201,16 @@ public class FileOperateUtils {
             CacheUtils.remove(CacheConstants.FILE_PATH_MD5_KEY, filePath);
             CacheUtils.remove(CacheConstants.FILE_MD5_PATH_KEY, md5ByFilePath);
         }
+    }
+
+    /**
+     * 获取文件的访问链接
+     *
+     * @param filePath 文件路径
+     * @return 访问链接
+     * @throws Exception
+     */
+    public static String getURL(String filePath) throws Exception {
+        return fileService.generateUrl(filePath);
     }
 }

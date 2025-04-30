@@ -16,6 +16,7 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.file.utils.FileOperateUtils;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
@@ -82,6 +83,12 @@ public class SysLoginController {
         if (!loginUser.getPermissions().equals(permissions)) {
             loginUser.setPermissions(permissions);
             tokenService.refreshToken(loginUser);
+        }
+        if (user.getAvatar() != null) {
+            try {
+                user.setAvatar(FileOperateUtils.getURL(user.getAvatar()));
+            } catch (Exception e) {
+            }
         }
         AjaxResult ajax = AjaxResult.success();
         ajax.put("user", user);

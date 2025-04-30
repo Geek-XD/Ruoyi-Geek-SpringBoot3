@@ -1,7 +1,6 @@
 package com.ruoyi.file.service;
 
 import java.io.InputStream;
-import java.net.URL;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,7 +25,7 @@ public class LocalFileService implements FileService {
     public String upload(String filePath, MultipartFile file) throws Exception {
         LocalBucket primaryBucket = localConfig.getPrimaryBucket();
         primaryBucket.put(filePath, file);
-        return primaryBucket.generatePublicURL(filePath).toString();
+        return generateUrl(filePath);
     }
 
     @Override
@@ -49,14 +48,12 @@ public class LocalFileService implements FileService {
     }
 
     @Override
-    public URL generatePresignedUrl(String filePath) throws Exception {
+    public String generateUrl(String filePath) throws Exception {
         LocalBucket primaryBucket = localConfig.getPrimaryBucket();
-        return primaryBucket.generatePresignedUrl(filePath, 3600);
-    }
-
-    @Override
-    public String generatePublicURL(String filePath) throws Exception {
-        LocalBucket primaryBucket = localConfig.getPrimaryBucket();
-        return primaryBucket.generatePublicURL(filePath).toString();
+        if (primaryBucket.getPermission() == "public") {
+            return primaryBucket.generatePublicURL(filePath).toString();
+        } else {
+            return primaryBucket.generatePresignedUrl(filePath, 3600).toString();
+        }
     }
 }

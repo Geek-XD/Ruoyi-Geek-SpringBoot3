@@ -51,6 +51,12 @@ public class SysProfileController extends BaseController {
     public AjaxResult profile() {
         LoginUser loginUser = getLoginUser();
         SysUser user = loginUser.getUser();
+        if (user.getAvatar() != null) {
+            try {
+                user.setAvatar(FileOperateUtils.getURL(user.getAvatar()));
+            } catch (Exception e) {
+            }
+        }
         AjaxResult ajax = AjaxResult.success(user);
         ajax.put("roleGroup", userService.selectUserRoleGroup(loginUser.getUsername()));
         ajax.put("postGroup", userService.selectUserPostGroup(loginUser.getUsername()));
@@ -126,12 +132,9 @@ public class SysProfileController extends BaseController {
             LoginUser loginUser = getLoginUser();
             String extractPath = loginUser.getUsername() + "/" + loginUser.getUserId();
             String fileName = "avatar." + FileUtils.getExtension(file);
-            // RuoYiConfig.getAvatarPath() + File.separator
-            String filepath = FileOperateUtils.upload(
-                    "avatar/" + extractPath + "/" + fileName,
-                    file, MimeTypeUtils.IMAGE_EXTENSION);
-            String url = FileOperateUtils.generatePublicURL(filepath);
-            if (userService.updateUserAvatar(loginUser.getUsername(), url)) {
+            String filePath = "avatar/" + extractPath + "/" + fileName;
+            String url = FileOperateUtils.upload(filePath, file, MimeTypeUtils.IMAGE_EXTENSION);
+            if (userService.updateUserAvatar(loginUser.getUsername(), filePath)) {
                 AjaxResult ajax = AjaxResult.success();
                 ajax.put("imgUrl", url);
                 // 更新缓存用户头像

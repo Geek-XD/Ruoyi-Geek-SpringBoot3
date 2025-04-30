@@ -2,7 +2,6 @@ package com.ruoyi.file.service;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -81,19 +80,12 @@ public interface FileService {
     public boolean deleteFile(String filePath) throws Exception;
 
     /**
-     * 获取文件的临时访问方式的URL
+     * 生成文件访问链接
      *
      * @param filePath 文件路径
-     * @return 预签名URL
-     * @throws Exception 如果生成过程中出现错误
-     */
-    public URL generatePresignedUrl(String filePath) throws Exception;
-
-    /**
-     * 获取文件的公开访问方式的URL
+     * @return 返回文件访问链接
+     * @throws Exception 比如读写文件出错时
      *
-     * @param filePath 文件路径
-     * @return 公开访问URL
      */
-    public String generatePublicURL(String filePath) throws Exception;
+    public String generateUrl(String filePath) throws Exception;
 }
