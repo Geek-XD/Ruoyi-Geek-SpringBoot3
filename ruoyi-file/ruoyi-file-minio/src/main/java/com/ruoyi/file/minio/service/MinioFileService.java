@@ -7,20 +7,20 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ruoyi.file.domain.FileEntity;
-import com.ruoyi.file.minio.config.MinioConfig;
+import com.ruoyi.file.minio.config.MinioManagement;
 import com.ruoyi.file.minio.domain.MinioBucket;
-import com.ruoyi.file.service.FileService;
+import com.ruoyi.file.storage.StorageEntity;
+import com.ruoyi.file.storage.StorageService;
 
 /**
  * Minio文件操作实现类
  */
 @Component("file:strategy:minio")
 @ConditionalOnProperty(prefix = "minio", name = { "enable" }, havingValue = "true", matchIfMissing = false)
-public class MinioFileService implements FileService {
+public class MinioFileService implements StorageService {
 
     @Autowired
-    private MinioConfig minioConfig;
+    private MinioManagement minioConfig;
 
     @Override
     public String upload(String filePath, MultipartFile file) throws Exception {
@@ -32,11 +32,11 @@ public class MinioFileService implements FileService {
     @Override
     public InputStream downLoad(String filePath) throws Exception {
         MinioBucket minioBucket = minioConfig.getPrimaryBucket();
-        return minioBucket.get(filePath).getFileInputSteam();
+        return minioBucket.get(filePath).getInputSteam();
     }
 
     @Override
-    public FileEntity getFile(String filePath) throws Exception {
+    public StorageEntity getFile(String filePath) throws Exception {
         MinioBucket minioBucket = minioConfig.getPrimaryBucket();
         return minioBucket.get(filePath);
     }

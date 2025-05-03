@@ -1,4 +1,4 @@
-package com.ruoyi.file.domain;
+package com.ruoyi.file.local.domain;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.file.storage.StorageBucket;
+import com.ruoyi.file.storage.StorageEntity;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -31,11 +32,11 @@ public class LocalBucket implements StorageBucket {
     }
 
     @Override
-    public FileEntity get(String filePath) throws IOException {
+    public StorageEntity get(String filePath) throws IOException {
         Path file = Paths.get(basePath, filePath);
-        FileEntity fileEntity = new FileEntity();
+        StorageEntity fileEntity = new StorageEntity();
         fileEntity.setFilePath(filePath);
-        fileEntity.setFileInputSteam(new FileInputStream(file.toFile()));
+        fileEntity.setInputSteam(new FileInputStream(file.toFile()));
         fileEntity.setByteCount(file.toFile().length());
         return fileEntity;
     }

@@ -28,12 +28,12 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
-import com.ruoyi.file.domain.FileEntity;
 import com.ruoyi.file.domain.SysFileInfo;
 import com.ruoyi.file.service.ISysFileInfoService;
 import com.ruoyi.file.storage.StorageBucket;
-import com.ruoyi.file.storage.StorageConfig;
+import com.ruoyi.file.storage.StorageEntity;
 import com.ruoyi.file.storage.StorageManagement;
+import com.ruoyi.file.storage.StorageManagements;
 import com.ruoyi.file.utils.FileOperateUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,7 +53,7 @@ public class FileController {
     private ISysFileInfoService sysFileInfoService;
 
     @Autowired
-    StorageManagement storageManagement;
+    StorageManagements storageManagement;
 
     private static final String FILE_DELIMETER = ",";
 
@@ -79,9 +79,9 @@ public class FileController {
     @GetMapping("/client-list")
     public AjaxResult getClientList() {
         Map<String, List<String>> result = new HashMap<>();
-        Map<String, StorageConfig> configs = storageManagement.getStorageTypes();
+        Map<String, StorageManagement> configs = storageManagement.getStorageTypes();
         for (String storageType : configs.keySet()) {
-            StorageConfig config = configs.get(storageType);
+            StorageManagement config = configs.get(storageType);
             result.put(storageType, new ArrayList<>(config.getClient().keySet()));
         }
         return AjaxResult.success(result);
@@ -215,11 +215,11 @@ public class FileController {
             HttpServletResponse response) throws Exception {
         try {
             StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
-            FileEntity fileEntity = storageBucket.get(filePath);
+            StorageEntity fileEntity = storageBucket.get(filePath);
             response.setContentType("application/octet-stream");
             response.setHeader("Content-Disposition",
                     "attachment; filename=" + URLEncoder.encode(filePath, "UTF-8"));
-            IOUtils.copy(fileEntity.getFileInputSteam(), response.getOutputStream());
+            IOUtils.copy(fileEntity.getInputSteam(), response.getOutputStream());
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("下载失败: " + e.getMessage());
@@ -239,13 +239,13 @@ public class FileController {
         try {
             filePath = URLDecoder.decode(filePath, "UTF-8");
             StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
-            FileEntity fileEntity = storageBucket.get(filePath);
+            StorageEntity fileEntity = storageBucket.get(filePath);
             String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(filePath));
             if (contentType == null) {
                 contentType = "application/octet-stream";
             }
             response.setContentType(contentType);
-            IOUtils.copy(fileEntity.getFileInputSteam(), response.getOutputStream());
+            IOUtils.copy(fileEntity.getInputSteam(), response.getOutputStream());
             response.flushBuffer();
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");

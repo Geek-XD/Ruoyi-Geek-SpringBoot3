@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `sys_file_info`;
 CREATE TABLE sys_file_info (
     file_id      BIGINT      NOT NULL AUTO_INCREMENT COMMENT '文件主键',
     file_name    VARCHAR(255) NOT NULL COMMENT '原始文件名',

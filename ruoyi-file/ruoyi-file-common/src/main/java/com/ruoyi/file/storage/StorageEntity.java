@@ -1,21 +1,21 @@
-package com.ruoyi.file.domain;
+package com.ruoyi.file.storage;
 
 import java.io.InputStream;
 
-public class FileEntity {
-    private InputStream fileInputSteam;
+public class StorageEntity {
+    private InputStream inputStream;
     private Long byteCount;
     private String filePath;
 
-    public FileEntity() {
+    public StorageEntity() {
     }
 
-    public InputStream getFileInputSteam() {
-        return fileInputSteam;
+    public InputStream getInputSteam() {
+        return inputStream;
     }
 
-    public void setFileInputSteam(InputStream fileInputSteam) {
-        this.fileInputSteam = fileInputSteam;
+    public void setInputSteam(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
     public Long getByteCount() {

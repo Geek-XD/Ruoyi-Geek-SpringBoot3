@@ -132,18 +132,18 @@ CREATE TABLE gen_join_table (
   PRIMARY KEY (table_id, right_table_id, left_table_id)
 );
 
-COMMENT ON TABLE gen_table_column IS '代码生成关联表';
-COMMENT ON COLUMN gen_table_column.table_id IS '表编号';
-COMMENT ON COLUMN gen_table_column.left_table_id IS '左表名称';
-COMMENT ON COLUMN gen_table_column.right_table_id IS '右表编号';
-COMMENT ON COLUMN gen_table_column.left_table_alias IS '左表别名';
-COMMENT ON COLUMN gen_table_column.right_table_alias IS '右表别名';
-COMMENT ON COLUMN gen_table_column.left_table_fk IS '左表关联键';
-COMMENT ON COLUMN gen_table_column.right_table_fk IS '右表关联键';
-COMMENT ON COLUMN gen_table_column.join_type IS '关联类型';
-COMMENT ON COLUMN gen_table_column.join_columns IS '关联字段';
-COMMENT ON COLUMN gen_table_column.order_num IS '序号';
-COMMENT ON COLUMN gen_table_column.new_table_id IS '新表编号';
+COMMENT ON TABLE gen_join_table IS '代码生成关联表';
+COMMENT ON COLUMN gen_join_table.table_id IS '表编号';
+COMMENT ON COLUMN gen_join_table.left_table_id IS '左表名称';
+COMMENT ON COLUMN gen_join_table.right_table_id IS '右表编号';
+COMMENT ON COLUMN gen_join_table.left_table_alias IS '左表别名';
+COMMENT ON COLUMN gen_join_table.right_table_alias IS '右表别名';
+COMMENT ON COLUMN gen_join_table.left_table_fk IS '左表关联键';
+COMMENT ON COLUMN gen_join_table.right_table_fk IS '右表关联键';
+COMMENT ON COLUMN gen_join_table.join_type IS '关联类型';
+COMMENT ON COLUMN gen_join_table.join_columns IS '关联字段';
+COMMENT ON COLUMN gen_join_table.order_num IS '序号';
+COMMENT ON COLUMN gen_join_table.new_table_id IS '新表编号';
 
 -- 插入菜单数据
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)

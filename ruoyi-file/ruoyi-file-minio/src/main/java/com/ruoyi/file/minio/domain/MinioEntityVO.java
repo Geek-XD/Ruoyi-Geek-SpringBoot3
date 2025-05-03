@@ -1,16 +1,16 @@
 package com.ruoyi.file.minio.domain;
 
-import com.ruoyi.file.domain.FileEntity;
+import com.ruoyi.file.storage.StorageEntity;
 
 import okhttp3.Headers;
 
-public class MinioFileVO extends FileEntity {
+public class MinioEntityVO extends StorageEntity {
     private String object;
     private Headers headers;
     private String buket;
     private String region;
 
-    public MinioFileVO() {
+    public MinioEntityVO() {
         super();
     }
 

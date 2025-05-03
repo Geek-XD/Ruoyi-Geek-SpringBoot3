@@ -1,4 +1,4 @@
-package com.ruoyi.file.service;
+package com.ruoyi.file.local.service;
 
 import java.io.InputStream;
 
@@ -7,19 +7,20 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ruoyi.file.config.LocalConfig;
-import com.ruoyi.file.domain.FileEntity;
-import com.ruoyi.file.domain.LocalBucket;
+import com.ruoyi.file.local.config.LocalManagement;
+import com.ruoyi.file.local.domain.LocalBucket;
+import com.ruoyi.file.storage.StorageEntity;
+import com.ruoyi.file.storage.StorageService;
 
 /**
  * 磁盘文件操作实现类
  */
 @Component("file:strategy:local")
 @ConditionalOnProperty(prefix = "local", name = { "enable" }, havingValue = "true", matchIfMissing = false)
-public class LocalFileService implements FileService {
+public class LocalFileService implements StorageService {
 
     @Autowired
-    LocalConfig localConfig;
+    LocalManagement localConfig;
 
     @Override
     public String upload(String filePath, MultipartFile file) throws Exception {
@@ -31,11 +32,11 @@ public class LocalFileService implements FileService {
     @Override
     public InputStream downLoad(String filePath) throws Exception {
         LocalBucket primaryBucket = localConfig.getPrimaryBucket();
-        return primaryBucket.get(filePath).getFileInputSteam();
+        return primaryBucket.get(filePath).getInputSteam();
     }
 
     @Override
-    public FileEntity getFile(String filePath) throws Exception {
+    public StorageEntity getFile(String filePath) throws Exception {
         LocalBucket primaryBucket = localConfig.getPrimaryBucket();
         return primaryBucket.get(filePath);
     }

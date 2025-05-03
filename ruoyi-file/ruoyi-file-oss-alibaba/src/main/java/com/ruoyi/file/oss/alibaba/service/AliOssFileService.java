@@ -7,20 +7,20 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ruoyi.file.domain.FileEntity;
-import com.ruoyi.file.oss.alibaba.config.AliOssConfig;
+import com.ruoyi.file.oss.alibaba.config.AliOssManagement;
 import com.ruoyi.file.oss.alibaba.domain.AliOssBucket;
-import com.ruoyi.file.service.FileService;
+import com.ruoyi.file.storage.StorageEntity;
+import com.ruoyi.file.storage.StorageService;
 
 /**
  * oss文件操作实现类
  */
 @Component("file:strategy:oss")
 @ConditionalOnProperty(prefix = "oss", name = { "enable" }, havingValue = "true", matchIfMissing = false)
-public class AliOssFileService implements FileService {
+public class AliOssFileService implements StorageService {
 
     @Autowired
-    private AliOssConfig aliOssConfig;
+    private AliOssManagement aliOssConfig;
 
     @Override
     public String upload(String filePath, MultipartFile file) throws Exception {
@@ -32,11 +32,11 @@ public class AliOssFileService implements FileService {
     @Override
     public InputStream downLoad(String filePath) throws Exception {
         AliOssBucket aliOssBucket = aliOssConfig.getPrimaryBucket();
-        return aliOssBucket.get(filePath).getFileInputSteam();
+        return aliOssBucket.get(filePath).getInputSteam();
     }
 
     @Override
-    public FileEntity getFile(String filePath) throws Exception {
+    public StorageEntity getFile(String filePath) throws Exception {
         AliOssBucket aliOssBucket = aliOssConfig.getPrimaryBucket();
         return aliOssBucket.get(filePath);
     };

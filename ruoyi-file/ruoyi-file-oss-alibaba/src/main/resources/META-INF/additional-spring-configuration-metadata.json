@@ -12,7 +12,7 @@
         },
         {
             "name": "oss.client",
-            "type": "java.util.Map<java.lang.String, com.ruoyi.alibaba.oss.config.AliOssProperties>",
+            "type": "java.util.Map<java.lang.String, com.ruoyi.file.oss.alibaba.config.AliOssBucketProperties>",
             "description": "储存桶"
         }
     ]

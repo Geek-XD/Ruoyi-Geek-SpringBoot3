@@ -1,24 +1,23 @@
-package com.ruoyi.file.config;
+package com.ruoyi.file.local.config;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import com.ruoyi.file.domain.LocalBucket;
-import com.ruoyi.file.storage.StorageConfig;
+import com.ruoyi.file.local.domain.LocalBucket;
+import com.ruoyi.file.storage.StorageManagement;
 
 @Configuration("local")
 @ConditionalOnProperty(prefix = "local", name = { "enable" }, havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties("local")
-public class LocalConfig implements InitializingBean, StorageConfig {
-    private static final Logger logger = LoggerFactory.getLogger(LocalConfig.class);
-    private Map<String, LocalClientProperties> client;
+public class LocalManagement implements StorageManagement {
+    private static final Logger logger = LoggerFactory.getLogger(LocalManagement.class);
+    private Map<String, LocalBucketProperties> client;
     private String primary;
     private Map<String, LocalBucket> targetLocalBucket = new HashMap<>();
     private LocalBucket primaryBucket;
@@ -38,20 +37,20 @@ public class LocalConfig implements InitializingBean, StorageConfig {
         primaryBucket = targetLocalBucket.get(primary);
     }
 
-    public LocalBucket getPrimaryBucket() {
-        return this.primaryBucket;
-    }
-
     @Override
     public LocalBucket getBucket(String clientName) {
         return targetLocalBucket.get(clientName);
     }
 
-    public Map<String, LocalClientProperties> getClient() {
+    public LocalBucket getPrimaryBucket() {
+        return this.primaryBucket;
+    }
+
+    public Map<String, LocalBucketProperties> getClient() {
         return client;
     }
 
-    public void setClient(Map<String, LocalClientProperties> client) {
+    public void setClient(Map<String, LocalBucketProperties> client) {
         this.client = client;
     }
 

@@ -39,14 +39,14 @@ public class AliOssBucket implements StorageBucket {
     }
 
     @Override
-    public AliOssFileVO get(String filePath) throws Exception {
+    public AliOssEntityVO get(String filePath) throws Exception {
         GetObjectRequest request = new GetObjectRequest(this.bucketName, filePath);
         OSSObject ossObject = this.ossClient.getObject(request);
         if (ossObject == null) {
             throw new Exception("Failed to retrieve object from OSS.");
         }
-        AliOssFileVO fileVO = new AliOssFileVO();
-        fileVO.setFileInputSteam(ossObject.getObjectContent());
+        AliOssEntityVO fileVO = new AliOssEntityVO();
+        fileVO.setInputSteam(ossObject.getObjectContent());
         fileVO.setKey(ossObject.getKey());
         fileVO.setBucketName(ossObject.getBucketName());
         fileVO.setByteCount(ossObject.getObjectMetadata().getContentLength());

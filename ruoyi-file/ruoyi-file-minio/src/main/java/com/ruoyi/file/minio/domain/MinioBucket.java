@@ -38,12 +38,12 @@ public class MinioBucket implements StorageBucket {
     }
 
     @Override
-    public MinioFileVO get(String filePath) throws Exception {
+    public MinioEntityVO get(String filePath) throws Exception {
         GetObjectArgs getObjectArgs = GetObjectArgs.builder().object(filePath).bucket(bucketName).build();
         GetObjectResponse inputStream = this.client.getObject(getObjectArgs);
-        MinioFileVO minioFileVO = new MinioFileVO();
+        MinioEntityVO minioFileVO = new MinioEntityVO();
 
-        minioFileVO.setFileInputSteam(inputStream);
+        minioFileVO.setInputSteam(inputStream);
         minioFileVO.setByteCount(Convert.toLong(inputStream.headers().get("Content-Length"), null));
         minioFileVO.setFilePath(filePath);
         minioFileVO.setObject(inputStream.object());

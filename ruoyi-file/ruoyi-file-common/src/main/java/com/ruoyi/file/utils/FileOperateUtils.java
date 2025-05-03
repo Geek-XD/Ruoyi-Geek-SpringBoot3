@@ -15,8 +15,8 @@ import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.file.domain.FileEntity;
-import com.ruoyi.file.service.FileService;
+import com.ruoyi.file.storage.StorageEntity;
+import com.ruoyi.file.storage.StorageService;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class FileOperateUtils {
 
-    private static FileService fileService = SpringUtils.getBean("file:strategy:" + RuoYiConfig.getFileServer());
+    private static StorageService fileService = SpringUtils.getBean("file:strategy:" + RuoYiConfig.getFileServer());
 
     /**
      * 以默认配置进行文件上传
@@ -52,13 +52,13 @@ public class FileOperateUtils {
             throws IOException {
         try {
             String md5 = Md5Utils.getMd5(file);
-            String pathForMd5 = FileOperateUtils.getFilePathForMd5(md5);
+            String pathForMd5 = getFilePathForMd5(md5);
             if (StringUtils.isNotEmpty(pathForMd5)) {
                 return pathForMd5;
             }
             FileUtils.assertAllowed(file, allowedExtension);
             String filePath = fileService.upload(file);
-            FileOperateUtils.saveFilePathAndMd5(filePath, md5);
+            saveFilePathAndMd5(filePath, md5);
             return filePath;
         } catch (Exception e) {
             throw new IOException(e.getMessage(), e);
@@ -90,13 +90,13 @@ public class FileOperateUtils {
             throws IOException {
         try {
             String md5 = Md5Utils.getMd5(file);
-            String pathForMd5 = FileOperateUtils.getFilePathForMd5(md5);
+            String pathForMd5 = getFilePathForMd5(md5);
             if (StringUtils.isNotEmpty(pathForMd5)) {
                 return pathForMd5;
             }
             FileUtils.assertAllowed(file, allowedExtension);
             String url = fileService.upload(filePath, file);
-            FileOperateUtils.saveFilePathAndMd5(url, md5);
+            saveFilePathAndMd5(url, md5);
             return url;
         } catch (Exception e) {
             throw new IOException(e.getMessage(), e);
@@ -125,8 +125,8 @@ public class FileOperateUtils {
      * @throws IOException
      */
     public static final void downLoad(String filePath, HttpServletResponse response) throws Exception {
-        FileEntity fileEntity = fileService.getFile(filePath);
-        InputStream inputStream = fileEntity.getFileInputSteam();
+        StorageEntity fileEntity = fileService.getFile(filePath);
+        InputStream inputStream = fileEntity.getInputSteam();
         OutputStream outputStream = response.getOutputStream();
         FileUtils.setAttachmentResponseHeader(response, FileUtils.getName(fileEntity.getFilePath()));
         response.setContentLengthLong(fileEntity.getByteCount());
@@ -183,7 +183,7 @@ public class FileOperateUtils {
      * @param md5 文件的md5
      */
     public static void deleteFileAndMd5ByMd5(String md5) {
-        String filePathByMd5 = FileOperateUtils.getFilePathForMd5(md5);
+        String filePathByMd5 = getFilePathForMd5(md5);
         if (StringUtils.isNotEmpty(filePathByMd5)) {
             CacheUtils.remove(CacheConstants.FILE_MD5_PATH_KEY, md5);
             CacheUtils.remove(CacheConstants.FILE_PATH_MD5_KEY, filePathByMd5);
@@ -196,7 +196,7 @@ public class FileOperateUtils {
      * @param filePath 文件的路径
      */
     public static void deleteFileAndMd5ByFilePath(String filePath) {
-        String md5ByFilePath = FileOperateUtils.getMd5ForFilePath(filePath);
+        String md5ByFilePath = getMd5ForFilePath(filePath);
         if (StringUtils.isNotEmpty(md5ByFilePath)) {
             CacheUtils.remove(CacheConstants.FILE_PATH_MD5_KEY, filePath);
             CacheUtils.remove(CacheConstants.FILE_MD5_PATH_KEY, md5ByFilePath);

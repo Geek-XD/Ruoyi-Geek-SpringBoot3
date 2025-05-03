@@ -4,8 +4,6 @@ import java.net.URL;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ruoyi.file.domain.FileEntity;
-
 public interface StorageBucket {
 
     /**
@@ -15,7 +13,7 @@ public interface StorageBucket {
      * @return
      * @throws Exception
      */
-    FileEntity get(String filepath) throws Exception;
+    StorageEntity get(String filepath) throws Exception;
 
     /**
      * 上传文件

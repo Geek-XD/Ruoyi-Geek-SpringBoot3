@@ -1,14 +1,14 @@
 package com.ruoyi.file.oss.alibaba.domain;
 
 import com.aliyun.oss.model.ObjectMetadata;
-import com.ruoyi.file.domain.FileEntity;
+import com.ruoyi.file.storage.StorageEntity;
 
-public class AliOssFileVO extends FileEntity {
+public class AliOssEntityVO extends StorageEntity {
     private String key;
     private String bucketName;
     private ObjectMetadata metadata;
 
-    public AliOssFileVO() {
+    public AliOssEntityVO() {
     }
 
     public String getKey() {

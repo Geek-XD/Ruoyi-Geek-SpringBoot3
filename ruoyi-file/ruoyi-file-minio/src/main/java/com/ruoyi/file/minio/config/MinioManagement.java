@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.http.impl.io.EmptyInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +14,7 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.file.minio.domain.MinioBucket;
-import com.ruoyi.file.storage.StorageConfig;
+import com.ruoyi.file.storage.StorageManagement;
 
 import io.minio.BucketExistsArgs;
 import io.minio.MinioClient;
@@ -24,11 +23,9 @@ import io.minio.PutObjectArgs;
 @Configuration("minio")
 @ConditionalOnProperty(prefix = "minio", name = { "enable" }, havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties("minio")
-public class MinioConfig implements InitializingBean, StorageConfig {
-    private static final Logger logger = LoggerFactory.getLogger(MinioConfig.class);
-    public static int maxSize;
-    private String prefix = "/minio";
-    private Map<String, MinioClientProperties> client;
+public class MinioManagement implements StorageManagement {
+    private static final Logger logger = LoggerFactory.getLogger(MinioManagement.class);
+    private Map<String, MinioBucketProperties> client;
     private String primary;
     private Map<String, MinioBucket> targetMinioBucket = new HashMap<>();
     private MinioBucket primaryBucket;
@@ -70,7 +67,7 @@ public class MinioConfig implements InitializingBean, StorageConfig {
         }
     }
 
-    private MinioBucket createMinioClient(String name, MinioClientProperties props) {
+    private MinioBucket createMinioClient(String name, MinioBucketProperties props) {
         MinioClient client;
         if (StringUtils.isEmpty(props.getAccessKey())) {
             client = MinioClient.builder()
@@ -93,19 +90,15 @@ public class MinioConfig implements InitializingBean, StorageConfig {
         return targetMinioBucket.get(clent);
     }
 
-    public int getMaxSize() {
-        return maxSize;
-    }
-
     public MinioBucket getPrimaryBucket() {
         return this.primaryBucket;
     }
 
-    public Map<String, MinioClientProperties> getClient() {
+    public Map<String, MinioBucketProperties> getClient() {
         return client;
     }
 
-    public void setClient(Map<String, MinioClientProperties> client) {
+    public void setClient(Map<String, MinioBucketProperties> client) {
         this.client = client;
     }
 
@@ -115,13 +108,5 @@ public class MinioConfig implements InitializingBean, StorageConfig {
 
     public void setPrimary(String primary) {
         this.primary = primary;
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
     }
 }

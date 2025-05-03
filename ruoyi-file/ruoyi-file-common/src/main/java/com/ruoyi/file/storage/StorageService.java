@@ -1,4 +1,4 @@
-package com.ruoyi.file.service;
+package com.ruoyi.file.storage;
 
 import java.io.File;
 import java.io.InputStream;
@@ -7,12 +7,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.file.domain.FileEntity;
 
 /**
  * 文件操作接口
  */
-public interface FileService {
+public interface StorageService {
 
     /**
      * 上传文件
@@ -67,7 +66,7 @@ public interface FileService {
      * @return 文件对象
      * @throws Exception
      */
-    public FileEntity getFile(String filePath) throws Exception;
+    public StorageEntity getFile(String filePath) throws Exception;
 
     /**
      * 删除文件

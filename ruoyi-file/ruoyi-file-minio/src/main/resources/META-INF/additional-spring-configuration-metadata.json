@@ -12,7 +12,7 @@
         },
         {
             "name": "minio.client",
-            "type": "java.util.Map<java.lang.String, com.ruoyi.middleware.minio.domain.MinioBucket>",
+            "type": "java.util.Map<java.lang.String, com.ruoyi.file.minio.config.MinioBucketProperties>",
             "description": "储存桶"
         }
     ]
