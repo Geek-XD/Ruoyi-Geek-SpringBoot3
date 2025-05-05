@@ -15,7 +15,7 @@
         <ruoyi.version>3.8.9-G</ruoyi.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <spring-boot.version>3.4.5</spring-boot.version>
         <druid.version>1.2.24</druid.version>
@@ -91,11 +91,6 @@
                 <artifactId>mybatis-spring-boot-starter</artifactId>
                 <version>${mybatis-spring-boot.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis</artifactId>
-                <version>${mybatis.version}</version>
-            </dependency>
 
             <!-- pagehelper 分页插件 -->
             <dependency>
@@ -105,8 +100,8 @@
                 <!-- 排除低版本的 mybatis -->
                 <exclusions>
                     <exclusion>
-                        <groupId>org.mybatis</groupId>
-                        <artifactId>mybatis</artifactId>
+                        <groupId>org.mybatis.spring.boot</groupId>
+                        <artifactId>mybatis-spring-boot-starter</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
