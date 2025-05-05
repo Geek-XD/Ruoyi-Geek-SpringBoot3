@@ -2,6 +2,7 @@ package com.ruoyi.file.local.domain;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -11,6 +12,7 @@ import java.nio.file.Paths;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.file.storage.StorageBucket;
@@ -25,10 +27,14 @@ public class LocalBucket implements StorageBucket {
     private String api;
 
     @Override
-    public void put(String filePath, MultipartFile file) throws IOException {
+    public void put(String filePath, MultipartFile file) {
         Path dest = Paths.get(basePath, filePath);
-        Files.createDirectories(dest.getParent());
-        file.transferTo(dest);
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.createDirectories(dest.getParent());
+            Files.copy(inputStream, dest);
+        } catch (Exception e) {
+            throw new ServiceException("Failed to upload file: " + e.getMessage());
+        }
     }
 
     @Override
@@ -36,7 +42,7 @@ public class LocalBucket implements StorageBucket {
         Path file = Paths.get(basePath, filePath);
         StorageEntity fileEntity = new StorageEntity();
         fileEntity.setFilePath(filePath);
-        fileEntity.setInputSteam(new FileInputStream(file.toFile()));
+        fileEntity.setInputStream(new FileInputStream(file.toFile()));
         fileEntity.setByteCount(file.toFile().length());
         return fileEntity;
     }

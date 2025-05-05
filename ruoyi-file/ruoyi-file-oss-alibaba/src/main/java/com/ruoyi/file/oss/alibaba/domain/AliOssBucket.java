@@ -29,8 +29,18 @@ public class AliOssBucket implements StorageBucket {
     private String endpoint;
 
     @Override
-    public void put(String fileName, MultipartFile file) throws Exception {
-        put(fileName, file.getContentType(), file.getInputStream());
+    public void put(String filePath, MultipartFile file) throws Exception {
+        try {
+            InputStream inputStream = file.getInputStream();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(inputStream.available());
+            PutObjectRequest putRequest = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
+            this.ossClient.putObject(putRequest);
+        } catch (Exception e) {
+            logger.error("Error uploading file to OSS: {}", e.getMessage(), e);
+            throw new AliOssClientErrorException("Error uploading file to OSS: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -46,7 +56,7 @@ public class AliOssBucket implements StorageBucket {
             throw new Exception("Failed to retrieve object from OSS.");
         }
         AliOssEntityVO fileVO = new AliOssEntityVO();
-        fileVO.setInputSteam(ossObject.getObjectContent());
+        fileVO.setInputStream(ossObject.getObjectContent());
         fileVO.setKey(ossObject.getKey());
         fileVO.setBucketName(ossObject.getBucketName());
         fileVO.setByteCount(ossObject.getObjectMetadata().getContentLength());
@@ -69,28 +79,6 @@ public class AliOssBucket implements StorageBucket {
                 .append(".").append(getEndpoint())
                 .append("/").append(filePath);
         return URI.create(sb.toString()).toURL();
-    }
-
-    public void put(String filePath, String contentType, InputStream inputStream) throws Exception {
-        try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(contentType);
-            metadata.setContentLength(inputStream.available()); // 使用 InputStream 的 available 方法
-            PutObjectRequest putRequest = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
-            ossClient.putObject(putRequest);
-        } catch (Exception e) {
-            logger.error("Error uploading file: {}", e.getMessage(), e);
-            throw new AliOssClientErrorException("Error uploading file: " + e.getMessage(), e);
-        }
-    }
-
-    public void put(PutObjectRequest putObjectRequest) throws Exception {
-        try {
-            this.ossClient.putObject(putObjectRequest);
-        } catch (Exception e) {
-            logger.error("Error uploading file: {}", e.getMessage(), e);
-            throw new AliOssClientErrorException("Error uploading file: " + e.getMessage(), e);
-        }
     }
 
     public void removeMultiple(List<String> filePaths) throws Exception {

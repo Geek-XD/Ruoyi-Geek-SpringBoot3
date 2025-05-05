@@ -1,6 +1,10 @@
 package com.ruoyi.common.utils.sign;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -80,8 +84,7 @@ public class Md5Utils {
      * @return
      */
     public static String getMd5(Object file) {
-        try {
-            InputStream inputStream = getInputStream(file);
+        try (InputStream inputStream = getInputStream(file)) {
             long fileSize = getFileSize(file);
             // 10MB作为分界点
             if (fileSize < 10 * 1024 * 1024) {

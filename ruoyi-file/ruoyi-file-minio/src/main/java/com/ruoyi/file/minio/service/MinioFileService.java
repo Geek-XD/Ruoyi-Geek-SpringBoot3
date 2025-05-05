@@ -32,7 +32,7 @@ public class MinioFileService implements StorageService {
     @Override
     public InputStream downLoad(String filePath) throws Exception {
         MinioBucket minioBucket = minioConfig.getPrimaryBucket();
-        return minioBucket.get(filePath).getInputSteam();
+        return minioBucket.get(filePath).getInputStream();
     }
 
     @Override

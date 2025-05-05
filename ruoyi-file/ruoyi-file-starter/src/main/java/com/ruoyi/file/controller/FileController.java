@@ -189,15 +189,10 @@ public class FileController {
             info.setFileType(fileType);
             info.setFileSize(file.getSize());
             info.setMd5(md5);
-            info.setDelFlag("0");
             sysFileInfoService.insertSysFileInfo(info);
             AjaxResult ajax = AjaxResult.success();
             ajax.put("url", url);
-            ajax.put("fileName", filePath);
-            ajax.put("originalFilename", file.getOriginalFilename());
-            ajax.put("fileId", info.getFileId());
-            ajax.put("storageType", storageType);
-            ajax.put("md5", md5);
+            ajax.put("info", info);
             return ajax;
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
@@ -219,7 +214,7 @@ public class FileController {
             response.setContentType("application/octet-stream");
             response.setHeader("Content-Disposition",
                     "attachment; filename=" + URLEncoder.encode(filePath, "UTF-8"));
-            IOUtils.copy(fileEntity.getInputSteam(), response.getOutputStream());
+            IOUtils.copy(fileEntity.getInputStream(), response.getOutputStream());
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("下载失败: " + e.getMessage());
@@ -245,7 +240,7 @@ public class FileController {
                 contentType = "application/octet-stream";
             }
             response.setContentType(contentType);
-            IOUtils.copy(fileEntity.getInputSteam(), response.getOutputStream());
+            IOUtils.copy(fileEntity.getInputStream(), response.getOutputStream());
             response.flushBuffer();
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");

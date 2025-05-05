@@ -126,7 +126,7 @@ public class FileOperateUtils {
      */
     public static final void downLoad(String filePath, HttpServletResponse response) throws Exception {
         StorageEntity fileEntity = fileService.getFile(filePath);
-        InputStream inputStream = fileEntity.getInputSteam();
+        InputStream inputStream = fileEntity.getInputStream();
         OutputStream outputStream = response.getOutputStream();
         FileUtils.setAttachmentResponseHeader(response, FileUtils.getName(fileEntity.getFilePath()));
         response.setContentLengthLong(fileEntity.getByteCount());

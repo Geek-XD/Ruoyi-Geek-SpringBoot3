@@ -32,7 +32,7 @@ public class LocalFileService implements StorageService {
     @Override
     public InputStream downLoad(String filePath) throws Exception {
         LocalBucket primaryBucket = localConfig.getPrimaryBucket();
-        return primaryBucket.get(filePath).getInputSteam();
+        return primaryBucket.get(filePath).getInputStream();
     }
 
     @Override

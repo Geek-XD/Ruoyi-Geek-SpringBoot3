@@ -32,7 +32,7 @@ public class AliOssFileService implements StorageService {
     @Override
     public InputStream downLoad(String filePath) throws Exception {
         AliOssBucket aliOssBucket = aliOssConfig.getPrimaryBucket();
-        return aliOssBucket.get(filePath).getInputSteam();
+        return aliOssBucket.get(filePath).getInputStream();
     }
 
     @Override

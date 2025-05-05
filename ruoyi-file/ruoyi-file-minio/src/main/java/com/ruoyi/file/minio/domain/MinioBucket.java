@@ -27,23 +27,39 @@ public class MinioBucket implements StorageBucket {
     private String bucketName;
 
     @Override
-    public void put(String fileName, MultipartFile file) throws Exception {
-        put(fileName, file.getContentType(), file.getInputStream());
+    public void put(String filePath, MultipartFile file) {
+        try {
+            InputStream inputStream = file.getInputStream();
+            PutObjectArgs putObjectArgs = PutObjectArgs.builder()
+                    .contentType(file.getContentType())
+                    .stream(inputStream, inputStream.available(), -1)
+                    .bucket(bucketName)
+                    .object(filePath)
+                    .build();
+            this.client.putObject(putObjectArgs);
+        } catch (Exception e) {
+            throw new MinioClientErrorException(e.getMessage());
+        }
     }
 
     @Override
     public void remove(String filePath) throws Exception {
-        RemoveObjectArgs build = RemoveObjectArgs.builder().object(filePath).bucket(bucketName).build();
-        remove(build);
+        RemoveObjectArgs removeObjectArgs = RemoveObjectArgs.builder()
+                .object(filePath)
+                .bucket(bucketName)
+                .build();
+        this.client.removeObject(removeObjectArgs);
     }
 
     @Override
     public MinioEntityVO get(String filePath) throws Exception {
-        GetObjectArgs getObjectArgs = GetObjectArgs.builder().object(filePath).bucket(bucketName).build();
+        GetObjectArgs getObjectArgs = GetObjectArgs.builder()
+                .object(filePath)
+                .bucket(bucketName)
+                .build();
         GetObjectResponse inputStream = this.client.getObject(getObjectArgs);
         MinioEntityVO minioFileVO = new MinioEntityVO();
-
-        minioFileVO.setInputSteam(inputStream);
+        minioFileVO.setInputStream(inputStream);
         minioFileVO.setByteCount(Convert.toLong(inputStream.headers().get("Content-Length"), null));
         minioFileVO.setFilePath(filePath);
         minioFileVO.setObject(inputStream.object());
@@ -72,28 +88,6 @@ public class MinioBucket implements StorageBucket {
                 .append("/").append(getBucketName())
                 .append("/").append(filePath);
         return URI.create(sb.toString()).toURL();
-    }
-
-    public void put(String filePath, String contentType, InputStream inputStream) throws Exception {
-        PutObjectArgs build = PutObjectArgs.builder().contentType(contentType)
-                .stream(inputStream, inputStream.available(), -1)
-                .bucket(bucketName).object(filePath).build();
-        put(build);
-    }
-
-    public void put(PutObjectArgs putObjectArgs) throws Exception {
-        try {
-            this.client.putObject(putObjectArgs);
-        } catch (Exception e) {
-            throw new MinioClientErrorException(e.getMessage());
-        }
-    }
-
-    public void remove(RemoveObjectArgs removeObjectArgs) throws Exception {
-        this.client.removeObject(removeObjectArgs);
-    }
-
-    public MinioBucket() {
     }
 
     public MinioBucket(MinioClient client, String bucketName, String permission, String url) {
