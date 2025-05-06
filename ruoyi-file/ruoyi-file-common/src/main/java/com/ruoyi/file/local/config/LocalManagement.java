@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.ruoyi.file.local.domain.LocalBucket;
 import com.ruoyi.file.storage.StorageManagement;
@@ -15,7 +17,7 @@ import com.ruoyi.file.storage.StorageManagement;
 @Configuration("local")
 @ConditionalOnProperty(prefix = "local", name = { "enable" }, havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties("local")
-public class LocalManagement implements StorageManagement {
+public class LocalManagement implements StorageManagement, WebMvcConfigurer {
     private static final Logger logger = LoggerFactory.getLogger(LocalManagement.class);
     private Map<String, LocalBucketProperties> client;
     private String primary;
@@ -40,6 +42,16 @@ public class LocalManagement implements StorageManagement {
     @Override
     public LocalBucket getBucket(String clientName) {
         return targetLocalBucket.get(clientName);
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        client.forEach((name, props) -> {
+            if ("public".equals(props.getPermission())) {
+                registry.addResourceHandler(props.getApi() + "/**")
+                        .addResourceLocations("file:" + props.getPath() + "/");
+            }
+        });
     }
 
     public LocalBucket getPrimaryBucket() {

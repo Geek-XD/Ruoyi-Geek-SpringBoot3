@@ -4,13 +4,15 @@ local:
   primary: MASTER
   client:
     MASTER:
-      permission: public
+      permission: public 
       path: /data/files/master
-      api: /file/resource
+      # 建议public权限的api以 /profile开头就不需要再从SecurityConfig配置权限了
+      api: /profile/files/master
     # SLAVE:
-    #   permission: public
+    #   permission: private
     #   path: /data/files/slave
-    #   api: 
+      # private需要自己编写一个api例如FileController中的/file/resource
+    #   api: /file/resource
 
 # Minio配置
 minio:
@@ -20,14 +22,14 @@ minio:
     MASTER:
       permission: public
       url: http://localhost:9000
-      accessKey:
-      secretKey:
+      accessKey: 
+      secretKey: 
       bucketName: ruoyi
     # SLAVE:
-    #   permission: public
-    #   url: http://127.0.0.1:9000
-    #   accessKey:
-    #   secretKey:
+    #   permission: private
+    #   url: http://localhost:9000
+    #   accessKey: minioadmin
+    #   secretKey: minioadmin
     #   bucketName: ry
 
 # oss配置
@@ -42,7 +44,7 @@ oss:
       bucketName: ruoyi
       endpoint: oss-cn-beijing.aliyuncs.com
     # SLAVE:
-    #   permission: public
+    #   permission: private
     #   accessKeyId: 
     #   accessKeySecret: 
     #   bucketName: 

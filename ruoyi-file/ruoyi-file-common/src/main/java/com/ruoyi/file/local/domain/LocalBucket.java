@@ -76,8 +76,8 @@ public class LocalBucket implements StorageBucket {
         StringBuilder sb = new StringBuilder();
         sb.append(url.delete(url.length() - request.getRequestURI().length(), url.length())
                 .append(contextPath).toString())
-                .append(getApi()).append("?")
-                .append("filePath=").append(URLEncoder.encode(filePath, "UTF-8"));
+                .append(getApi()).append("/")
+                .append(filePath);
         return new URI(sb.toString()).toURL();
     }
 

@@ -48,4 +48,26 @@ public interface StorageBucket {
      * @return 公开访问URL
      */
     URL generatePublicURL(String filePath) throws Exception;
+
+    /**
+     * 获取存储渠道权限
+     * 
+     * @return public/private
+     */
+    String getPermission();
+
+    /**
+     * 获取文件的默认访问方式的URL
+     * 
+     * @param filePath
+     * @return
+     * @throws Exception
+     */
+    default URL getUrl(String filePath) throws Exception {
+        if ("public".equals(getPermission())) {
+            return generatePublicURL(filePath);
+        } else {
+            return generatePresignedUrl(filePath, 3600);
+        }
+    };
 }
