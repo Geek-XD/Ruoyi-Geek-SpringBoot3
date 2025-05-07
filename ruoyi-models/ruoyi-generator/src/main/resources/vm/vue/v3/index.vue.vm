@@ -621,7 +621,7 @@ function remoteMethod${JavaField}(query){
       loading${JavaField}.value = true
       list目标业务名({${column.subColumnJavaField}:query}).then(res=>{
         loading${JavaField}.value = false
-        options${JavaField}.value = res.rows.map(item=>({label:item.${column.subColumnJavaField},value:item.${column.getSubColumnFkJavaField()}}))
+        options${JavaField}.value = res.rows.map(item=>({label:item.${column.subColumnJavaField},value:item.${column.subColumnFkName}}))
       })
     } else {
       options${JavaField}.value = []
