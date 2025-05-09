@@ -44,7 +44,7 @@ COMMENT ON COLUMN sys_file_info.del_flag IS '删除标志（0代表存在 2代�
 -- ----------------------------
 SELECT setval('sys_menu_menu_id_seq', max(menu_id)) FROM sys_menu WHERE menu_id < 100;
 INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-VALUES ('文件管理', 0, 4, 'file', NULL, NULL, '', 1, 0, 'M', '0', '0', NULL, 'file', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
+VALUES ('文件管理', 0, 4, 'file', NULL, NULL, '', 1, 0, 'M', '0', '0', NULL, 'excel', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
 
 -- 文件管理菜单ID
 DO $$
@@ -56,7 +56,7 @@ BEGIN
     
     -- 文件信息菜单
     INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-    VALUES ('文件信息', fileParentId, 1, 'info', 'file/info/index', 1, 0, 'C', '0', '0', 'file:info:list', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '文件信息菜单');
+    VALUES ('文件信息', fileParentId, 1, 'info', 'file/info/index', 1, 0, 'C', '0', '0', 'file:info:list', 'excel', 'admin', CURRENT_TIMESTAMP, '', NULL, '文件信息菜单');
     
     SELECT LASTVAL() INTO parentId;
     

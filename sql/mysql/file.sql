@@ -18,7 +18,7 @@ CREATE TABLE sys_file_info (
     UNIQUE KEY uk_md5 (md5)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文件信息表';
 
-INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, query,route_name, is_frame, is_cache, menu_type, visible, `status`, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES ('文件管理', 0, 4, 'file', NULL, NULL, '',1, 0, 'M', '0', '0', NULL, 'file', 'admin', '2024-02-15 22:40:23', '', NULL, '');
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, query,route_name, is_frame, is_cache, menu_type, visible, `status`, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES ('文件管理', 0, 4, 'file', NULL, NULL, '',1, 0, 'M', '0', '0', NULL, 'excel', 'admin', '2024-02-15 22:40:23', '', NULL, '');
 
 -- 按钮父菜单ID
 SELECT @parentId := LAST_INSERT_ID();
@@ -27,7 +27,7 @@ select @fileParentId := @parentId;
 
 -- 菜单 SQL
 insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-values('文件信息', @fileParentId, '1', 'info', 'file/info/index', 1, 0, 'C', '0', '0', 'file:info:list', '#', 'admin', sysdate(), '', null, '文件信息菜单');
+values('文件信息', @fileParentId, '1', 'info', 'file/info/index', 1, 0, 'C', '0', '0', 'file:info:list', 'excel', 'admin', sysdate(), '', null, '文件信息菜单');
 
 -- 按钮父菜单ID
 SELECT @parentId := LAST_INSERT_ID();
