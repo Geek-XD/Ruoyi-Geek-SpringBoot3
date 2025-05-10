@@ -56,7 +56,7 @@ public class PayController extends BaseController {
     })
     @GetMapping("/url/{orderNumber}")
     public AjaxResult url(@PathVariable String channel, @PathVariable String orderNumber) throws Exception {
-        PayService payService = payServiceMap.get(channel + "PayService");
+        PayService payService = payServiceMap.get("pay:service:" + channel );
         PayOrder payOrder = payOrderService.selectPayOrderByOrderNumber(orderNumber);
         return success(payService.payUrl(payOrder));
     }
@@ -69,7 +69,7 @@ public class PayController extends BaseController {
     @PostMapping("/notify")
     public String notify(@PathVariable String channel, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-        PayService payService = payServiceMap.get(channel + "PayService");
+        PayService payService = payServiceMap.get("pay:service:" + channel );
         return payService.notify(request, response);
     }
 
@@ -81,7 +81,7 @@ public class PayController extends BaseController {
     @PostMapping("/query/{orderNumber}")
     public AjaxResult query(@PathVariable String channel, @PathVariable(name = "orderNumber") String orderNumber)
             throws Exception {
-        PayService payService = payServiceMap.get(channel + "PayService");
+        PayService payService = payServiceMap.get("pay:service:" + channel );
         PayOrder payOrder = payOrderService.selectPayOrderByOrderNumber(orderNumber);
         return success(payService.query(payOrder));
     }
@@ -92,7 +92,7 @@ public class PayController extends BaseController {
             @Parameter(name = "channel", description = "支付方式", required = true),
     })
     public AjaxResult refund(@PathVariable String channel, @RequestBody PayOrder payOrder) {
-        PayService payService = payServiceMap.get(channel + "PayService");
+        PayService payService = payServiceMap.get("pay:service:" + channel );
         return success(payService.refund(payOrder));
     }
 }

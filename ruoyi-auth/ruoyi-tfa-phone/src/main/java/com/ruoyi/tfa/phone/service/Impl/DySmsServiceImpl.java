@@ -37,7 +37,7 @@ import com.ruoyi.tfa.phone.utils.DySmsUtil;
  * @author zlh
  * @date 2024-04-16
  */
-@Service("dySmsAuthService")
+@Service("auth:service:dySms")
 public class DySmsServiceImpl implements DySmsService {
 
     @Autowired

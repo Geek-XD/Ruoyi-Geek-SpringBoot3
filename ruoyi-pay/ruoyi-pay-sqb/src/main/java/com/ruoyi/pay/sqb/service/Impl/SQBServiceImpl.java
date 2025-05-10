@@ -37,7 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service("sqbPayService")
+@Service("pay:service:sqb")
 @ConditionalOnProperty(prefix = "pay.sqb", name = "enabled", havingValue = "true")
 public class SQBServiceImpl implements ISqbPayService {
     @Autowired

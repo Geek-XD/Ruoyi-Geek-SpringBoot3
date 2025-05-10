@@ -29,7 +29,7 @@ import com.wechat.pay.java.service.refund.model.Status;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Service("wechatPayService")
+@Service("pay:service:wechat")
 @ConditionalOnProperty(prefix = "pay.wechat", name = "enabled", havingValue = "true")
 public class WxPayService implements IWxPayService {
 

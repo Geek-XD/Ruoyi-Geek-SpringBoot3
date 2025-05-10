@@ -44,7 +44,7 @@ public class TfaController extends BaseController {
     @Operation(summary = "发送绑定验证码")
     @PostMapping("/send/bind")
     public AjaxResult send(@PathVariable String channel, @RequestBody LoginBody loginBody) {
-        TfaService tfaService = tfaServiceMap.get(channel + "AuthService");
+        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
         tfaService.doBind(loginBody);
         return success();
     }
@@ -52,7 +52,7 @@ public class TfaController extends BaseController {
     @Operation(summary = "验证绑定验证码")
     @PostMapping("/verify/bind") // 发送验证码
     public AjaxResult verify(@PathVariable String channel, @RequestBody LoginBody loginBody) {
-        TfaService tfaService = tfaServiceMap.get(channel + "AuthService");
+        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
         tfaService.doBindVerify(loginBody);
         return success();
     }
@@ -61,7 +61,7 @@ public class TfaController extends BaseController {
     @PostMapping("/send/register")
     @Anonymous
     public AjaxResult sendRegister(@PathVariable String channel, @RequestBody RegisterBody registerBody) {
-        TfaService tfaService = tfaServiceMap.get(channel + "AuthService");
+        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
         tfaService.doRegister(registerBody);
         return success();
     }
@@ -70,7 +70,7 @@ public class TfaController extends BaseController {
     @PostMapping("/verify/register")
     @Anonymous
     public AjaxResult verifyRegister(@PathVariable String channel, @RequestBody RegisterBody registerBody) {
-        TfaService tfaService = tfaServiceMap.get(channel + "AuthService");
+        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
         tfaService.doRegisterVerify(registerBody);
         return success();
     }
@@ -79,7 +79,7 @@ public class TfaController extends BaseController {
     @PostMapping("/send/login")
     @Anonymous
     public AjaxResult sendLogin(@PathVariable String channel, @RequestBody LoginBody loginBody) {
-        TfaService tfaService = tfaServiceMap.get(channel + "AuthService");
+        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
         tfaService.doLogin(loginBody);
         return success();
     }
@@ -88,7 +88,7 @@ public class TfaController extends BaseController {
     @PostMapping("/verify/login")
     @Anonymous
     public AjaxResult verifyLogin(@PathVariable String channel, @RequestBody LoginBody loginBody) {
-        TfaService tfaService = tfaServiceMap.get(channel + "AuthService");
+        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
         return success(tfaService.doLoginVerify(loginBody));
     }
 }
