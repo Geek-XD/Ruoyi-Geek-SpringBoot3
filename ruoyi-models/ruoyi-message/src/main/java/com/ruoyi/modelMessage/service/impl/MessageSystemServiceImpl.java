@@ -169,14 +169,14 @@ public class MessageSystemServiceImpl implements IMessageSystemService {
      */
     @Override
     public List<SysUser> getUserNameByDeptId(Long deptId) {
-        List<SysUser> depts= messageSystemMapper.getUserNameByDeptId(deptId);
+        List<SysUser> depts = messageSystemMapper.getUserNameByDeptId(deptId);
         return depts;
     }
 
     // 查询模版签名
     @Override
     public List<MessageTemplate> selecTemplates() {
-        List<MessageTemplate> templates= messageSystemMapper.selecTemplates();
+        List<MessageTemplate> templates = messageSystemMapper.selecTemplates();
         return templates;
     }
 
@@ -195,7 +195,7 @@ public class MessageSystemServiceImpl implements IMessageSystemService {
             messageSystem.setUpdateTime(nowDate);
         }
         int result = messageSystemMapper.batchInsertMessageSystem(messageSystemList);
-        if ( result <= 0) {
+        if (result <= 0) {
             throw new ServiceException("消息发送失败！");
         }
         return result;
@@ -237,9 +237,9 @@ public class MessageSystemServiceImpl implements IMessageSystemService {
     public void sendPlatformMessage(MessageSystem messageSystem) {
         String notificationContent = messageSystem.getMessageContent();
         try {
-            String filledMessage = notificationContent.startsWith("SMS_") ?
-            messageSystemUtils.processTemplateMessage(messageSystem, notificationContent) :
-            notificationContent; // 是自定义输入，使用用户输入的内容
+            String filledMessage = notificationContent.startsWith("SMS_")
+                    ? messageSystemUtils.processTemplateMessage(messageSystem, notificationContent)
+                    : notificationContent; // 是自定义输入，使用用户输入的内容
             log.info("平台内容: {}", filledMessage);
             messageSystem.setMessageContent(filledMessage);
         } catch (Exception e) {
@@ -257,9 +257,9 @@ public class MessageSystemServiceImpl implements IMessageSystemService {
             throw new ServiceException("邮箱地址不能为空！");
         }
         try {
-            String filledMessage = messageSystem.getMessageContent().startsWith("SMS_") ?
-            messageSystemUtils.processTemplateMessage(messageSystem, messageSystem.getMessageContent()) :
-            messageSystem.getMessageContent(); // 是自定义输入，则直接使用用户提供的内容
+            String filledMessage = messageSystem.getMessageContent().startsWith("SMS_")
+                    ? messageSystemUtils.processTemplateMessage(messageSystem, messageSystem.getMessageContent())
+                    : messageSystem.getMessageContent(); // 是自定义输入，则直接使用用户提供的内容
             log.info("邮件内容: {}", filledMessage);
             messageSystem.setMessageContent(filledMessage);
             EmailUtil.sendMessage(email, "通知", filledMessage);
@@ -289,12 +289,13 @@ public class MessageSystemServiceImpl implements IMessageSystemService {
                 // 提取模板中的变量名并填充内置变量
                 List<String> variableNames = (List<String>) parsedParams.get("variableNames");
                 messageSystemUtils.fillBuiltInVariables(params, messageSystem, variableNames);
-                String filledMessage = messageSystemUtils.fillTemplate((String) parsedParams.get("templateContent"), params);
+                String filledMessage = messageSystemUtils.fillTemplate((String) parsedParams.get("templateContent"),
+                        params);
                 messageSystem.setMessageContent(filledMessage);
                 JSONObject templateParamJson = new JSONObject(params);
-                DySmsUtil.sendSms(dySmsTemplate, templateParamJson, phone);
+                DySmsUtil.sendSms(phone, dySmsTemplate, templateParamJson);
             } else {
-                DySmsUtil.sendSms(null, null, phone);
+                DySmsUtil.sendSms(phone, null, null);
             }
         } catch (Exception e) {
             log.error("发送短信时发生异常: ", e);
