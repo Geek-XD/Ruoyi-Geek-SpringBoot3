@@ -46,16 +46,16 @@ public class MailServiceImpl implements IMailService {
     @Override
     public boolean sendCode(String email, String code, OauthVerificationUse use) {
         if (CacheUtils.hasKey(CacheConstants.EMAIL_CODES, use.getValue() + email)) {
-            throw new ServiceException("当前验证码未失效，请在1分钟后再发送短信");
+            throw new ServiceException("当前验证码未失效，请在1分钟后再发送");
         }
 
         try {
             EmailUtil.sendMessage(email, "验证码邮件", "您收到的验证码是：" + code);
-            CacheUtils.put(CacheConstants.EMAIL_CODES, use.getValue() + email, code, 10, TimeUnit.MINUTES);
+            CacheUtils.put(CacheConstants.EMAIL_CODES, use.getValue() + email, code, 1, TimeUnit.MINUTES);
             log.info("发送邮箱验证码成功:{ email: " + email + " code:" + code + "}");
             return true;
         } catch (Exception e) {
-            throw new ServiceException("发送手机验证码异常：" + email);
+            throw new ServiceException("发送邮箱验证码异常：" + email);
         }
     }
 
@@ -72,6 +72,7 @@ public class MailServiceImpl implements IMailService {
         return isValid;
     }
 
+    @Override
     public void doLogin(LoginBody loginBody) {
         SysUser sysUser = userService.selectUserByEmail(loginBody.getEmail());
         if (sysUser == null) {
@@ -81,6 +82,7 @@ public class MailServiceImpl implements IMailService {
         }
     }
 
+    @Override
     public String doLoginVerify(LoginBody loginBody) {
         if (checkCode(loginBody.getEmail(), loginBody.getCode(), OauthVerificationUse.LOGIN)) {
             SysUser sysUser = userService.selectUserByEmail(loginBody.getEmail());
@@ -97,6 +99,7 @@ public class MailServiceImpl implements IMailService {
         }
     }
 
+    @Override
     public void doRegister(RegisterBody registerBody) {
         SysUser sysUser = userService.selectUserByEmail(registerBody.getEmail());
         if (sysUser != null) {
@@ -106,6 +109,7 @@ public class MailServiceImpl implements IMailService {
         }
     }
 
+    @Override
     public void doRegisterVerify(RegisterBody registerBody) {
         if (checkCode(registerBody.getEmail(), registerBody.getCode(), OauthVerificationUse.REGISTER)) {
             SysUser sysUser = new SysUser();
@@ -121,25 +125,26 @@ public class MailServiceImpl implements IMailService {
         }
     }
 
-    public void doReset(String email) {
-        SysUser sysUser = userService.selectUserByEmail(email);
+    public void doReset(RegisterBody registerBody) {
+        SysUser sysUser = userService.selectUserByEmail(registerBody.getEmail());
         if (sysUser == null) {
             throw new ServiceException("该邮箱未绑定用户");
         } else {
-            sendCode(email, RandomCodeUtil.numberCode(6), OauthVerificationUse.RESET);
+            sendCode(registerBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.RESET);
         }
     }
 
-    public int doResetVerify(RegisterBody registerBody) {
+    public void doResetVerify(RegisterBody registerBody) {
         if (checkCode(registerBody.getEmail(), registerBody.getCode(), OauthVerificationUse.RESET)) {
             SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());
             sysUser.setEmail(registerBody.getEmail());
-            return userService.updateUser(sysUser);
+            userService.updateUser(sysUser);
         } else {
             throw new ServiceException("验证码错误");
         }
     }
 
+    @Override
     public void doBind(LoginBody loginBody) {
         SysUser sysUser = userService.selectUserByEmail(loginBody.getEmail());
         if (sysUser != null) {
@@ -152,6 +157,7 @@ public class MailServiceImpl implements IMailService {
         sendCode(loginBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.BIND);
     }
 
+    @Override
     public void doBindVerify(LoginBody loginBody) {
         if (checkCode(loginBody.getEmail(), loginBody.getCode(), OauthVerificationUse.BIND)) {
             SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());

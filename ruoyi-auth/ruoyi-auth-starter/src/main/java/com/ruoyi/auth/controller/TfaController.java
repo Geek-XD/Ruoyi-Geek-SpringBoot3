@@ -41,22 +41,6 @@ public class TfaController extends BaseController {
         }
     }
 
-    @Operation(summary = "发送绑定验证码")
-    @PostMapping("/send/bind")
-    public AjaxResult send(@PathVariable String channel, @RequestBody LoginBody loginBody) {
-        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
-        tfaService.doBind(loginBody);
-        return success();
-    }
-
-    @Operation(summary = "验证绑定验证码")
-    @PostMapping("/verify/bind") // 发送验证码
-    public AjaxResult verify(@PathVariable String channel, @RequestBody LoginBody loginBody) {
-        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
-        tfaService.doBindVerify(loginBody);
-        return success();
-    }
-
     @Operation(summary = "发送注册验证码")
     @PostMapping("/send/register")
     @Anonymous
@@ -90,5 +74,37 @@ public class TfaController extends BaseController {
     public AjaxResult verifyLogin(@PathVariable String channel, @RequestBody LoginBody loginBody) {
         TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
         return success(tfaService.doLoginVerify(loginBody));
+    }
+
+    @Operation(summary = "发送绑定验证码")
+    @PostMapping("/send/bind")
+    public AjaxResult send(@PathVariable String channel, @RequestBody LoginBody loginBody) {
+        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
+        tfaService.doBind(loginBody);
+        return success();
+    }
+
+    @Operation(summary = "验证绑定验证码")
+    @PostMapping("/verify/bind") // 发送验证码
+    public AjaxResult verify(@PathVariable String channel, @RequestBody LoginBody loginBody) {
+        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
+        tfaService.doBindVerify(loginBody);
+        return success();
+    }
+
+    @Operation(summary = "发送重置验证码")
+    @PostMapping("/send/reset")
+    public AjaxResult sendReset(@PathVariable String channel, @RequestBody RegisterBody registerBody) {
+        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
+        tfaService.doReset(registerBody);
+        return success();
+    }
+
+    @Operation(summary = "验证重置验证码")
+    @PostMapping("/verify/reset")
+    public AjaxResult verifyReset(@PathVariable String channel, @RequestBody RegisterBody registerBody) {
+        TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
+        tfaService.doReset(registerBody);
+        return success();
     }
 }

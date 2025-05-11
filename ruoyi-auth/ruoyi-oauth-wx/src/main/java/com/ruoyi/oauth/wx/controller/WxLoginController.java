@@ -21,10 +21,10 @@ import com.ruoyi.oauth.wx.service.Impl.WxPubLoginServiceImpl;
 public class WxLoginController extends BaseController {
 
     @Autowired
-    private WxMiniAppLoginServiceImpl wxMiniAppLoginServiceImpl;
+    private IOauthUserService oauthUserService;
 
     @Autowired
-    private IOauthUserService oauthUserService;
+    private WxMiniAppLoginServiceImpl wxMiniAppLoginServiceImpl;
 
     @Autowired
     private WxPubLoginServiceImpl wxPubLoginServiceImpl;

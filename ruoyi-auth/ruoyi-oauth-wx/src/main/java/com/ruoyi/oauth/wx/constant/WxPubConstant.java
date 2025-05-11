@@ -1,9 +1,9 @@
 package com.ruoyi.oauth.wx.constant;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
-@Component
+@Configuration
 public class WxPubConstant {
     @Value("${oauth.wx.pub.appId}")
     private String appId;

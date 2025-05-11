@@ -12,6 +12,7 @@ import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.teautil.Common;
 import com.aliyun.teautil.models.RuntimeOptions;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.tfa.phone.config.DySmsConfig;
 import com.ruoyi.tfa.phone.domain.DySmsTemplate;
@@ -55,8 +56,11 @@ public class DySmsUtil {
         }
     }
 
-    public static void sendSms(DySmsTemplate dySmsTemplate, JSONObject templateParamJson, String phone)
+    public static void sendSms(String phone, DySmsTemplate dySmsTemplate, JSONObject templateParamJson)
             throws Exception {
+        if (StringUtils.isEmpty(phone)) {
+            throw new ServiceException("手机号不能为空");
+        }
         validateParam(templateParamJson, dySmsTemplate);
         Client client = createClient();
         SendSmsRequest sendSmsRequest = new SendSmsRequest()

@@ -20,12 +20,6 @@ public class DySmsTemplate {
      */
     private String keys;
 
-    public DySmsTemplate(String templateCode, String signName, String keys) {
-        this.templateCode = templateCode;
-        this.signName = signName;
-        this.keys = keys;
-    }
-
     public String getTemplateCode() {
         return templateCode;
     }

@@ -56,13 +56,13 @@ public class DySmsServiceImpl implements DySmsService {
     @Override
     public boolean sendCode(String phone, String code, OauthVerificationUse use) {
         if (CacheUtils.hasKey(CacheConstants.PHONE_CODES, use.getValue() + phone)) {
-            throw new ServiceException("当前验证码未失效，请在1分钟后再发送短信");
+            throw new ServiceException("当前验证码未失效，请在1分钟后再发送");
         }
 
         try {
             JSONObject templateParams = new JSONObject();
             templateParams.put("code", code);
-            DySmsUtil.sendSms(dySmsConfig.getTemplate().get("VerificationCode"), templateParams, phone);
+            DySmsUtil.sendSms(phone, dySmsConfig.getTemplate().get("VerificationCode"), templateParams);
             CacheUtils.put(CacheConstants.PHONE_CODES, use.getValue() + phone, code, 1, TimeUnit.MINUTES);
             log.info("发送手机验证码成功:{ phone: " + phone + " code:" + code + "}");
             return true;
@@ -84,6 +84,7 @@ public class DySmsServiceImpl implements DySmsService {
         return isValid;
     }
 
+    @Override
     public void doLogin(LoginBody loginBody) {
         SysUser sysUser = userService.selectUserByPhone(loginBody.getPhonenumber());
         if (sysUser == null) {
@@ -93,6 +94,7 @@ public class DySmsServiceImpl implements DySmsService {
         }
     }
 
+    @Override
     public String doLoginVerify(LoginBody loginBody) {
         if (checkCode(loginBody.getPhonenumber(), loginBody.getCode(), OauthVerificationUse.LOGIN)) {
             SysUser sysUser = userService.selectUserByPhone(loginBody.getPhonenumber());
@@ -109,6 +111,7 @@ public class DySmsServiceImpl implements DySmsService {
         }
     }
 
+    @Override
     public void doRegister(RegisterBody registerBody) {
         SysUser sysUser = userService.selectUserByPhone(registerBody.getPhonenumber());
         if (sysUser != null) {
@@ -118,6 +121,7 @@ public class DySmsServiceImpl implements DySmsService {
         }
     }
 
+    @Override
     public void doRegisterVerify(RegisterBody registerBody) {
         if (checkCode(registerBody.getPhonenumber(), registerBody.getCode(), OauthVerificationUse.REGISTER)) {
             SysUser sysUser = new SysUser();
@@ -133,25 +137,26 @@ public class DySmsServiceImpl implements DySmsService {
         }
     }
 
-    public void doReset(String phone) {
-        SysUser sysUser = userService.selectUserByPhone(phone);
+    public void doReset(RegisterBody registerBody) {
+        SysUser sysUser = userService.selectUserByPhone(registerBody.getPhonenumber());
         if (sysUser == null) {
             throw new ServiceException("该手机号未绑定用户");
         } else {
-            sendCode(phone, RandomCodeUtil.numberCode(6), OauthVerificationUse.RESET);
+            sendCode(registerBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.RESET);
         }
     }
 
-    public int doResetVerify(RegisterBody registerBody) {
+    public void doResetVerify(RegisterBody registerBody) {
         if (checkCode(registerBody.getPhonenumber(), registerBody.getCode(), OauthVerificationUse.RESET)) {
             SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());
             sysUser.setPhonenumber(registerBody.getPhonenumber());
-            return userService.updateUser(sysUser);
+            userService.updateUser(sysUser);
         } else {
             throw new ServiceException("验证码错误");
         }
     }
 
+    @Override
     public void doBind(LoginBody loginBody) {
         SysUser sysUser = userService.selectUserByPhone(loginBody.getPhonenumber());
         if (sysUser != null) {
@@ -164,6 +169,7 @@ public class DySmsServiceImpl implements DySmsService {
         sendCode(loginBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.BIND);
     }
 
+    @Override
     public void doBindVerify(LoginBody loginBody) {
         if (checkCode(loginBody.getPhonenumber(), loginBody.getCode(), OauthVerificationUse.BIND)) {
             SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());
