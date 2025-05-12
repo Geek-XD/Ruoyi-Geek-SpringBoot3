@@ -57,4 +57,10 @@ public class LocalFileService implements StorageService {
             return primaryBucket.generatePresignedUrl(filePath, 3600).toString();
         }
     }
+
+    @Override
+    public String uploadFileByMultipart(MultipartFile file, String filePath, double partSize) throws Exception {
+        LocalBucket primaryBucket = localConfig.getPrimaryBucket();
+        return primaryBucket.uploadByMultipart(file, filePath, partSize);
+    }
 }

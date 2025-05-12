@@ -5,9 +5,21 @@ import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 
 public interface StorageManagement extends InitializingBean {
-
+    /**
+     * 获取存储桶
+     *
+     * @param clientName 客户端名称
+     * @return 存储桶
+     */
     StorageBucket getBucket(String clientName);
 
+    /**
+     * 获取存储桶
+     *
+     * @param clientName 客户端名称
+     * @param bucketName 存储桶名称
+     * @return 存储桶
+     */
     public Map<String, ?> getClient();
 
 }

@@ -10,10 +10,6 @@ public class MinioEntityVO extends StorageEntity {
     private String buket;
     private String region;
 
-    public MinioEntityVO() {
-        super();
-    }
-
     public String getObject() {
         return object;
     }

@@ -8,9 +8,6 @@ public class AliOssEntityVO extends StorageEntity {
     private String bucketName;
     private ObjectMetadata metadata;
 
-    public AliOssEntityVO() {
-    }
-
     public String getKey() {
         return key;
     }

@@ -213,4 +213,16 @@ public class FileOperateUtils {
     public static String getURL(String filePath) throws Exception {
         return fileService.generateUrl(filePath);
     }
+
+    /**
+     * 分片上传文件方法
+     * 
+     * @param file     待上传的文件，类型为 MultipartFile。
+     * @param filePath 文件在服务器上的存储路径。
+     * @param partSize 每个分片的大小，单位为字节。
+     * @throws Exception 如果在上传过程中出现错误，如读写文件出错时，则抛出异常。
+     */
+    public static String uploadFileByMultipart(MultipartFile file, String filePath, long partSize) throws Exception {
+        return fileService.uploadFileByMultipart(file, filePath, partSize);
+    }
 }

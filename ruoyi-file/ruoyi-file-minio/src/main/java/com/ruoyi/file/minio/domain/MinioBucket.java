@@ -5,6 +5,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.core.text.Convert;
@@ -21,6 +23,7 @@ import io.minio.http.Method;
 
 public class MinioBucket implements StorageBucket {
 
+    private static final Logger log = LoggerFactory.getLogger(StorageBucket.class);
     private String url;
     private String permission;
     private MinioClient client;
@@ -88,6 +91,33 @@ public class MinioBucket implements StorageBucket {
                 .append("/").append(getBucketName())
                 .append("/").append(filePath);
         return URI.create(sb.toString()).toURL();
+    }
+
+    public String uploadByMultipart(MultipartFile file, String filePath, double partSizeInMB) throws Exception {
+        // 验证分片大小（直接比较 MB 值）
+        if (partSizeInMB < 15.0) {
+            log.warn("分片大小过小，调整为15MB: 传入值={}MB", partSizeInMB);
+            partSizeInMB = 15.0; // 修正：使用 MB 值
+        }
+
+        // 将 MB 转换为字节（仅在需要时转换）
+        long partSizeInBytes = (long) (partSizeInMB * 1024 * 1024);
+
+        log.info("实际分片大小: {}MB ({}字节)", partSizeInMB, partSizeInBytes);
+
+        try (InputStream inputStream = file.getInputStream()) {
+            PutObjectArgs putArgs = PutObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(filePath)
+                    .stream(inputStream, file.getSize(), partSizeInBytes) // 使用字节值
+                    .contentType(file.getContentType())
+                    .build();
+
+            client.putObject(putArgs);
+            return filePath;
+        } catch (Exception e) {
+            throw new MinioClientErrorException("上传失败: " + e.getMessage());
+        }
     }
 
     public MinioBucket(MinioClient client, String bucketName, String permission, String url) {

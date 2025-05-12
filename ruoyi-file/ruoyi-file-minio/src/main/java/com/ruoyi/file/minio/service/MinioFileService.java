@@ -58,4 +58,10 @@ public class MinioFileService implements StorageService {
         }
     }
 
+    @Override
+    public String uploadFileByMultipart(MultipartFile file, String filePath, double partSize) throws Exception {
+        MinioBucket minioBucket = minioConfig.getPrimaryBucket();
+        return minioBucket.uploadByMultipart(file, filePath, partSize);
+    }
+
 }

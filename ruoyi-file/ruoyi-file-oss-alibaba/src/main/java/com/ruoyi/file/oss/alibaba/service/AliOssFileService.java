@@ -58,4 +58,8 @@ public class AliOssFileService implements StorageService {
         }
     }
 
+    @Override
+    public String uploadFileByMultipart(MultipartFile file, String filePath, double partSize) throws Exception {
+        return aliOssConfig.getPrimaryBucket().uploadFileByMultipart(file, filePath, partSize);
+    }
 }
