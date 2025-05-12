@@ -44,8 +44,15 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+            <!-- 消息模块-->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-form</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
             <!-- 手机号认证-->
-           <dependency>
+            <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-tfa-phone</artifactId>
                 <version>${ruoyi.version}</version>
@@ -68,6 +75,7 @@
         <module>ruoyi-quartz</module>
         <module>ruoyi-online</module>
         <module>ruoyi-message</module>
+        <module>ruoyi-form</module>
     </modules>
     <packaging>pom</packaging>
 </project>

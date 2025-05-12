@@ -40,6 +40,12 @@
             <artifactId>ruoyi-message</artifactId>
         </dependency>
 
+        <!-- 消息模块-->
+        <dependency>
+            <groupId>com.ruoyi.geekxd</groupId>
+            <artifactId>ruoyi-form</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
