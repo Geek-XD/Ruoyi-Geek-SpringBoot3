@@ -16,7 +16,7 @@ CREATE TABLE sys_file_info (
     PRIMARY KEY (file_id),
     UNIQUE KEY uk_file_path (file_path),
     UNIQUE KEY uk_md5 (md5)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文件信息表';
+) ENGINE=InnoDB COMMENT='文件信息表';
 
 INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, query,route_name, is_frame, is_cache, menu_type, visible, `status`, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES ('文件管理', 0, 4, 'file', NULL, NULL, '',1, 0, 'M', '0', '0', NULL, 'excel', 'admin', '2024-02-15 22:40:23', '', NULL, '');
 

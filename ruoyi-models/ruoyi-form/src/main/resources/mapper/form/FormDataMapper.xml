@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="formId" column="form_id" />
         <result property="formVersion" column="form_version" />
         <result property="dataContent" column="data_content" />
+        <result property="formSchema" column="form_schema" />
         <result property="status" column="status" />
         <result property="createBy" column="create_by" />
         <result property="createTime" column="create_time" />
@@ -17,7 +18,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark" column="remark" />
         <result property="delFlag" column="del_flag" />
         <result property="formName" column="form_name" />
-        <result property="userName" column="user_name" />
     </resultMap>
 
     <sql id="selectFormDataVo">
@@ -33,8 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             fd.update_time,
             fd.remark,
             fd.del_flag,
-            ft.form_name,
-            su.user_name
+            ft.form_name
         from form_data fd
         left join form_template ft on ft.form_id = fd.form_id
         left join sys_user su on su.user_name = fd.create_by
@@ -48,12 +47,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="dataContent != null  and dataContent != ''"> and fd.data_content = #{dataContent}</if>
             <if test="status != null  and status != ''"> and fd.status = #{status}</if>
             <if test="formName != null  and formName != ''"> and ft.form_name like concat('%', #{formName}, '%')</if>
-            <if test="userName != null  and userName != ''"> and su.user_name like concat('%', #{userName}, '%')</if>
         </where>
     </select>
     
     <select id="selectFormDataByDataId" parameterType="Long" resultMap="FormDataResult">
-        <include refid="selectFormDataVo"/>
+        select 
+            fd.data_id,
+            fd.form_id,
+            fd.form_version,
+            fd.data_content,
+            fd.status,
+            fd.create_by,
+            fd.create_time,
+            fd.update_by,
+            fd.update_time,
+            fd.remark,
+            fd.del_flag,
+            ft.form_name,
+            ft.form_schema
+        from form_data fd
+        left join form_template ft on ft.form_id = fd.form_id
+        left join sys_user su on su.user_name = fd.create_by
         where fd.data_id = #{dataId}
     </select>
         

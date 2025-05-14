@@ -44,10 +44,17 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
-            <!-- 消息模块-->
+            <!-- 表单模块-->
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-form</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- flowable模块-->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-flowable</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
@@ -76,6 +83,7 @@
         <module>ruoyi-online</module>
         <module>ruoyi-message</module>
         <module>ruoyi-form</module>
+        <module>ruoyi-flowable</module>
     </modules>
     <packaging>pom</packaging>
 </project>

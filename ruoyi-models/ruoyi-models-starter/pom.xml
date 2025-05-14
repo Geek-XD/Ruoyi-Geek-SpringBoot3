@@ -46,6 +46,12 @@
             <artifactId>ruoyi-form</artifactId>
         </dependency>
 
+        <!-- flowable模块-->
+        <dependency>
+            <groupId>com.ruoyi.geekxd</groupId>
+            <artifactId>ruoyi-flowable</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

@@ -1,10 +1,12 @@
 package com.ruoyi.form.domain;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 单数据对象 form_data
@@ -13,10 +15,8 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * @date 2025-05-12
  */
 @Schema(description = "单数据对象")
-public class FormData extends BaseEntity
-{
+public class FormData extends BaseEntity {
     private static final long serialVersionUID = 1L;
-
 
     /** 数据ID */
     @Schema(title = "数据ID")
@@ -51,115 +51,90 @@ public class FormData extends BaseEntity
     @Excel(name = "表单名称")
     private String formName;
 
-    /** 用户账号 */
-    @Schema(title = "用户账号")
-    @Excel(name = "用户账号")
-    private String userName;
-    public void setDataId(Long dataId) 
-    {
+    /** 表单JSON Schema（vForm配置） */
+    @Schema(title = "表单JSON Schema（vForm配置）")
+    @Excel(name = "表单JSON Schema", readConverterExp = "v=Form配置")
+    private String formSchema;
+
+    public void setDataId(Long dataId) {
         this.dataId = dataId;
     }
 
-    public Long getDataId() 
-    {
+    public Long getDataId() {
         return dataId;
     }
 
+    public String getFormSchema() {
+        return formSchema;
+    }
 
-    public void setFormId(Long formId) 
-    {
+    public void setFormSchema(String formSchema) {
+        this.formSchema = formSchema;
+    }
+
+    public void setFormId(Long formId) {
         this.formId = formId;
     }
 
-    public Long getFormId() 
-    {
+    public Long getFormId() {
         return formId;
     }
 
-
-    public void setFormVersion(String formVersion) 
-    {
+    public void setFormVersion(String formVersion) {
         this.formVersion = formVersion;
     }
 
-    public String getFormVersion() 
-    {
+    public String getFormVersion() {
         return formVersion;
     }
 
-
-    public void setDataContent(String dataContent) 
-    {
+    public void setDataContent(String dataContent) {
         this.dataContent = dataContent;
     }
 
-    public String getDataContent() 
-    {
+    public String getDataContent() {
         return dataContent;
     }
 
-
-    public void setStatus(String status) 
-    {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public String getStatus() 
-    {
+    public String getStatus() {
         return status;
     }
 
-
-    public void setDelFlag(String delFlag) 
-    {
+    public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
     }
 
-    public String getDelFlag() 
-    {
+    public String getDelFlag() {
         return delFlag;
     }
 
-
-    public void setFormName(String formName) 
-    {
+    public void setFormName(String formName) {
         this.formName = formName;
     }
 
-    public String getFormName() 
-    {
+    public String getFormName() {
         return formName;
     }
 
-
-    public void setUserName(String userName) 
-    {
-        this.userName = userName;
-    }
-
-    public String getUserName() 
-    {
-        return userName;
-    }
-
-
-
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("dataId", getDataId())
-            .append("formId", getFormId())
-            .append("formVersion", getFormVersion())
-            .append("dataContent", getDataContent())
-            .append("status", getStatus())
-            .append("createBy", getCreateBy())
-            .append("createTime", getCreateTime())
-            .append("updateBy", getUpdateBy())
-            .append("updateTime", getUpdateTime())
-            .append("remark", getRemark())
-            .append("delFlag", getDelFlag())
-            .append("formName", getFormName())
-            .append("userName", getUserName())
-            .toString();
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append("dataId", getDataId())
+                .append("formId", getFormId())
+                .append("formVersion", getFormVersion())
+                .append("dataContent", getDataContent())
+                .append("status", getStatus())
+                .append("createBy", getCreateBy())
+                .append("createTime", getCreateTime())
+                .append("updateBy", getUpdateBy())
+                .append("updateTime", getUpdateTime())
+                .append("remark", getRemark())
+                .append("delFlag", getDelFlag())
+                .append("formName", getFormName())
+                .toString();
     }
 }
