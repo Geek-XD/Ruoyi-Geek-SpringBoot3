@@ -20,7 +20,9 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
+import lombok.Builder;
 
+@Builder
 public class MinioBucket implements StorageBucket {
 
     private static final Logger log = LoggerFactory.getLogger(StorageBucket.class);
@@ -118,13 +120,6 @@ public class MinioBucket implements StorageBucket {
         } catch (Exception e) {
             throw new MinioClientErrorException("上传失败: " + e.getMessage());
         }
-    }
-
-    public MinioBucket(MinioClient client, String bucketName, String permission, String url) {
-        this.client = client;
-        this.bucketName = bucketName;
-        this.permission = permission;
-        this.url = url;
     }
 
     public String getName() {

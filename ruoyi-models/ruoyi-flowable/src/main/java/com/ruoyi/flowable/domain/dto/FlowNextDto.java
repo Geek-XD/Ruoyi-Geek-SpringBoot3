@@ -1,11 +1,8 @@
 package com.ruoyi.flowable.domain.dto;
 
-import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import lombok.Data;
-
 import java.io.Serializable;
-import java.util.List;
+
+import lombok.Data;
 
 /**
  * 动态人员、组

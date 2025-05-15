@@ -32,8 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 @RestController
 @RequestMapping("/system/listener")
-public class SysListenerController extends BaseController
-{
+public class SysListenerController extends BaseController {
     @Autowired
     private ISysListenerService sysListenerService;
 
@@ -42,8 +41,7 @@ public class SysListenerController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:listener:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysListener sysListener)
-    {
+    public TableDataInfo list(SysListener sysListener) {
         startPage();
         List<SysListener> list = sysListenerService.selectSysListenerList(sysListener);
         return getDataTable(list);
@@ -55,8 +53,7 @@ public class SysListenerController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:listener:export')")
     @Log(title = "流程监听", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysListener sysListener)
-    {
+    public void export(HttpServletResponse response, SysListener sysListener) {
         List<SysListener> list = sysListenerService.selectSysListenerList(sysListener);
         ExcelUtil<SysListener> util = new ExcelUtil<SysListener>(SysListener.class);
         util.exportExcel(response, list, "流程监听数据");
@@ -67,8 +64,7 @@ public class SysListenerController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:listener:query')")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
-    {
+    public AjaxResult getInfo(@PathVariable("id") Long id) {
         return success(sysListenerService.selectSysListenerById(id));
     }
 
@@ -78,8 +74,7 @@ public class SysListenerController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:listener:add')")
     @Log(title = "流程监听", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody SysListener sysListener)
-    {
+    public AjaxResult add(@RequestBody SysListener sysListener) {
         return toAjax(sysListenerService.insertSysListener(sysListener));
     }
 
@@ -89,8 +84,7 @@ public class SysListenerController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:listener:edit')")
     @Log(title = "流程监听", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody SysListener sysListener)
-    {
+    public AjaxResult edit(@RequestBody SysListener sysListener) {
         return toAjax(sysListenerService.updateSysListener(sysListener));
     }
 
@@ -99,9 +93,8 @@ public class SysListenerController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:listener:remove')")
     @Log(title = "流程监听", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
-    {
+    @DeleteMapping("/{ids}")
+    public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(sysListenerService.deleteSysListenerByIds(ids));
     }
 }

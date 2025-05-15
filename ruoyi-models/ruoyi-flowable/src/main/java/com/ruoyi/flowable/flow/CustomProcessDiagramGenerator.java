@@ -1,13 +1,26 @@
 package com.ruoyi.flowable.flow;
 
 
-import org.flowable.bpmn.model.Process;
-import org.flowable.bpmn.model.*;
-import org.flowable.image.impl.DefaultProcessDiagramCanvas;
-import org.flowable.image.impl.DefaultProcessDiagramGenerator;
-
 import java.util.Iterator;
 import java.util.List;
+
+import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.Artifact;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CallActivity;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowElementsContainer;
+import org.flowable.bpmn.model.FlowNode;
+import org.flowable.bpmn.model.Gateway;
+import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.Lane;
+import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
+import org.flowable.bpmn.model.Pool;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.SubProcess;
+import org.flowable.image.impl.DefaultProcessDiagramCanvas;
+import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 
 /**
  * @author Tony
@@ -18,7 +31,7 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
     protected DefaultProcessDiagramCanvas generateProcessDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows, String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor, boolean drawSequenceFlowNameWithNoLabelDI) {
         this.prepareBpmnModel(bpmnModel);
         DefaultProcessDiagramCanvas processDiagramCanvas = initProcessDiagramCanvas(bpmnModel, imageType, activityFontName, labelFontName, annotationFontName, customClassLoader);
-        Iterator var13 = bpmnModel.getPools().iterator();
+        Iterator<?> var13 = bpmnModel.getPools().iterator();
 
         while (var13.hasNext()) {
             Pool process = (Pool) var13.next();
@@ -29,7 +42,7 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
         var13 = bpmnModel.getProcesses().iterator();
 
         Process process1;
-        Iterator subProcesses1;
+        Iterator<?> subProcesses1;
         while (var13.hasNext()) {
             process1 = (Process) var13.next();
             subProcesses1 = process1.getLanes().iterator();
@@ -59,7 +72,7 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
 
         label75:
         while (true) {
-            List subProcesses2;
+            List<?> subProcesses2;
             do {
                 if (!var13.hasNext()) {
                     return processDiagramCanvas;
@@ -76,7 +89,7 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
                 subProcesses2 = process1.findFlowElementsOfType(SubProcess.class, true);
             } while (subProcesses2 == null);
 
-            Iterator artifact3 = subProcesses2.iterator();
+            Iterator<?> artifact3 = subProcesses2.iterator();
 
             while (true) {
                 GraphicInfo graphicInfo;
@@ -92,7 +105,7 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
                     } while (graphicInfo != null && graphicInfo.getExpanded() != null && !graphicInfo.getExpanded().booleanValue());
                 } while (this.isPartOfCollapsedSubProcess(subProcess1, bpmnModel));
 
-                Iterator var19 = subProcess1.getArtifacts().iterator();
+                Iterator<?> var19 = subProcess1.getArtifacts().iterator();
 
                 while (var19.hasNext()) {
                     Artifact subProcessArtifact = (Artifact) var19.next();
@@ -109,7 +122,7 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
         double maxY = 0.0D;
 
         GraphicInfo nrOfLanes;
-        for (Iterator flowNodes = bpmnModel.getPools().iterator(); flowNodes.hasNext(); maxY = nrOfLanes.getY() + nrOfLanes.getHeight()) {
+        for (Iterator<?> flowNodes = bpmnModel.getPools().iterator(); flowNodes.hasNext(); maxY = nrOfLanes.getY() + nrOfLanes.getHeight()) {
             Pool artifacts = (Pool) flowNodes.next();
             nrOfLanes = bpmnModel.getGraphicInfo(artifacts.getId());
             minX = nrOfLanes.getX();
@@ -117,8 +130,8 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
             minY = nrOfLanes.getY();
         }
 
-        List var23 = gatherAllFlowNodes(bpmnModel);
-        Iterator var24 = var23.iterator();
+        List<?> var23 = gatherAllFlowNodes(bpmnModel);
+        Iterator<?> var24 = var23.iterator();
 
         label155:
         while (var24.hasNext()) {
@@ -140,10 +153,10 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
                 minY = artifact.getY();
             }
 
-            Iterator process = var26.getOutgoingFlows().iterator();
+            Iterator<?> process = var26.getOutgoingFlows().iterator();
 
             while (true) {
-                List l;
+                List<?> l;
                 do {
                     if (!process.hasNext()) {
                         continue label155;
@@ -153,7 +166,7 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
                     l = bpmnModel.getFlowLocationGraphicInfo(graphicInfoList.getId());
                 } while (l == null);
 
-                Iterator graphicInfo = l.iterator();
+                Iterator<?> graphicInfo = l.iterator();
 
                 while (graphicInfo.hasNext()) {
                     GraphicInfo graphicInfo1 = (GraphicInfo) graphicInfo.next();
@@ -176,8 +189,8 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
             }
         }
 
-        List var25 = gatherAllArtifacts(bpmnModel);
-        Iterator var27 = var25.iterator();
+        List<?> var25 = gatherAllArtifacts(bpmnModel);
+        Iterator<?> var27 = var25.iterator();
 
         GraphicInfo var37;
         while (var27.hasNext()) {
@@ -201,9 +214,9 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
                 }
             }
 
-            List var33 = bpmnModel.getFlowLocationGraphicInfo(var29.getId());
+            List<?> var33 = bpmnModel.getFlowLocationGraphicInfo(var29.getId());
             if (var33 != null) {
-                Iterator var35 = var33.iterator();
+                Iterator<?> var35 = var33.iterator();
 
                 while (var35.hasNext()) {
                     var37 = (GraphicInfo) var35.next();
@@ -227,11 +240,11 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
         }
 
         int var28 = 0;
-        Iterator var30 = bpmnModel.getProcesses().iterator();
+        Iterator<?> var30 = bpmnModel.getProcesses().iterator();
 
         while (var30.hasNext()) {
             Process var32 = (Process) var30.next();
-            Iterator var34 = var32.getLanes().iterator();
+            Iterator<?> var34 = var32.getLanes().iterator();
 
             while (var34.hasNext()) {
                 Lane var36 = (Lane) var34.next();

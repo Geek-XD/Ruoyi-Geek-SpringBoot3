@@ -79,7 +79,12 @@ public class MinioManagement implements StorageManagement {
                     .credentials(props.getAccessKey(), props.getSecretKey())
                     .build();
         }
-        MinioBucket minioBucket = new MinioBucket(client, props.getBucketName(), props.getPermission(), props.getUrl());
+        MinioBucket minioBucket = MinioBucket.builder()
+                .client(client)
+                .bucketName(props.getBucketName())
+                .permission(props.getPermission())
+                .url(props.getUrl())
+                .build();
         validateMinioBucket(minioBucket);
         logger.info("数据桶：{}  - 链接成功", name);
         return minioBucket;

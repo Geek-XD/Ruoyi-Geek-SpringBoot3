@@ -1,6 +1,5 @@
 package com.ruoyi.flowable.controller;
 
-
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <p>工作流流程实例管理<p>
+ * <p>
+ * 工作流流程实例管理
+ * <p>
  *
  * @author Tony
  * @date 2021-04-03
@@ -40,17 +41,15 @@ public class FlowInstanceController extends BaseController {
 
     @Operation(summary = "根据流程定义id启动流程实例")
     @PostMapping("/startBy/{procDefId}")
-    public AjaxResult startById( @PathVariable String procDefId,
-                                 @RequestBody Map<String, Object> variables) {
+    public AjaxResult startById(@PathVariable String procDefId, @RequestBody Map<String, Object> variables) {
         return flowInstanceService.startProcessInstanceById(procDefId, variables);
 
     }
 
     @Operation(summary = "激活或挂起流程实例")
     @PostMapping(value = "/updateState")
-    public AjaxResult updateState( @RequestParam Integer state,
-                                   @RequestParam String instanceId) {
-        flowInstanceService.updateState(state,instanceId);
+    public AjaxResult updateState(@RequestParam Integer state, @RequestParam String instanceId) {
+        flowInstanceService.updateState(state, instanceId);
         return AjaxResult.success();
     }
 
@@ -64,10 +63,9 @@ public class FlowInstanceController extends BaseController {
     @Operation(summary = "删除流程实例")
     @Log(title = "删除任务", businessType = BusinessType.DELETE)
     @DeleteMapping(value = "/delete/{instanceIds}")
-    public AjaxResult delete( @PathVariable String[] instanceIds,
-                              @RequestParam(required = false) String deleteReason) {
+    public AjaxResult delete(@PathVariable String[] instanceIds, @RequestParam(required = false) String deleteReason) {
         for (String instanceId : instanceIds) {
-            flowInstanceService.delete(instanceId,deleteReason);
+            flowInstanceService.delete(instanceId, deleteReason);
         }
         return AjaxResult.success();
     }

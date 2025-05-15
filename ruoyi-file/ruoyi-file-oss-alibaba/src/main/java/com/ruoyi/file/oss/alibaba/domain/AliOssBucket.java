@@ -27,6 +27,9 @@ import com.aliyun.oss.model.UploadPartRequest;
 import com.ruoyi.file.oss.alibaba.exception.AliOssClientErrorException;
 import com.ruoyi.file.storage.StorageBucket;
 
+import lombok.Builder;
+
+@Builder
 public class AliOssBucket implements StorageBucket {
 
     private static final Logger logger = LoggerFactory.getLogger(AliOssBucket.class);
@@ -168,15 +171,6 @@ public class AliOssBucket implements StorageBucket {
 
         logger.info("分片上传已完成并合并: 文件={}, uploadId={}", filePath, uploadId);
         return filePath;
-    }
-
-    public AliOssBucket() {
-    }
-
-    // 构造函数
-    public AliOssBucket(OSS ossClient, String bucketName) {
-        this.ossClient = ossClient;
-        this.bucketName = bucketName;
     }
 
     public OSS getOssClient() {

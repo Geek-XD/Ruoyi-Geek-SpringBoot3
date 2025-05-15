@@ -55,6 +55,7 @@ public class SysFormController extends BaseController {
         List<SysForm> list = SysFormService.selectSysFormList(sysForm);
         return AjaxResult.success(list);
     }
+
     /**
      * 导出流程表单列表
      */
@@ -105,7 +106,6 @@ public class SysFormController extends BaseController {
     public AjaxResult remove(@PathVariable Long[] formIds) {
         return toAjax(SysFormService.deleteSysFormByIds(formIds));
     }
-
 
     /**
      * 挂载流程表单

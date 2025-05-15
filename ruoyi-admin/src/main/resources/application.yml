@@ -122,6 +122,6 @@ xss:
 
 flowable:
   # 开启定时任务JOB
-  async-executor-activate: true
+  async-executor-activate: false
   # 在引擎启动时，会自动更新数据库架构
   database-schema-update: true

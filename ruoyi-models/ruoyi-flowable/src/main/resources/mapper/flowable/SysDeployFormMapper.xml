@@ -3,11 +3,11 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.flowable.mapper.SysDeployFormMapper">
-    
+
     <resultMap type="SysDeployForm" id="SysDeployFormResult">
-        <result property="id"    column="id"    />
-        <result property="formId"    column="form_id"    />
-        <result property="deployId"    column="deploy_id"    />
+        <result property="id" column="id" />
+        <result property="formId" column="form_id" />
+        <result property="deployId" column="deploy_id" />
     </resultMap>
 
     <sql id="selectSysDeployFormVo">
@@ -16,19 +16,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectSysDeployFormList" parameterType="SysDeployForm" resultMap="SysDeployFormResult">
         <include refid="selectSysDeployFormVo"/>
-        <where>  
+        <where>
             <if test="formId != null "> and form_id = #{formId}</if>
             <if test="deployId != null  and deployId != ''"> and deploy_id = #{deployId}</if>
         </where>
     </select>
-    
+
     <select id="selectSysDeployFormById" parameterType="Long" resultMap="SysDeployFormResult">
         <include refid="selectSysDeployFormVo"/>
         where id = #{id}
     </select>
 
     <select id="selectSysDeployFormByDeployId" resultType="SysForm">
-        select t1.form_content as formContent,t1.form_name as formName,t1.form_id as formId from sys_form t1 left join sys_deploy_form t2 on t1.form_id = t2.form_id
+        select t1.form_content as formContent,t1.form_name as formName,t1.form_id as formId from sys_form t1 
+        left join sys_deploy_form t2 on t1.form_id = t2.form_id
         where t2.deploy_id = #{deployId} limit 1
     </select>
 
@@ -37,11 +38,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="formId != null">form_id,</if>
             <if test="deployId != null">deploy_id,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="formId != null">#{formId},</if>
             <if test="deployId != null">#{deployId},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateSysDeployForm" parameterType="SysDeployForm">

@@ -70,7 +70,8 @@ public class FlowDefinitionController extends BaseController {
 
     @GetMapping(value = "/list")
     @Operation(summary = "流程定义列表")
-    public TableDataInfo list(@RequestParam Integer pageNum,
+    public TableDataInfo list(
+            @RequestParam Integer pageNum,
             @RequestParam Integer pageSize,
             @RequestParam(required = false) String name) {
         return getDataTable(flowDefinitionService.list(name, pageNum, pageSize));
@@ -78,7 +79,8 @@ public class FlowDefinitionController extends BaseController {
 
     @Operation(summary = "导入流程文件")
     @PostMapping("/import")
-    public AjaxResult importFile(@RequestParam(required = false) String name,
+    public AjaxResult importFile(
+            @RequestParam(required = false) String name,
             @RequestParam(required = false) String category,
             MultipartFile file) {
         InputStream in = null;
@@ -166,16 +168,14 @@ public class FlowDefinitionController extends BaseController {
     @Operation(summary = "发起流程")
     @Log(title = "发起流程", businessType = BusinessType.INSERT)
     @PostMapping("/start/{procDefId}")
-    public AjaxResult start(@PathVariable String procDefId,
-            @RequestBody Map<String, Object> variables) {
+    public AjaxResult start(@PathVariable String procDefId, @RequestBody Map<String, Object> variables) {
         return flowDefinitionService.startProcessInstanceById(procDefId, variables);
     }
 
     @Operation(summary = "激活或挂起流程定义")
     @Log(title = "激活/挂起流程", businessType = BusinessType.UPDATE)
     @PutMapping(value = "/updateState")
-    public AjaxResult updateState(@RequestParam Integer state,
-            @RequestParam String deployId) {
+    public AjaxResult updateState(@RequestParam Integer state, @RequestParam String deployId) {
         flowDefinitionService.updateState(state, deployId);
         return AjaxResult.success();
     }

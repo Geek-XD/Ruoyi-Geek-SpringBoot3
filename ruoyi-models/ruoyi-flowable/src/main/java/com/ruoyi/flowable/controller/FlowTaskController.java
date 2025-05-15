@@ -34,7 +34,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <p>工作流任务管理<p>
+ * <p>
+ * 工作流任务管理
+ * <p>
  *
  * @author Tony
  * @date 2021-04-03
@@ -81,7 +83,6 @@ public class FlowTaskController extends BaseController {
         return getDataTable(flowTaskService.finishedList(queryVo));
     }
 
-
     @Operation(summary = "流程历史流转记录")
     @GetMapping(value = "/flowRecord")
     public AjaxResult flowRecord(String procInsId, String deployId) {
@@ -93,7 +94,6 @@ public class FlowTaskController extends BaseController {
     public AjaxResult getTaskForm(String taskId) {
         return flowTaskService.getTaskForm(taskId);
     }
-
 
     @Operation(summary = "流程初始化表单")
     @GetMapping(value = "/flowFormData")
@@ -211,8 +211,7 @@ public class FlowTaskController extends BaseController {
      * @param processId 任务ID
      */
     @GetMapping("/diagram/{processId}")
-    public void genProcessDiagram(HttpServletResponse response,
-                                  @PathVariable("processId") String processId) {
+    public void genProcessDiagram(HttpServletResponse response, @PathVariable("processId") String processId) {
         InputStream inputStream = flowTaskService.diagram(processId);
         OutputStream os = null;
         BufferedImage image = null;
@@ -244,8 +243,9 @@ public class FlowTaskController extends BaseController {
      * @param procInsId 任务执行编号
      */
     @GetMapping("/flowViewer/{procInsId}/{executionId}")
-    public AjaxResult getFlowViewer(@PathVariable("procInsId") String procInsId,
-                                    @PathVariable("executionId") String executionId) {
+    public AjaxResult getFlowViewer(
+            @PathVariable("procInsId") String procInsId,
+            @PathVariable("executionId") String executionId) {
         return flowTaskService.getFlowViewer(procInsId, executionId);
     }
 
@@ -257,7 +257,7 @@ public class FlowTaskController extends BaseController {
      */
     @GetMapping("/flowXmlAndNode")
     public AjaxResult flowXmlAndNode(@RequestParam(value = "procInsId", required = false) String procInsId,
-                                     @RequestParam(value = "deployId", required = false) String deployId) {
+            @RequestParam(value = "deployId", required = false) String deployId) {
         return flowTaskService.flowXmlAndNode(procInsId, deployId);
     }
 
@@ -272,7 +272,6 @@ public class FlowTaskController extends BaseController {
         return flowTaskService.flowTaskForm(taskId);
     }
 
-
     /**
      * 流程节点信息
      *
@@ -281,9 +280,10 @@ public class FlowTaskController extends BaseController {
      * @return
      */
     @GetMapping("/flowTaskInfo")
-    public AjaxResult flowTaskInfo(@RequestParam(value = "procInsId") String procInsId,
-                                   @RequestParam(value = "elementId") String elementId){
-        return flowTaskService.flowTaskInfo(procInsId,elementId);
+    public AjaxResult flowTaskInfo(
+            @RequestParam(value = "procInsId") String procInsId,
+            @RequestParam(value = "elementId") String elementId) {
+        return flowTaskService.flowTaskInfo(procInsId, elementId);
     }
 
 }

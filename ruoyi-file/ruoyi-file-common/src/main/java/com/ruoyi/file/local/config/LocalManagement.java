@@ -30,7 +30,12 @@ public class LocalManagement implements StorageManagement, WebMvcConfigurer {
             throw new RuntimeException("Local client properties cannot be null or empty");
         }
         client.forEach((name, props) -> {
-            targetLocalBucket.put(name, new LocalBucket(name, props.getPath(), props.getPermission(), props.getApi()));
+            targetLocalBucket.put(name, LocalBucket.builder()
+                    .clientName(name)
+                    .basePath(props.getPath())
+                    .permission(props.getPermission())
+                    .api(props.getApi())
+                    .build());
             logger.info("本地存储目录：{} - 配置成功，路径:{}", name, props.getPath());
         });
         if (targetLocalBucket.get(primary) == null) {

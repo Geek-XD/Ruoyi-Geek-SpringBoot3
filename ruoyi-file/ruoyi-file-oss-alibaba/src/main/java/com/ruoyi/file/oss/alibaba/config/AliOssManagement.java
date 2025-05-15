@@ -77,7 +77,10 @@ public class AliOssManagement implements StorageManagement {
 
         OSS client = new OSSClientBuilder().build(props.getEndpoint(), props.getAccessKeyId(),
                 props.getAccessKeySecret());
-        AliOssBucket ossBucket = new AliOssBucket(client, props.getBucketName());
+        AliOssBucket ossBucket = AliOssBucket.builder()
+                .ossClient(client)
+                .bucketName(props.getBucketName())
+                .build();
         validateOssBucket(ossBucket);
         logger.info("数据桶：{} - 链接成功", name);
         return ossBucket;

@@ -26,7 +26,9 @@ import com.ruoyi.file.storage.StorageBucket;
 import com.ruoyi.file.storage.StorageEntity;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Builder;
 
+@Builder
 public class LocalBucket implements StorageBucket {
     private String clientName;
     private String basePath;
@@ -133,13 +135,6 @@ public class LocalBucket implements StorageBucket {
         } finally {
             Files.walk(tempDir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
         }
-    }
-
-    public LocalBucket(String clientName, String basePath, String permission, String api) {
-        this.clientName = clientName;
-        this.basePath = basePath;
-        this.permission = permission;
-        this.api = api;
     }
 
     public String getClientName() {
