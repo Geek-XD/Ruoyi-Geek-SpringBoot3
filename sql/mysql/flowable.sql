@@ -26,22 +26,6 @@ CREATE TABLE `sys_expression`
 ) ENGINE=InnoDB AUTO_INCREMENT=69  COMMENT='流程表达式';
 
 
--- sys_form definition
-DROP TABLE IF EXISTS `sys_form`;
-CREATE TABLE `sys_form`
-(
-    `form_id`      bigint(20) NOT NULL AUTO_INCREMENT COMMENT '表单主键',
-    `form_name`    varchar(50)  DEFAULT NULL COMMENT '表单名称',
-    `form_content` longtext COMMENT '表单内容',
-    `create_time`  datetime     DEFAULT NULL COMMENT '创建时间',
-    `update_time`  datetime     DEFAULT NULL COMMENT '更新时间',
-    `create_by`    bigint(20) DEFAULT NULL COMMENT '创建人员',
-    `update_by`    bigint(20) DEFAULT NULL COMMENT '更新人员',
-    `remark`       varchar(255) DEFAULT NULL COMMENT '备注',
-    PRIMARY KEY (`form_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3936  COMMENT='流程表单';
-
-
 -- sys_listener definition
 DROP TABLE IF EXISTS `sys_listener`;
 CREATE TABLE `sys_listener`
@@ -75,16 +59,9 @@ INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query
 
 INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES( '已发任务', @task, 1, 'process', 'flowable/task/myProcess/index', NULL, NULL, 1, 1, 'C', '0', '0', '', 'guide', 'admin', '2021-03-30 09:26:23', 'admin', '2022-12-12 09:58:07', '');
 SELECT @process := LAST_INSERT_ID();
-
-INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES( '表单配置', @flowable, 2, 'form', 'flowable/task/form/index', NULL, NULL, 1, 1, 'C', '0', '0', 'flowable:form:list', 'form', 'admin', '2021-03-30 22:55:12', 'admin', '2023-08-19 15:54:57', '');
-SELECT @form := LAST_INSERT_ID();
-INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES( '新增', @form, 1, '', NULL, NULL, NULL, 1, 0, 'F', '0', '0', 'flowable:form:add', '#', 'admin', '2021-07-07 14:23:37', 'admin', '2023-08-16 09:17:38', '');
-INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES( '删除', @form, 3, '', NULL, NULL, NULL, 1, 0, 'F', '0', '0', 'flowable:form:remove', '#', 'admin', '2021-07-07 14:24:10', '', NULL, '');
-INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES( '编辑', @form, 2, '', NULL, NULL, NULL, 1, 0, 'F', '0', '0', 'flowable:form:edit', '#', 'admin', '2021-07-07 14:24:31', '', NULL, '');
 INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES( '新增', @process, 1, '', NULL, NULL, NULL, 1, 0, 'F', '0', '0', 'system:deployment:add', '#', 'admin', '2021-07-07 14:25:22', '', NULL, '');
 INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES( '编辑', @process, 2, '', NULL, NULL, NULL, 1, 0, 'F', '0', '0', 'system:deployment:edit', '#', 'admin', '2021-07-07 14:25:47', '', NULL, '');
 INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES( '删除', @process, 3, '', NULL, NULL, NULL, 1, 0, 'F', '0', '0', 'system:deployment:remove', '#', 'admin', '2021-07-07 14:26:02', '', NULL, '');
-INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES( '查询', @form, 4, '', NULL, NULL, NULL, 1, 0, 'F', '0', '0', 'flowable:form:query', '#', 'admin', '2021-07-08 14:05:22', '', NULL, '');
 
 INSERT INTO sys_menu ( menu_name, parent_id, order_num, `path`, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark) VALUES( '流程表达式', @flowable, 3, 'expression', 'flowable/expression/index', NULL, NULL, 1, 1, 'C', '0', '0', 'system:expression:list', 'list', 'admin', '2022-12-12 17:12:19', 'admin', '2022-12-12 17:13:44', '流程达式菜单');
 SELECT @expression := LAST_INSERT_ID();

@@ -11,10 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -58,7 +54,6 @@ import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.flowable.common.constant.ProcessConstants;
 import com.ruoyi.flowable.common.enums.FlowComment;
-import com.ruoyi.flowable.domain.SysForm;
 import com.ruoyi.flowable.domain.dto.FlowCommentDto;
 import com.ruoyi.flowable.domain.dto.FlowNextDto;
 import com.ruoyi.flowable.domain.dto.FlowTaskDto;
@@ -71,7 +66,8 @@ import com.ruoyi.flowable.flow.FindNextNodeUtil;
 import com.ruoyi.flowable.flow.FlowableUtils;
 import com.ruoyi.flowable.service.IFlowTaskService;
 import com.ruoyi.flowable.service.ISysDeployFormService;
-import com.ruoyi.flowable.service.ISysFormService;
+import com.ruoyi.form.domain.FormTemplate;
+import com.ruoyi.form.service.IFormTemplateService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
 
@@ -92,8 +88,10 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
     private ISysRoleService sysRoleService;
     @Resource
     private ISysDeployFormService sysInstanceFormService;
+    // @Resource
+    // private ISysFormService sysFormService;
     @Resource
-    private ISysFormService sysFormService;
+    private IFormTemplateService formTemplateService;
 
     /**
      * 完成任务
@@ -742,10 +740,10 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
         return hisTaskList;
     }
 
-    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
+    // private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+    //     Set<Object> seen = ConcurrentHashMap.newKeySet();
+    //     return t -> seen.add(keyExtractor.apply(t));
+    // }
 
     /**
      * 流程历史流转记录
@@ -828,11 +826,11 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
         }
         // 第一次申请获取初始化表单
         if (StringUtils.isNotBlank(deployId)) {
-            SysForm sysForm = sysInstanceFormService.selectSysDeployFormByDeployId(deployId);
+            FormTemplate sysForm = sysInstanceFormService.selectSysDeployFormByDeployId(deployId);
             if (Objects.isNull(sysForm)) {
                 return AjaxResult.error("请先配置流程表单");
             }
-            map.put("formData", JSONObject.parseObject(sysForm.getFormContent()));
+            map.put("formData", JSONObject.parseObject(sysForm.getFormSchema()));
         }
         return AjaxResult.success(map);
     }
@@ -846,8 +844,8 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
     @Override
     public AjaxResult getTaskForm(String taskId) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        SysForm sysForm = sysFormService.selectSysFormById(Long.parseLong(task.getFormKey()));
-        return AjaxResult.success(sysForm.getFormContent());
+        FormTemplate sysForm = formTemplateService.selectFormTemplateByFormId(Long.parseLong(task.getFormKey()));
+        return AjaxResult.success(sysForm.getFormSchema());
     }
 
     /**
@@ -1040,11 +1038,11 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
     public AjaxResult flowFormData(String deployId) {
         // 第一次申请获取初始化表单
         if (StringUtils.isNotBlank(deployId)) {
-            SysForm sysForm = sysInstanceFormService.selectSysDeployFormByDeployId(deployId);
+            FormTemplate sysForm = sysInstanceFormService.selectSysDeployFormByDeployId(deployId);
             if (Objects.isNull(sysForm)) {
                 return AjaxResult.error("请先配置流程表单!");
             }
-            return AjaxResult.success(JSONObject.parseObject(sysForm.getFormContent()));
+            return AjaxResult.success(JSONObject.parseObject(sysForm.getFormSchema()));
         } else {
             return AjaxResult.error("参数错误!");
         }
@@ -1092,7 +1090,7 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
                 flowViewerDto.setCompleted(false);
                 flowViewerList.add(flowViewerDto);
             });
-            Map<String, Object> result = new HashMap();
+            Map<String, Object> result = new HashMap<>();
             // xmlData 数据
             ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deployId).singleResult();
             InputStream inputStream = repositoryService.getResourceAsStream(definition.getDeploymentId(), definition.getResourceName());
@@ -1132,8 +1130,8 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
         }
         // TODO 暂时只处理用户任务上的表单
         if (StringUtils.isNotBlank(task.getFormKey())) {
-            SysForm sysForm = sysFormService.selectSysFormById(Long.parseLong(task.getFormKey()));
-            JSONObject data = JSONObject.parseObject(sysForm.getFormContent());
+            FormTemplate sysForm = formTemplateService.selectFormTemplateByFormId(Long.parseLong(task.getFormKey()));
+            JSONObject data = JSONObject.parseObject(sysForm.getFormSchema());
             List<JSONObject> newFields = JSON.parseObject(JSON.toJSONString(data.get("widgetList")), new TypeReference<List<JSONObject>>() {
             });
             // 表单回显时 加入子表单信息到流程变量中

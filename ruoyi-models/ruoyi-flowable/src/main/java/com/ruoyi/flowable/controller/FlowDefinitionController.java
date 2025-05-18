@@ -30,9 +30,11 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.flowable.domain.SysDeployForm;
 import com.ruoyi.flowable.domain.SysExpression;
 import com.ruoyi.flowable.domain.dto.FlowSaveXmlVo;
 import com.ruoyi.flowable.service.IFlowDefinitionService;
+import com.ruoyi.flowable.service.ISysDeployFormService;
 import com.ruoyi.flowable.service.ISysExpressionService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
@@ -67,6 +69,9 @@ public class FlowDefinitionController extends BaseController {
     private ISysRoleService sysRoleService;
     @Resource
     private ISysExpressionService sysExpressionService;
+
+    @Resource
+    private ISysDeployFormService sysDeployFormService;
 
     @GetMapping(value = "/list")
     @Operation(summary = "流程定义列表")
@@ -209,6 +214,15 @@ public class FlowDefinitionController extends BaseController {
     public AjaxResult expList(SysExpression sysExpression) {
         List<SysExpression> list = sysExpressionService.selectSysExpressionList(sysExpression);
         return AjaxResult.success(list);
+    }
+
+    /**
+     * 挂载流程表单
+     */
+    @Log(title = "流程表单", businessType = BusinessType.INSERT)
+    @PostMapping("/addDeployForm")
+    public AjaxResult addDeployForm(@RequestBody SysDeployForm sysDeployForm) {
+        return toAjax(sysDeployFormService.insertSysDeployForm(sysDeployForm));
     }
 
 }

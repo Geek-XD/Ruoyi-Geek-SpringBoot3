@@ -3,7 +3,7 @@ package com.ruoyi.flowable.service;
 import java.util.List;
 
 import com.ruoyi.flowable.domain.SysDeployForm;
-import com.ruoyi.flowable.domain.SysForm;
+import com.ruoyi.form.domain.FormTemplate;
 /**
  * 流程实例关联表单Service接口
  * 
@@ -65,5 +65,5 @@ public interface ISysDeployFormService
      * @param deployId
      * @return
      */
-    SysForm selectSysDeployFormByDeployId(String deployId);
+    FormTemplate selectSysDeployFormByDeployId(String deployId);
 }

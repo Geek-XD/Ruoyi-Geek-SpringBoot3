@@ -5,7 +5,7 @@ package com.ruoyi.flowable.mapper;
 import java.util.List;
 
 import com.ruoyi.flowable.domain.SysDeployForm;
-import com.ruoyi.flowable.domain.SysForm;
+import com.ruoyi.form.domain.FormTemplate;
 
 /**
  * 流程实例关联表单Mapper接口
@@ -70,5 +70,5 @@ public interface SysDeployFormMapper
      * @param deployId
      * @return
      */
-    SysForm selectSysDeployFormByDeployId(String deployId);
+    FormTemplate selectSysDeployFormByDeployId(String deployId);
 }

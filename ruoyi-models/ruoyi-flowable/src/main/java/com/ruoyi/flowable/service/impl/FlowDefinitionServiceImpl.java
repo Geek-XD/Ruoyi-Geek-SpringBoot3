@@ -24,12 +24,12 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.flowable.common.constant.ProcessConstants;
 import com.ruoyi.flowable.common.enums.FlowComment;
-import com.ruoyi.flowable.domain.SysForm;
 import com.ruoyi.flowable.domain.dto.FlowProcDefDto;
 import com.ruoyi.flowable.factory.FlowServiceFactory;
 import com.ruoyi.flowable.mapper.FlowDeployMapper;
 import com.ruoyi.flowable.service.IFlowDefinitionService;
 import com.ruoyi.flowable.service.ISysDeployFormService;
+import com.ruoyi.form.domain.FormTemplate;
 import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysUserService;
 
@@ -107,7 +107,7 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
         final List<FlowProcDefDto> dataList = flowDeployMapper.selectDeployList(name);
         // 加载挂表单
         for (FlowProcDefDto procDef : dataList) {
-            SysForm sysForm = sysDeployFormService.selectSysDeployFormByDeployId(procDef.getDeploymentId());
+            FormTemplate sysForm = sysDeployFormService.selectSysDeployFormByDeployId(procDef.getDeploymentId());
             if (Objects.nonNull(sysForm)) {
                 procDef.setFormName(sysForm.getFormName());
                 procDef.setFormId(sysForm.getFormId());

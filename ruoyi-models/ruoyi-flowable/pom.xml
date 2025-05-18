@@ -41,6 +41,11 @@
             <version>5.3.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.ruoyi.geekxd</groupId>
+            <artifactId>ruoyi-form</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

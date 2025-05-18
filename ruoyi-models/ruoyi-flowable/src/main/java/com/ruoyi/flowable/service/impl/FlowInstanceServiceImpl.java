@@ -1,16 +1,17 @@
 package com.ruoyi.flowable.service.impl;
 
-
 import java.util.Map;
 import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.task.api.Task;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.flowable.domain.vo.FlowTaskVo;
 import com.ruoyi.flowable.factory.FlowServiceFactory;
 import com.ruoyi.flowable.service.IFlowInstanceService;
@@ -18,7 +19,9 @@ import com.ruoyi.flowable.service.IFlowInstanceService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <p>工作流流程实例管理<p>
+ * <p>
+ * 工作流流程实例管理
+ * <p>
  *
  * @author Tony
  * @date 2021-04-03
@@ -36,6 +39,22 @@ public class FlowInstanceServiceImpl extends FlowServiceFactory implements IFlow
     public void stopProcessInstance(FlowTaskVo vo) {
         String taskId = vo.getTaskId();
 
+        if (!StringUtils.hasText(taskId)) {
+            throw new IllegalArgumentException("任务ID不能为空。");
+        }
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new RuntimeException("未找到ID为 " + taskId + " 的任务，无法停止流程实例。可能任务已完成或不存在。");
+        }
+        String processInstanceId = task.getProcessInstanceId();
+        if (!StringUtils.hasText(processInstanceId)) {
+            throw new RuntimeException("任务 " + taskId + " 没有关联的流程实例ID。");
+        }
+        String deleteReason = vo.getComment(); // 假设 FlowTaskVo 有 getComment() 方法获取原因
+        if (!StringUtils.hasText(deleteReason)) {
+            deleteReason = "流程实例由用户通过任务ID " + taskId + " 手动停止。"; // 提供一个默认原因
+        }
+        runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
     }
 
     /**
@@ -87,8 +106,8 @@ public class FlowInstanceServiceImpl extends FlowServiceFactory implements IFlow
      */
     @Override
     public HistoricProcessInstance getHistoricProcessInstanceById(String processInstanceId) {
-        HistoricProcessInstance historicProcessInstance =
-                historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId).singleResult();
         if (Objects.isNull(historicProcessInstance)) {
             throw new FlowableObjectNotFoundException("流程实例不存在: " + processInstanceId);
         }
@@ -108,8 +127,8 @@ public class FlowInstanceServiceImpl extends FlowServiceFactory implements IFlow
         try {
             // 设置流程发起人Id到流程中
             Long userId = SecurityUtils.getLoginUser().getUser().getUserId();
-//            identityService.setAuthenticatedUserId(userId.toString());
-            variables.put("initiator",userId);
+            // identityService.setAuthenticatedUserId(userId.toString());
+            variables.put("initiator", userId);
             variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
             runtimeService.startProcessInstanceById(procDefId, variables);
             return AjaxResult.success("流程启动成功");

@@ -1,10 +1,11 @@
 package com.ruoyi.flowable.listener;
 
-import lombok.extern.slf4j.Slf4j;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 执行监听器
@@ -31,6 +32,6 @@ public class FlowExecutionListener implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution execution) {
-        log.info("执行监听器:{}", execution);
+        log.info("执行监听器:{},参数:{}", execution, param);
     }
 }
