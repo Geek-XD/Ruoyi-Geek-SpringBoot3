@@ -51,7 +51,7 @@ public class AliOssFileService implements StorageService {
     @Override
     public String generateUrl(String filePath) throws Exception {
         AliOssBucket aliOssBucket = aliOssConfig.getPrimaryBucket();
-        if (aliOssBucket.getPermission() == "public") {
+        if ("public".equals(aliOssBucket.getPermission())) {
             return aliOssBucket.generatePublicURL(filePath).toString();
         } else {
             return aliOssBucket.generatePresignedUrl(filePath, 3600).toString();

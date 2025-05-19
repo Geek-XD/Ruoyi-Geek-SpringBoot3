@@ -93,15 +93,11 @@ public class CommonController {
     @Anonymous
     public AjaxResult uploadFile(@RequestBody MultipartFile file) throws Exception {
         try {
-            // 上传文件路径
-            // String filePath = RuoYiConfig.getUploadPath();
-            // 上传并返回新文件名称
-            String fileName = FileOperateUtils.upload(file);
-            String url = serverConfig.getUrl() + fileName;
+            String url = FileOperateUtils.upload(file);
             AjaxResult ajax = AjaxResult.success();
             ajax.put("url", url);
-            ajax.put("fileName", fileName);
-            ajax.put("newFileName", FileUtils.getName(fileName));
+            ajax.put("fileName", file.getOriginalFilename());
+            ajax.put("newFileName", FileUtils.getName(file.getOriginalFilename()));
             ajax.put("originalFilename", file.getOriginalFilename());
             return ajax;
         } catch (Exception e) {

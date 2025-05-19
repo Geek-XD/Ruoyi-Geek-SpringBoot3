@@ -51,7 +51,7 @@ public class LocalFileService implements StorageService {
     @Override
     public String generateUrl(String filePath) throws Exception {
         LocalBucket primaryBucket = localConfig.getPrimaryBucket();
-        if (primaryBucket.getPermission() == "public") {
+        if ("public".equals(primaryBucket.getPermission())) {
             return primaryBucket.generatePublicURL(filePath).toString();
         } else {
             return primaryBucket.generatePresignedUrl(filePath, 3600).toString();

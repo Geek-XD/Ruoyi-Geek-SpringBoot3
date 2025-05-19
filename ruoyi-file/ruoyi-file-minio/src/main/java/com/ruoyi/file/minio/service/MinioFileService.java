@@ -51,7 +51,7 @@ public class MinioFileService implements StorageService {
     @Override
     public String generateUrl(String filePath) throws Exception {
         MinioBucket minioBucket = minioConfig.getPrimaryBucket();
-        if (minioBucket.getPermission() == "public") {
+        if ("public".equals(minioBucket.getPermission())) {
             return minioBucket.generatePublicURL(filePath).toString();
         } else {
             return minioBucket.generatePresignedUrl(filePath, 3600).toString();

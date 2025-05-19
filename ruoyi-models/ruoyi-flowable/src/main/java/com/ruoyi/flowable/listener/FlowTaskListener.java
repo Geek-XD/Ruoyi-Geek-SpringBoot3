@@ -1,5 +1,6 @@
 package com.ruoyi.flowable.listener;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.springframework.stereotype.Component;
@@ -19,14 +20,18 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class FlowTaskListener implements TaskListener{
+public class FlowTaskListener implements TaskListener {
+
+    /**
+     * 流程设计器添加的参数
+     */
+    private Expression param;
 
     @Override
     public void notify(DelegateTask delegateTask) {
 
-        log.info("任务监听器:{}", delegateTask);
-        // TODO  获取事件类型 delegateTask.getEventName(),可以通过监听器给任务执行人发送相应的通知消息
-
+        log.info("任务监听器:{}", delegateTask, param.getValue(delegateTask));
+        // TODO 获取事件类型 delegateTask.getEventName(),可以通过监听器给任务执行人发送相应的通知消息
 
     }
 
