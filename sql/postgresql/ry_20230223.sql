@@ -857,7 +857,7 @@ values('账号自助-是否开启用户注册功能', 'sys.account.registerUser'
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
 values('主题颜色', 'sys.index.theme', '#11A983', 'Y', 'admin', '2023-04-22 00:57:18', 'admin', '2023-04-22 00:58:23', null);
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('开启TopNav', 'sys.index.topNav', 'true', 'Y', 'admin', '2023-04-22 00:58:59', '', null, null);
+values('开启TopNav', 'sys.index.topNav', 'false', 'Y', 'admin', '2023-04-22 00:58:59', '', null, null);
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
 values('开启Tags-Views', 'sys.index.tagsView', 'true', 'Y', 'admin', '2023-04-22 00:59:40', '', null, null);
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
