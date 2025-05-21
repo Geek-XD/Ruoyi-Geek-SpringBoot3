@@ -16,6 +16,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
@@ -130,15 +131,15 @@ public class SysProfileController extends BaseController {
     public AjaxResult avatar(@RequestParam("avatarfile") MultipartFile file) throws Exception {
         if (!file.isEmpty()) {
             LoginUser loginUser = getLoginUser();
-            String extractPath = loginUser.getUsername() + "/" + loginUser.getUserId();
-            String fileName = "avatar." + FileUtils.getExtension(file);
+            String extractPath = loginUser.getUsername() + "/" + loginUser.getUserId() + "";
+            String fileName = DateUtils.dateTimeNow() + "-avatar." + FileUtils.getExtension(file);
             String filePath = "avatar/" + extractPath + "/" + fileName;
             String url = FileOperateUtils.upload(filePath, file, MimeTypeUtils.IMAGE_EXTENSION);
             if (userService.updateUserAvatar(loginUser.getUsername(), filePath)) {
                 AjaxResult ajax = AjaxResult.success();
                 ajax.put("imgUrl", url);
                 // 更新缓存用户头像
-                loginUser.getUser().setAvatar(url);
+                loginUser.getUser().setAvatar(filePath);
                 tokenService.setLoginUser(loginUser);
                 return ajax;
             }
