@@ -1,12 +1,20 @@
 package com.ruoyi.file.minio.domain;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.core.text.Convert;
@@ -21,27 +29,29 @@ import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
 @Builder
+@Slf4j
 public class MinioBucket implements StorageBucket {
 
-    private static final Logger log = LoggerFactory.getLogger(StorageBucket.class);
     private String url;
     private String permission;
     private MinioClient client;
     private String bucketName;
 
+    private static final ConcurrentHashMap<String, AtomicBoolean> uploadingParts = new ConcurrentHashMap<>();
+
     @Override
     public void put(String filePath, MultipartFile file) {
-        try {
-            InputStream inputStream = file.getInputStream();
+        try (InputStream inputStream = file.getInputStream()) {
             PutObjectArgs putObjectArgs = PutObjectArgs.builder()
                     .contentType(file.getContentType())
-                    .stream(inputStream, inputStream.available(), -1)
+                    .stream(inputStream, file.getSize(), -1)
                     .bucket(bucketName)
                     .object(filePath)
                     .build();
-            this.client.putObject(putObjectArgs);
+            client.putObject(putObjectArgs);
         } catch (Exception e) {
             throw new MinioClientErrorException(e.getMessage());
         }
@@ -53,7 +63,7 @@ public class MinioBucket implements StorageBucket {
                 .object(filePath)
                 .bucket(bucketName)
                 .build();
-        this.client.removeObject(removeObjectArgs);
+        client.removeObject(removeObjectArgs);
     }
 
     @Override
@@ -62,15 +72,15 @@ public class MinioBucket implements StorageBucket {
                 .object(filePath)
                 .bucket(bucketName)
                 .build();
-        GetObjectResponse inputStream = this.client.getObject(getObjectArgs);
+        GetObjectResponse response = client.getObject(getObjectArgs);
         MinioEntityVO minioFileVO = new MinioEntityVO();
-        minioFileVO.setInputStream(inputStream);
-        minioFileVO.setByteCount(Convert.toLong(inputStream.headers().get("Content-Length"), null));
+        minioFileVO.setInputStream(response);
+        minioFileVO.setByteCount(Convert.toLong(response.headers().get("Content-Length"), null));
         minioFileVO.setFilePath(filePath);
-        minioFileVO.setObject(inputStream.object());
-        minioFileVO.setRegion(inputStream.region());
-        minioFileVO.setBuket(inputStream.bucket());
-        minioFileVO.setHeaders(inputStream.headers());
+        minioFileVO.setObject(response.object());
+        minioFileVO.setRegion(response.region());
+        minioFileVO.setBuket(response.bucket());
+        minioFileVO.setHeaders(response.headers());
         return minioFileVO;
     }
 
@@ -80,7 +90,7 @@ public class MinioBucket implements StorageBucket {
                 .method(Method.GET)
                 .bucket(bucketName)
                 .object(filePath)
-                .expiry(expireTime, TimeUnit.SECONDS) // 设置过期时间为1小时
+                .expiry(expireTime, TimeUnit.SECONDS)
                 .build();
         String urlString = client.getPresignedObjectUrl(request);
         return URI.create(urlString).toURL();
@@ -95,31 +105,115 @@ public class MinioBucket implements StorageBucket {
         return URI.create(sb.toString()).toURL();
     }
 
-    public String uploadByMultipart(MultipartFile file, String filePath, double partSizeInMB) throws Exception {
-        // 验证分片大小（直接比较 MB 值）
-        if (partSizeInMB < 15.0) {
-            log.warn("分片大小过小，调整为15MB: 传入值={}MB", partSizeInMB);
-            partSizeInMB = 15.0; // 修正：使用 MB 值
+    /**
+     * 初始化分片上传
+     */
+    public String initMultipartUpload(String filePath) throws Exception {
+        try {
+            String uploadId = UUID.randomUUID().toString().replace("-", "").toUpperCase();
+            return uploadId;
+        } catch (Exception e) {
+            log.error("初始化失败: 文件={}, 错误={}", filePath, e.getMessage());
+            throw new MinioClientErrorException("初始化失败", e);
+        }
+    }
+
+    /**
+     * 上传单个分片
+     */
+    public String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
+            throws Exception {
+        // 生成唯一的上传键
+        String uploadKey = String.format("%s-%s-%d", filePath, uploadId, partNumber);
+        AtomicBoolean isUploading = uploadingParts.computeIfAbsent(uploadKey, k -> new AtomicBoolean(false));
+        // 使用 CAS 检查是否已经在上传中
+        if (!isUploading.compareAndSet(false, true)) {
+            throw new MinioClientErrorException("分片正在上传中: " + uploadKey);
+        }
+        try {
+            // 构建分片存储路径
+            String partPath = String.format("%s.%s.part.%d", filePath, uploadId, partNumber);
+            // 构造上传请求参数
+            PutObjectArgs args = PutObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(partPath)
+                    .stream(inputStream, partSize, -1)
+                    .build();
+            // 执行上传操作并获取 ETag
+            String etag = client.putObject(args).etag().replace("\"", "").toUpperCase();
+            return etag;
+        } catch (Exception e) {
+            log.error("分片上传失败: 文件={}, 分片={}, 错误={}", filePath, partNumber, e.getMessage());
+            throw new MinioClientErrorException("上传分片失败", e);
+        } finally {
+            isUploading.set(false);// 标记为上传完成，并清理状态
+            uploadingParts.remove(uploadKey);
+        }
+    }
+
+    /**
+     * 完成分片上传并合并文件
+     */
+    public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partInfos)
+            throws Exception {
+        if (partInfos == null || partInfos.isEmpty()) {
+            throw new IllegalArgumentException("分片信息不能为空");
         }
 
-        // 将 MB 转换为字节（仅在需要时转换）
-        long partSizeInBytes = (long) (partSizeInMB * 1024 * 1024);
+        // 按分片序号排序
+        List<Map<String, Object>> sortedParts = partInfos.stream()
+                .sorted(Comparator.comparingInt(p -> ((Number) p.get("partNumber")).intValue()))
+                .collect(Collectors.toList());
 
-        log.info("实际分片大小: {}MB ({}字节)", partSizeInMB, partSizeInBytes);
+        // 创建临时文件并合并分片
+        Path tempFilePath = Files.createTempFile("minio-merge-", ".tmp");
+        try (OutputStream fos = Files.newOutputStream(tempFilePath)) {
+            for (Map<String, Object> part : sortedParts) {
+                int partNumber = ((Number) part.get("partNumber")).intValue();
+                String partPath = String.format("%s.%s.part.%d", filePath, uploadId, partNumber);
 
-        try (InputStream inputStream = file.getInputStream()) {
+                try (InputStream is = client.getObject(
+                        GetObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(partPath)
+                                .build())) {
+                    byte[] buffer = new byte[8192];
+                    int bytesRead;
+                    while ((bytesRead = is.read(buffer)) != -1) {
+                        fos.write(buffer, 0, bytesRead);
+                    }
+                }
+            }
+        }
+        // 上传合并后的文件
+        try (InputStream finalInputStream = Files.newInputStream(tempFilePath)) {
+            long fileSize = Files.size(tempFilePath);
             PutObjectArgs putArgs = PutObjectArgs.builder()
                     .bucket(bucketName)
                     .object(filePath)
-                    .stream(inputStream, file.getSize(), partSizeInBytes) // 使用字节值
-                    .contentType(file.getContentType())
+                    .stream(finalInputStream, fileSize, -1)
                     .build();
 
             client.putObject(putArgs);
-            return filePath;
-        } catch (Exception e) {
-            throw new MinioClientErrorException("上传失败: " + e.getMessage());
         }
+        // 清理临时文件和分片
+        Files.deleteIfExists(tempFilePath);
+        for (Map<String, Object> part : sortedParts) {
+            int partNumber = ((Number) part.get("partNumber")).intValue();
+            String partPath = String.format("%s.%s.part.%d", filePath, uploadId, partNumber);
+            try {
+                client.removeObject(
+                        RemoveObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(partPath)
+                                .build());
+            } catch (Exception e) {
+                log.warn("清理分片失败: {}", e.getMessage());
+            }
+        }
+
+        log.info("分片合并完成: 文件={}, uploadId={}, 分片数={}", filePath, uploadId, sortedParts.size());
+        return filePath;
     }
 
     public String getName() {

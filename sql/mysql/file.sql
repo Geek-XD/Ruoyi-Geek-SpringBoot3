@@ -14,7 +14,7 @@ CREATE TABLE sys_file_info (
     remark       VARCHAR(255) DEFAULT NULL COMMENT '备注',
     del_flag     CHAR(1)      DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
     PRIMARY KEY (file_id),
-    UNIQUE KEY uk_file_path (file_path),
+    -- UNIQUE KEY uk_file_path (file_path),
     UNIQUE KEY uk_md5 (md5)
 ) ENGINE=InnoDB COMMENT='文件信息表';
 

@@ -4,17 +4,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,9 +31,12 @@ import com.ruoyi.file.storage.StorageEntity;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
 @Builder
+@Slf4j
 public class LocalBucket implements StorageBucket {
+
     private String clientName;
     private String basePath;
     private String permission;
@@ -90,51 +97,105 @@ public class LocalBucket implements StorageBucket {
         return new URI(sb.toString()).toURL();
     }
 
-    public String uploadByMultipart(MultipartFile file, String filePath, double partSizeInBytes) throws Exception {
-        final long PART_SIZE_IN_BYTES = partSizeInBytes > 0 ? (long) partSizeInBytes : 15L * 1024 * 1024;
-        int totalParts = (int) Math.ceil((double) file.getSize() / PART_SIZE_IN_BYTES);
+    // 存储分片上传的元数据
+    private final ConcurrentHashMap<String, List<Map<String, Object>>> uploadMetadata = new ConcurrentHashMap<>();
 
-        String uploadId = UUID.randomUUID().toString();
-        Path tempDir = Paths.get(basePath, "temp_uploads", uploadId);
-        Files.createDirectories(tempDir);
+    public String initMultipartUpload(String filePath) throws Exception {
+        try {
+            String uploadId = UUID.randomUUID().toString();
+            uploadMetadata.put(uploadId, new ArrayList<>());
 
-        try (InputStream inputStream = file.getInputStream()) {
-            for (int i = 0; i < totalParts; i++) {
-                Path partPath = tempDir.resolve("part_" + i);
-                long partSize = Math.min(PART_SIZE_IN_BYTES, file.getSize() - i * PART_SIZE_IN_BYTES);
-                try (WritableByteChannel channel = Files.newByteChannel(
-                        partPath,
-                        StandardOpenOption.WRITE,
-                        StandardOpenOption.CREATE,
-                        StandardOpenOption.TRUNCATE_EXISTING)) {
-                    ByteBuffer buffer = ByteBuffer.allocate(8192);
-                    int bytesRead;
-                    while (partSize > 0 && (bytesRead = inputStream.read(buffer.array())) != -1) {
-                        buffer.limit(bytesRead);
-                        channel.write(buffer);
-                        buffer.clear();
-                        partSize -= bytesRead;
-                    }
-                }
-            }
-            Path destPath = Paths.get(basePath, filePath);
-            Files.createDirectories(destPath.getParent());
-            try (WritableByteChannel outChannel = Files.newByteChannel(
-                    destPath,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.WRITE,
-                    StandardOpenOption.TRUNCATE_EXISTING)) {
-                for (int i = 0; i < totalParts; i++) {
-                    try (FileChannel inChannel = FileChannel.open(tempDir.resolve("part_" + i),
-                            StandardOpenOption.READ)) {
-                        inChannel.transferTo(0, inChannel.size(), outChannel);
-                    }
-                }
-            }
-            return filePath;
-        } finally {
-            Files.walk(tempDir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+            // 创建临时上传目录
+            Path tempDir = Paths.get(basePath, "temp_uploads", uploadId);
+            Files.createDirectories(tempDir);
+            return uploadId;
+        } catch (Exception e) {
+            log.error("初始化失败: 文件={}, 错误={}", filePath, e.getMessage());
+            throw new ServiceException("初始化分片上传失败: " + e.getMessage());
         }
+    }
+
+    public String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
+            throws Exception {
+        if (!uploadMetadata.containsKey(uploadId)) {
+            throw new ServiceException("无效的 uploadId: " + uploadId);
+        }
+        Path tempDir = Paths.get(basePath, "temp_uploads", uploadId);
+        Path partPath = tempDir.resolve("part_" + partNumber);
+        try (OutputStream fos = Files.newOutputStream(partPath)) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            long totalBytesWritten = 0;
+            while ((bytesRead = inputStream.read(buffer)) != -1 && totalBytesWritten < partSize) {
+                int writeSize = (int) Math.min(bytesRead, partSize - totalBytesWritten);
+                fos.write(buffer, 0, writeSize);
+                totalBytesWritten += writeSize;
+            }
+            if (totalBytesWritten != partSize) {
+                throw new ServiceException("分片大小不匹配: 预期=" + partSize + ", 实际=" + totalBytesWritten);
+            }
+        }
+        String etag = Md5Utils.getMd5(partPath.toFile());
+        if (etag == null) {
+            throw new ServiceException("计算分片 MD5 失败");
+        }
+        etag = etag.toUpperCase();
+        Map<String, Object> partInfo = Map.of(
+                "partNumber", partNumber,
+                "etag", etag,
+                "size", partSize,
+                "path", partPath.toString());
+        synchronized (uploadMetadata) {
+            List<Map<String, Object>> parts = uploadMetadata.get(uploadId);
+            int insertPos = 0;
+            while (insertPos < parts.size()
+                    && ((Number) parts.get(insertPos).get("partNumber")).intValue() < partNumber) {
+                insertPos++;
+            }
+            parts.add(insertPos, partInfo);
+        }
+        return etag;
+    }
+
+    public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags)
+            throws Exception {
+        List<Map<String, Object>> storedParts = uploadMetadata.get(uploadId);
+        if (storedParts == null) {
+            throw new ServiceException("无效的 uploadId: " + uploadId);
+        }
+        if (partETags.size() != storedParts.size()) {
+            throw new ServiceException("分片数量不匹配: 预期=" + storedParts.size() + ", 实际=" + partETags.size());
+        }
+        // 验证每个分片的 ETag
+        for (int i = 0; i < partETags.size(); i++) {
+            Map<String, Object> expected = storedParts.get(i);
+            Map<String, Object> actual = partETags.get(i);
+
+            if (!expected.get("etag").equals(actual.get("etag")) ||
+                    !expected.get("partNumber").equals(actual.get("partNumber"))) {
+                throw new ServiceException("分片验证失败: 序号=" + expected.get("partNumber"));
+            }
+        }
+        Path destPath = Paths.get(basePath, filePath);
+        Files.createDirectories(destPath.getParent());
+        try (WritableByteChannel outChannel = Files.newByteChannel(
+                destPath,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.WRITE,
+                StandardOpenOption.TRUNCATE_EXISTING)) {
+            for (Map<String, Object> part : storedParts) {
+                Path partPath = Paths.get((String) part.get("path"));
+                try (FileChannel inChannel = FileChannel.open(partPath, StandardOpenOption.READ)) {
+                    inChannel.transferTo(0, inChannel.size(), outChannel);
+                }
+            }
+        }
+        // 清理临时文件和元数据
+        Path tempDir = Paths.get(basePath, "temp_uploads", uploadId);
+        Files.walk(tempDir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+        uploadMetadata.remove(uploadId);
+        log.info("分片合并完成: 文件={}, uploadId={}, 分片数={}", filePath, uploadId, storedParts.size());
+        return filePath;
     }
 
     public String getClientName() {

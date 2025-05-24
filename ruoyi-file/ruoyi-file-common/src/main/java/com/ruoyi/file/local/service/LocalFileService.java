@@ -1,6 +1,8 @@
 package com.ruoyi.file.local.service;
 
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -59,8 +61,22 @@ public class LocalFileService implements StorageService {
     }
 
     @Override
-    public String uploadFileByMultipart(MultipartFile file, String filePath, double partSize) throws Exception {
+    public String initMultipartUpload(String filePath) throws Exception {
         LocalBucket primaryBucket = localConfig.getPrimaryBucket();
-        return primaryBucket.uploadByMultipart(file, filePath, partSize);
+        return primaryBucket.initMultipartUpload(filePath);
+    }
+
+    @Override
+    public String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
+            throws Exception {
+        LocalBucket primaryBucket = localConfig.getPrimaryBucket();
+        return primaryBucket.uploadPart(filePath, uploadId, partNumber, partSize, inputStream);
+    }
+
+    @Override
+    public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags)
+            throws Exception {
+        LocalBucket primaryBucket = localConfig.getPrimaryBucket();
+        return primaryBucket.completeMultipartUpload(filePath, uploadId, partETags);
     }
 }

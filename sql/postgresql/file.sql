@@ -21,7 +21,7 @@ CREATE TABLE sys_file_info (
 
 -- 添加唯一约束
 ALTER TABLE sys_file_info ADD CONSTRAINT uk_file_path UNIQUE (file_path);
-ALTER TABLE sys_file_info ADD CONSTRAINT uk_md5 UNIQUE (md5);
+-- ALTER TABLE sys_file_info ADD CONSTRAINT uk_md5 UNIQUE (md5);
 
 -- 添加表和列注释
 COMMENT ON TABLE sys_file_info IS '文件信息表';

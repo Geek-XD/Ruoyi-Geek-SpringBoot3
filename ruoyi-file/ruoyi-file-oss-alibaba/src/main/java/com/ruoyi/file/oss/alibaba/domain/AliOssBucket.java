@@ -1,21 +1,18 @@
 package com.ruoyi.file.oss.alibaba.domain;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.ServiceException;
 import com.aliyun.oss.model.AbortMultipartUploadRequest;
 import com.aliyun.oss.model.CompleteMultipartUploadRequest;
-import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.GeneratePresignedUrlRequest;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.InitiateMultipartUploadRequest;
@@ -28,11 +25,12 @@ import com.ruoyi.file.oss.alibaba.exception.AliOssClientErrorException;
 import com.ruoyi.file.storage.StorageBucket;
 
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
 @Builder
+@Slf4j
 public class AliOssBucket implements StorageBucket {
 
-    private static final Logger logger = LoggerFactory.getLogger(AliOssBucket.class);
     private String bucketName;
     private OSS ossClient;
     private String permission;
@@ -48,7 +46,7 @@ public class AliOssBucket implements StorageBucket {
             PutObjectRequest putRequest = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
             this.ossClient.putObject(putRequest);
         } catch (Exception e) {
-            logger.error("Error uploading file to OSS: {}", e.getMessage(), e);
+            log.error("Error uploading file to OSS: {}", e.getMessage(), e);
             throw new AliOssClientErrorException("Error uploading file to OSS: " + e.getMessage(), e);
         }
     }
@@ -91,86 +89,58 @@ public class AliOssBucket implements StorageBucket {
         return URI.create(sb.toString()).toURL();
     }
 
-    public void removeMultiple(List<String> filePaths) throws Exception {
-        try {
-            DeleteObjectsRequest deleteRequest = new DeleteObjectsRequest(bucketName).withKeys(filePaths);
-            ossClient.deleteObjects(deleteRequest);
-        } catch (Exception e) {
-            logger.error("Error deleting files: {}", e.getMessage(), e);
-            throw new AliOssClientErrorException("Error deleting files: " + e.getMessage(), e);
-        }
-    }
-
-    public String uploadFileByMultipart(MultipartFile file, String filePath, double partSize) throws Exception {
-        final long PART_SIZE_BYTES = 15 * 1024 * 1024; // 15MB
-        // 初始化分片上传
+    /**
+     * 初始化分片上传
+     */
+    public String initMultipartUpload(String filePath) throws Exception {
         InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, filePath);
         String uploadId = ossClient.initiateMultipartUpload(initRequest).getUploadId();
+        return uploadId;
+    }
 
-        List<PartETag> partETags = new ArrayList<>();
+    /**
+     * 上传单个分片
+     */
+    public PartETag uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
+            throws Exception {
+        UploadPartRequest uploadPartRequest = new UploadPartRequest();
+        uploadPartRequest.setBucketName(bucketName);
+        uploadPartRequest.setKey(filePath);
+        uploadPartRequest.setUploadId(uploadId);
+        uploadPartRequest.setInputStream(inputStream);
+        uploadPartRequest.setPartSize(partSize);
+        uploadPartRequest.setPartNumber(partNumber);
 
-        try (InputStream inputStream = file.getInputStream()) {
-            byte[] buffer = new byte[(int) PART_SIZE_BYTES];
-            int bytesRead;
-            int partNumber = 1;
+        PartETag partETag = ossClient.uploadPart(uploadPartRequest).getPartETag();
+        return partETag;
+    }
 
-            // 计算总分片数
-            long totalParts = (file.getSize() + PART_SIZE_BYTES - 1) / PART_SIZE_BYTES;
-            long totalBytesUploaded = 0;
-
-            logger.info("开始分片上传: 文件={}, 总分片数={}, 分片大小={}MB",
-                    filePath, totalParts, PART_SIZE_BYTES / (1024.0 * 1024.0));
-
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                // 记录分片上传开始
-                logger.info("开始上传分片: 文件={}, 分片={}/{}, 大小={}KB",
-                        filePath, partNumber, totalParts, bytesRead / 1024);
-
-                UploadPartRequest uploadPartRequest = new UploadPartRequest();
-                uploadPartRequest.setBucketName(bucketName);
-                uploadPartRequest.setKey(filePath);
-                uploadPartRequest.setUploadId(uploadId);
-                uploadPartRequest.setInputStream(new ByteArrayInputStream(buffer, 0, bytesRead));
-                uploadPartRequest.setPartSize(bytesRead);
-                uploadPartRequest.setPartNumber(partNumber);
-
-                // 记录分片ETag
-                PartETag partETag = ossClient.uploadPart(uploadPartRequest).getPartETag();
-                partETags.add(partETag);
-
-                // 更新已上传字节数并记录进度
-                totalBytesUploaded += bytesRead;
-                double progress = (double) totalBytesUploaded / file.getSize() * 100;
-
-                logger.info("完成上传分片: 文件={}, 分片={}/{}, 大小={}KB, ETag={}, 进度={:.2f}%",
-                        filePath,
-                        partNumber,
-                        totalParts,
-                        bytesRead / 1024,
-                        partETag.getETag(),
-                        progress);
-
-                partNumber++;
-            }
-
-            logger.info("上传完成: 文件={}, 总大小={}MB, 总分片数={}",
-                    filePath,
-                    file.getSize() / (1024.0 * 1024.0),
-                    totalParts);
-        } catch (Exception e) {
-            // 上传失败，取消分片上传
-            logger.error("分片上传失败: 文件={}, uploadId={}", filePath, uploadId, e);
-            ossClient.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName, filePath, uploadId));
-            throw new AliOssClientErrorException("分片上传失败", e);
+    /**
+     * 完成分片上传
+     */
+    public String completeMultipartUpload(String filePath, String uploadId, List<PartETag> partETags) throws Exception {
+        if (partETags == null || partETags.isEmpty()) {
+            throw new ServiceException("分片ETag列表不能为空");
         }
-
-        // 完成分片上传
-        CompleteMultipartUploadRequest completeRequest = new CompleteMultipartUploadRequest(bucketName, filePath,
-                uploadId, partETags);
-        ossClient.completeMultipartUpload(completeRequest);
-
-        logger.info("分片上传已完成并合并: 文件={}, uploadId={}", filePath, uploadId);
-        return filePath;
+        // 确保分片按顺序排列
+        partETags.sort(Comparator.comparingInt(PartETag::getPartNumber));
+        try {
+            CompleteMultipartUploadRequest completeRequest = new CompleteMultipartUploadRequest(bucketName, filePath,
+                    uploadId, partETags);
+            ossClient.completeMultipartUpload(completeRequest);
+            log.info("分片上传已完成并合并: 文件={}, uploadId={}, 分片数={}",
+                    filePath, uploadId, partETags.size());
+            return filePath;
+        } catch (Exception e) {
+            log.error("合并分片失败: 文件={}, uploadId={}, 错误={}",
+                    filePath, uploadId, e.getMessage());
+            try {
+                ossClient.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName, filePath, uploadId));
+            } catch (Exception abortEx) {
+                log.error("取消分片上传失败: {}", abortEx.getMessage());
+            }
+            throw new AliOssClientErrorException("合并分片失败: " + e.getMessage(), e);
+        }
     }
 
     public OSS getOssClient() {

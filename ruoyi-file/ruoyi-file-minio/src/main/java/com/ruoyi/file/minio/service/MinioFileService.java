@@ -1,6 +1,8 @@
 package com.ruoyi.file.minio.service;
 
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -59,9 +61,27 @@ public class MinioFileService implements StorageService {
     }
 
     @Override
-    public String uploadFileByMultipart(MultipartFile file, String filePath, double partSize) throws Exception {
+    public String initMultipartUpload(String filePath) throws Exception {
         MinioBucket minioBucket = minioConfig.getPrimaryBucket();
-        return minioBucket.uploadByMultipart(file, filePath, partSize);
+        return minioBucket.initMultipartUpload(filePath);
+    }
+
+    @Override
+    public String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
+            throws Exception {
+        MinioBucket minioBucket = minioConfig.getPrimaryBucket();
+        return minioBucket.uploadPart(filePath, uploadId, partNumber, partSize, inputStream);
+    }
+
+    @Override
+    public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags)
+            throws Exception {
+        if (partETags == null || partETags.isEmpty()) {
+            throw new IllegalArgumentException("分片标识列表不能为空");
+        }
+
+        MinioBucket minioBucket = minioConfig.getPrimaryBucket();
+        return minioBucket.completeMultipartUpload(filePath, uploadId, partETags);
     }
 
 }

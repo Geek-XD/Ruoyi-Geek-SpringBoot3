@@ -4,10 +4,15 @@ import java.io.OutputStream;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
@@ -173,6 +181,135 @@ public class FileController {
             outputStream.flush();
         } finally {
             outputStream.close();
+        }
+    }
+
+    private static final long MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
+    // 存储上传会话ID与文件名的映射，用于通过uploadId查找原始文件名。
+    private final ConcurrentHashMap<String, String> uploadIdToFileName = new ConcurrentHashMap<>();
+    // 存储上传会话ID与文件大小（字节）的映射，记录分片上传任务对应的文件总大小。
+    private final ConcurrentHashMap<String, Long> uploadIdToFileSize = new ConcurrentHashMap<>();
+    // 存储上传会话ID与文件路径的映射，标识该上传任务在存储系统中的具体位置。
+    private final ConcurrentHashMap<String, String> uploadIdToFilePath = new ConcurrentHashMap<>();
+    // 存储上传会话ID与存储桶名称的映射，确定文件最终上传到哪个存储桶中。
+    private Map<String, String> uploadIdToBucketName = new ConcurrentHashMap<>();
+
+    /**
+     * 初始化分片上传
+     */
+    @PostMapping("/initUpload")
+    public AjaxResult initMultipartUpload(@RequestParam("fileName") String fileName,
+            @RequestParam("fileSize") Long fileSize,
+            @RequestParam(value = "fileType", required = false) String fileType,
+            @RequestParam("bucketName") String bucketName) {
+        try {
+            if (fileName == null || fileName.isEmpty() || fileSize == null || fileSize <= 0) {
+                throw new ServiceException("文件名或文件大小不能为空");
+            }
+            if (fileSize > MAX_FILE_SIZE)
+                throw new ServiceException("文件不能超过500MB");
+            String currentDate = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+            String timestamp = String.valueOf(System.currentTimeMillis());
+            String objectName = String.format("%s/%s/%s_%s", "/upload", currentDate, timestamp, fileName);
+            String uploadId = FileOperateUtils.initMultipartUpload(objectName);
+            // 存储上传会话信息
+            uploadIdToFileName.put(uploadId, fileName);
+            uploadIdToFileSize.put(uploadId, fileSize);
+            uploadIdToFilePath.put(uploadId, objectName);
+            uploadIdToBucketName.put(uploadId, bucketName);
+            return AjaxResult.success(Map.of("uploadId", uploadId, "filePath", objectName,
+                    "fileName", fileName, "bucketName", bucketName));
+        } catch (Exception e) {
+            return AjaxResult.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 上传文件分片
+     */
+    @PostMapping("/uploadChunk")
+    public AjaxResult uploadFileChunk(@RequestParam("uploadId") String uploadId,
+            @RequestParam("filePath") String filePath, @RequestParam("chunkIndex") int chunkIndex,
+            @RequestParam("chunk") MultipartFile chunk) {
+        try {
+            if (chunk == null || chunk.isEmpty())
+                throw new ServiceException("分片数据不能为空");
+            // 检查上传会话是否存在
+            String fileName = uploadIdToFileName.get(uploadId);
+            Long fileSize = uploadIdToFileSize.get(uploadId);
+            if (fileName == null || fileSize == null)
+                throw new ServiceException("文件上传会话不存在或已过期");
+            // 上传分片
+            String etag = FileOperateUtils.uploadPart(filePath, uploadId, chunkIndex + 1, chunk.getSize(),
+                    chunk.getInputStream());
+            if (etag == null || etag.isEmpty())
+                throw new ServiceException("上传分片失败：未获取到ETag");
+            return AjaxResult.success(Map.of("etag", etag, "chunkIndex",
+                    chunkIndex, "partNumber", chunkIndex + 1));
+        } catch (Exception e) {
+            return AjaxResult.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 完成分片上传并合并文件
+     */
+    @PostMapping("/completeUpload")
+    public AjaxResult completeMultipartUpload(@RequestParam("uploadId") String uploadId,
+            @RequestParam("filePath") String filePath, @RequestBody List<Map<String, Object>> partETags) {
+        try {
+            String bucketName = uploadIdToBucketName.get(uploadId);
+            if (bucketName == null || bucketName.trim().isEmpty())
+                throw new ServiceException("无法获取存储桶");
+            if (partETags == null || partETags.isEmpty())
+                throw new ServiceException("分片信息不能为空");
+            String fileName = uploadIdToFileName.get(uploadId);
+            Long fileSize = uploadIdToFileSize.get(uploadId);
+            if (fileName == null || fileSize == null)
+                throw new ServiceException("文件上传会话不存在或已过期");
+            // 验证并排序分片信息
+            List<Map<String, Object>> validParts = partETags.stream()
+                    .filter(part -> part != null && part.containsKey("partNumber") && part.containsKey("etag"))
+                    .peek(part -> {
+                        int partNumber = ((Number) part.get("partNumber")).intValue();
+                        String etag = (String) part.get("etag");
+                        if (partNumber <= 0 || etag == null || etag.isEmpty()) {
+                            throw new ServiceException("分片序号或ETag无效");
+                        }
+                    })
+                    .collect(Collectors.toList());
+            if (validParts.size() != partETags.size()) {
+                throw new ServiceException("分片信息格式不正确");
+            }
+            validParts.sort(Comparator.comparingInt(p -> ((Number) p.get("partNumber")).intValue()));
+            // 完成分片上传并合并文件
+            String finalPath = FileOperateUtils.completeMultipartUpload(filePath, uploadId, validParts);
+            if (finalPath == null || finalPath.isEmpty()) {
+                throw new ServiceException("合并分片失败：未获取到最终文件路径");
+            }
+            // 创建文件信息记录
+            SysFileInfo fileInfo = new SysFileInfo();
+            fileInfo.setFileName(fileName);
+            fileInfo.setFilePath(finalPath);
+            fileInfo.setFileSize(fileSize);
+            int dotIndex = fileName.lastIndexOf('.');
+            fileInfo.setFileType(dotIndex >= 0 ? fileName.substring(dotIndex + 1) : "");
+            fileInfo.setStorageType(bucketName);
+            fileInfo.setCreateBy(SecurityUtils.getUsername());
+            fileInfo.setCreateTime(new Date());
+            fileInfo.setUpdateBy(SecurityUtils.getUsername());
+            fileInfo.setUpdateTime(new Date());
+            fileInfo.setDelFlag("0");
+            sysFileInfoService.insertSysFileInfo(fileInfo);
+            // 清理上传会话信息
+            uploadIdToFileName.remove(uploadId);
+            uploadIdToFileSize.remove(uploadId);
+            uploadIdToFilePath.remove(uploadId);
+            uploadIdToBucketName.remove(uploadId);
+            return AjaxResult.success(Map.of("fileId", fileInfo.getFileId(), "fileName", fileName,
+                    "filePath", finalPath, "fileSize", fileSize, "storageType", bucketName));
+        } catch (Exception e) {
+            return AjaxResult.error(e.getMessage());
         }
     }
 }

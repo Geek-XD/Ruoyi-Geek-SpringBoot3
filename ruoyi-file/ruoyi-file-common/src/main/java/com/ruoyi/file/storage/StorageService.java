@@ -2,6 +2,8 @@ package com.ruoyi.file.storage;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -89,12 +91,28 @@ public interface StorageService {
     public String generateUrl(String filePath) throws Exception;
 
     /**
-     * 分片上传文件方法
-     * 
-     * @param file     待上传的文件，类型为 MultipartFile。
-     * @param filePath 文件在服务器上的存储路径。
-     * @param partSize 每个分片的大小，单位为字节。
-     * @throws Exception 如果在上传过程中出现错误，如读写文件出错时，则抛出异常。
+     * 初始化分片上传
+     * @param filePath 文件路径
+     * @return 返回uploadId
      */
-    public String uploadFileByMultipart(MultipartFile file, String filePath, double partSize) throws Exception;
+    public String initMultipartUpload(String filePath) throws Exception;
+
+    /**
+     * 上传分片
+     * @param filePath 文件路径
+     * @param uploadId 上传ID
+     * @param partNumber 分片序号
+     * @param partSize 分片大小
+     * @param inputStream 分片数据流
+     * @return 分片的ETag
+     */
+    public String uploadPart(String filePath, String uploadId, int partNumber,long partSize, InputStream inputStream) throws Exception;
+
+    /**
+     * 完成分片上传
+     * @param filePath 文件路径
+     * @param uploadId 上传ID
+     * @return 文件的最终路径
+     */
+    public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags) throws Exception;
 }

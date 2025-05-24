@@ -3,6 +3,8 @@ package com.ruoyi.file.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
@@ -215,14 +217,34 @@ public class FileOperateUtils {
     }
 
     /**
-     * 分片上传文件方法
-     * 
-     * @param file     待上传的文件，类型为 MultipartFile。
-     * @param filePath 文件在服务器上的存储路径。
-     * @param partSize 每个分片的大小，单位为字节。
-     * @throws Exception 如果在上传过程中出现错误，如读写文件出错时，则抛出异常。
+     * 初始化分片上传
+     * @param filePath 文件路径
+     * @return 返回uploadId
      */
-    public static String uploadFileByMultipart(MultipartFile file, String filePath, long partSize) throws Exception {
-        return fileService.uploadFileByMultipart(file, filePath, partSize);
+    public static String initMultipartUpload(String filePath) throws Exception{
+        return fileService.initMultipartUpload(filePath);
+    }
+
+    /**
+     * 上传分片
+     * @param filePath 文件路径
+     * @param uploadId 上传ID
+     * @param partNumber 分片序号
+     * @param partSize 分片大小
+     * @param inputStream 分片数据流
+     * @return 分片的ETag
+     */
+    public static String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream) throws Exception {
+                return fileService.uploadPart(filePath, uploadId, partNumber, partSize, inputStream);
+            }
+
+    /**
+     * 完成分片上传
+     * @param filePath 文件路径
+     * @param uploadId 上传ID
+     * @return 文件的最终路径
+     */
+    public static String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags) throws Exception{
+        return fileService.completeMultipartUpload(filePath, uploadId, partETags);
     }
 }
