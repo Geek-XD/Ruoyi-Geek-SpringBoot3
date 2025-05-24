@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.aliyun.oss.model.PartETag;
+import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.oss.alibaba.config.AliOssManagement;
 import com.ruoyi.file.oss.alibaba.domain.AliOssBucket;
 import com.ruoyi.file.storage.StorageEntity;
@@ -82,11 +82,11 @@ public class AliOssFileService implements StorageService {
         }
 
         // 将Map转换为PartETag对象
-        List<PartETag> ossPartETags = new ArrayList<>();
+        List<SysFilePartETag> ossPartETags = new ArrayList<>();
         for (Map<String, Object> part : partETags) {
             int partNumber = ((Number) part.get("partNumber")).intValue();
             String etag = (String) part.get("etag");
-            ossPartETags.add(new PartETag(partNumber, etag));
+            ossPartETags.add(new SysFilePartETag(partNumber, etag));
         }
         return aliOssConfig.getPrimaryBucket().completeMultipartUpload(filePath, uploadId, ossPartETags);
     }

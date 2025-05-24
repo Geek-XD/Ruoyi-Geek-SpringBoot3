@@ -26,6 +26,7 @@ import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.common.utils.uuid.UUID;
+import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.storage.StorageBucket;
 import com.ruoyi.file.storage.StorageEntity;
 
@@ -115,7 +116,8 @@ public class LocalBucket implements StorageBucket {
         }
     }
 
-    public String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
+    public SysFilePartETag uploadPart(String filePath, String uploadId, int partNumber, long partSize,
+            InputStream inputStream)
             throws Exception {
         if (!uploadMetadata.containsKey(uploadId)) {
             throw new ServiceException("无效的 uploadId: " + uploadId);
@@ -154,7 +156,7 @@ public class LocalBucket implements StorageBucket {
             }
             parts.add(insertPos, partInfo);
         }
-        return etag;
+        return new SysFilePartETag(partNumber, etag, partSize, null);
     }
 
     public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags)

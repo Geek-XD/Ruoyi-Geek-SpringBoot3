@@ -21,6 +21,7 @@ import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PartETag;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.UploadPartRequest;
+import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.oss.alibaba.exception.AliOssClientErrorException;
 import com.ruoyi.file.storage.StorageBucket;
 
@@ -101,7 +102,8 @@ public class AliOssBucket implements StorageBucket {
     /**
      * 上传单个分片
      */
-    public PartETag uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
+    public SysFilePartETag uploadPart(String filePath, String uploadId, int partNumber, long partSize,
+            InputStream inputStream)
             throws Exception {
         UploadPartRequest uploadPartRequest = new UploadPartRequest();
         uploadPartRequest.setBucketName(bucketName);
@@ -110,18 +112,22 @@ public class AliOssBucket implements StorageBucket {
         uploadPartRequest.setInputStream(inputStream);
         uploadPartRequest.setPartSize(partSize);
         uploadPartRequest.setPartNumber(partNumber);
-
         PartETag partETag = ossClient.uploadPart(uploadPartRequest).getPartETag();
-        return partETag;
+        return new SysFilePartETag(partETag.getPartNumber(), partETag.getETag(), partETag.getPartSize(),
+                partETag.getPartCRC());
     }
 
     /**
      * 完成分片上传
      */
-    public String completeMultipartUpload(String filePath, String uploadId, List<PartETag> partETags) throws Exception {
-        if (partETags == null || partETags.isEmpty()) {
+    public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> sysFilePartETags)
+            throws Exception {
+        if (sysFilePartETags == null || sysFilePartETags.isEmpty()) {
             throw new ServiceException("分片ETag列表不能为空");
         }
+        List<PartETag> partETags = sysFilePartETags.stream()
+                .map(part -> new PartETag(part.getPartNumber(), part.getETag(), part.getPartSize(), part.getPartCRC()))
+                .toList();
         // 确保分片按顺序排列
         partETags.sort(Comparator.comparingInt(PartETag::getPartNumber));
         try {

@@ -70,7 +70,7 @@ public class LocalFileService implements StorageService {
     public String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
             throws Exception {
         LocalBucket primaryBucket = localConfig.getPrimaryBucket();
-        return primaryBucket.uploadPart(filePath, uploadId, partNumber, partSize, inputStream);
+        return primaryBucket.uploadPart(filePath, uploadId, partNumber, partSize, inputStream).getETag();
     }
 
     @Override

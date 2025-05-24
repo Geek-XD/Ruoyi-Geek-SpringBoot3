@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.core.text.Convert;
+import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.minio.exception.MinioClientErrorException;
 import com.ruoyi.file.storage.StorageBucket;
 
@@ -121,7 +122,8 @@ public class MinioBucket implements StorageBucket {
     /**
      * 上传单个分片
      */
-    public String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
+    public SysFilePartETag uploadPart(String filePath, String uploadId, int partNumber, long partSize,
+            InputStream inputStream)
             throws Exception {
         // 生成唯一的上传键
         String uploadKey = String.format("%s-%s-%d", filePath, uploadId, partNumber);
@@ -141,7 +143,7 @@ public class MinioBucket implements StorageBucket {
                     .build();
             // 执行上传操作并获取 ETag
             String etag = client.putObject(args).etag().replace("\"", "").toUpperCase();
-            return etag;
+            return new SysFilePartETag(partNumber, etag);
         } catch (Exception e) {
             log.error("分片上传失败: 文件={}, 分片={}, 错误={}", filePath, partNumber, e.getMessage());
             throw new MinioClientErrorException("上传分片失败", e);
