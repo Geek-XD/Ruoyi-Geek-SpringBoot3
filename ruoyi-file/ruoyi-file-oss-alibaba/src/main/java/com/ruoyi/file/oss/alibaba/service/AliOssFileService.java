@@ -3,7 +3,6 @@ package com.ruoyi.file.oss.alibaba.service;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -75,7 +74,7 @@ public class AliOssFileService implements StorageService {
     }
 
     @Override
-    public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags)
+    public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
             throws Exception {
         if (partETags == null || partETags.isEmpty()) {
             throw new IllegalArgumentException("分片ETag列表不能为空");
@@ -83,9 +82,9 @@ public class AliOssFileService implements StorageService {
 
         // 将Map转换为PartETag对象
         List<SysFilePartETag> ossPartETags = new ArrayList<>();
-        for (Map<String, Object> part : partETags) {
-            int partNumber = ((Number) part.get("partNumber")).intValue();
-            String etag = (String) part.get("etag");
+        for (SysFilePartETag part : partETags) {
+            int partNumber = ((Number) part.getPartNumber()).intValue();
+            String etag = part.getETag();
             ossPartETags.add(new SysFilePartETag(partNumber, etag));
         }
         return aliOssConfig.getPrimaryBucket().completeMultipartUpload(filePath, uploadId, ossPartETags);

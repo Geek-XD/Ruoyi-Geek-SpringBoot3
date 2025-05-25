@@ -2,13 +2,13 @@ package com.ruoyi.file.minio.service;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.minio.config.MinioManagement;
 import com.ruoyi.file.minio.domain.MinioBucket;
 import com.ruoyi.file.storage.StorageEntity;
@@ -74,7 +74,7 @@ public class MinioFileService implements StorageService {
     }
 
     @Override
-    public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags)
+    public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
             throws Exception {
         if (partETags == null || partETags.isEmpty()) {
             throw new IllegalArgumentException("分片标识列表不能为空");

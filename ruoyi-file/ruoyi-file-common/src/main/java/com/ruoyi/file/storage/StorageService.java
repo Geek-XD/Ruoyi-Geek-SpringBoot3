@@ -3,12 +3,12 @@ package com.ruoyi.file.storage;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.file.domain.SysFilePartETag;
 
 /**
  * 文件操作接口
@@ -92,6 +92,7 @@ public interface StorageService {
 
     /**
      * 初始化分片上传
+     * 
      * @param filePath 文件路径
      * @return 返回uploadId
      */
@@ -99,14 +100,16 @@ public interface StorageService {
 
     /**
      * 上传分片
-     * @param filePath 文件路径
-     * @param uploadId 上传ID
-     * @param partNumber 分片序号
-     * @param partSize 分片大小
+     * 
+     * @param filePath    文件路径
+     * @param uploadId    上传ID
+     * @param partNumber  分片序号
+     * @param partSize    分片大小
      * @param inputStream 分片数据流
      * @return 分片的ETag
      */
-    public String uploadPart(String filePath, String uploadId, int partNumber,long partSize, InputStream inputStream) throws Exception;
+    public String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
+            throws Exception;
 
     /**
      * 完成分片上传
@@ -114,5 +117,6 @@ public interface StorageService {
      * @param uploadId 上传ID
      * @return 文件的最终路径
      */
-    public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags) throws Exception;
+    public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
+            throws Exception;
 }

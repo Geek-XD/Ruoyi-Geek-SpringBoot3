@@ -34,6 +34,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.file.domain.SysFileInfo;
+import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.service.ISysFileInfoService;
 import com.ruoyi.file.storage.StorageBucket;
 import com.ruoyi.file.storage.StorageEntity;
@@ -256,7 +257,7 @@ public class FileController {
      */
     @PostMapping("/completeUpload")
     public AjaxResult completeMultipartUpload(@RequestParam("uploadId") String uploadId,
-            @RequestParam("filePath") String filePath, @RequestBody List<Map<String, Object>> partETags) {
+            @RequestParam("filePath") String filePath, @RequestBody List<SysFilePartETag> partETags) {
         try {
             String bucketName = uploadIdToBucketName.get(uploadId);
             if (bucketName == null || bucketName.trim().isEmpty())
@@ -268,11 +269,11 @@ public class FileController {
             if (fileName == null || fileSize == null)
                 throw new ServiceException("文件上传会话不存在或已过期");
             // 验证并排序分片信息
-            List<Map<String, Object>> validParts = partETags.stream()
-                    .filter(part -> part != null && part.containsKey("partNumber") && part.containsKey("etag"))
+            List<SysFilePartETag> validParts = partETags.stream()
+                    .filter(part -> part != null && part.getPartNumber() != null && part.getETag() != null)
                     .peek(part -> {
-                        int partNumber = ((Number) part.get("partNumber")).intValue();
-                        String etag = (String) part.get("etag");
+                        int partNumber = ((Number) part.getPartNumber()).intValue();
+                        String etag = (String) part.getETag();
                         if (partNumber <= 0 || etag == null || etag.isEmpty()) {
                             throw new ServiceException("分片序号或ETag无效");
                         }
@@ -281,7 +282,7 @@ public class FileController {
             if (validParts.size() != partETags.size()) {
                 throw new ServiceException("分片信息格式不正确");
             }
-            validParts.sort(Comparator.comparingInt(p -> ((Number) p.get("partNumber")).intValue()));
+            validParts.sort(Comparator.comparingInt(p -> p.getPartNumber()));
             // 完成分片上传并合并文件
             String finalPath = FileOperateUtils.completeMultipartUpload(filePath, uploadId, validParts);
             if (finalPath == null || finalPath.isEmpty()) {

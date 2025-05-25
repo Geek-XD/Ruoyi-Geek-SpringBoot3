@@ -1,10 +1,11 @@
 package com.ruoyi.file.domain;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 文件信息对象 sys_file_info
@@ -13,10 +14,10 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * @date 2025-04-25
  */
 @Schema(description = "文件信息对象")
-public class SysFileInfo extends BaseEntity
-{
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class SysFileInfo extends BaseEntity {
     private static final long serialVersionUID = 1L;
-
 
     /** 文件主键 */
     @Schema(title = "文件主键")
@@ -55,111 +56,5 @@ public class SysFileInfo extends BaseEntity
     /** 删除标志（0代表存在 2代表删除） */
     @Schema(title = "删除标志（0代表存在 2代表删除）")
     private String delFlag;
-    public void setFileId(Long fileId) 
-    {
-        this.fileId = fileId;
-    }
 
-    public Long getFileId() 
-    {
-        return fileId;
-    }
-
-
-    public void setFileName(String fileName) 
-    {
-        this.fileName = fileName;
-    }
-
-    public String getFileName() 
-    {
-        return fileName;
-    }
-
-
-    public void setFilePath(String filePath) 
-    {
-        this.filePath = filePath;
-    }
-
-    public String getFilePath() 
-    {
-        return filePath;
-    }
-
-
-    public void setStorageType(String storageType) 
-    {
-        this.storageType = storageType;
-    }
-
-    public String getStorageType() 
-    {
-        return storageType;
-    }
-
-
-    public void setFileType(String fileType) 
-    {
-        this.fileType = fileType;
-    }
-
-    public String getFileType() 
-    {
-        return fileType;
-    }
-
-
-    public void setFileSize(Long fileSize) 
-    {
-        this.fileSize = fileSize;
-    }
-
-    public Long getFileSize() 
-    {
-        return fileSize;
-    }
-
-
-    public void setMd5(String md5) 
-    {
-        this.md5 = md5;
-    }
-
-    public String getMd5() 
-    {
-        return md5;
-    }
-
-
-    public void setDelFlag(String delFlag) 
-    {
-        this.delFlag = delFlag;
-    }
-
-    public String getDelFlag() 
-    {
-        return delFlag;
-    }
-
-
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("fileId", getFileId())
-            .append("fileName", getFileName())
-            .append("filePath", getFilePath())
-            .append("storageType", getStorageType())
-            .append("fileType", getFileType())
-            .append("fileSize", getFileSize())
-            .append("md5", getMd5())
-            .append("createBy", getCreateBy())
-            .append("createTime", getCreateTime())
-            .append("updateBy", getUpdateBy())
-            .append("updateTime", getUpdateTime())
-            .append("remark", getRemark())
-            .append("delFlag", getDelFlag())
-            .toString();
-    }
 }

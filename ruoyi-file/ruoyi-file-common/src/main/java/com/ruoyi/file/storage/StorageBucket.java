@@ -1,8 +1,12 @@
 package com.ruoyi.file.storage;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
+
+import com.ruoyi.file.domain.SysFilePartETag;
 
 public interface StorageBucket {
 
@@ -70,4 +74,36 @@ public interface StorageBucket {
             return generatePresignedUrl(filePath, 3600);
         }
     };
+
+    /**
+     * 初始化分片上传
+     * 
+     * @param filePath 文件路径
+     * @return 返回uploadId
+     */
+    public String initMultipartUpload(String filePath) throws Exception;
+
+    /**
+     * 上传分片
+     * 
+     * @param filePath    文件路径
+     * @param uploadId    上传ID
+     * @param partNumber  分片序号
+     * @param partSize    分片大小
+     * @param inputStream 分片数据流
+     * @return 分片的ETag
+     */
+    public SysFilePartETag uploadPart(String filePath, String uploadId, int partNumber, long partSize,
+            InputStream inputStream)
+            throws Exception;
+
+    /**
+     * 完成分片上传
+     * 
+     * @param filePath 文件路径
+     * @param uploadId 上传ID
+     * @return 文件的最终路径
+     */
+    public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
+            throws Exception;
 }

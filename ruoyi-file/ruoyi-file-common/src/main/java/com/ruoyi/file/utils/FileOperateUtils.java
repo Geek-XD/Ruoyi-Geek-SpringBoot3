@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +16,7 @@ import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.storage.StorageEntity;
 import com.ruoyi.file.storage.StorageService;
 
@@ -218,33 +218,38 @@ public class FileOperateUtils {
 
     /**
      * 初始化分片上传
+     * 
      * @param filePath 文件路径
      * @return 返回uploadId
      */
-    public static String initMultipartUpload(String filePath) throws Exception{
+    public static String initMultipartUpload(String filePath) throws Exception {
         return fileService.initMultipartUpload(filePath);
     }
 
     /**
      * 上传分片
-     * @param filePath 文件路径
-     * @param uploadId 上传ID
-     * @param partNumber 分片序号
-     * @param partSize 分片大小
+     * 
+     * @param filePath    文件路径
+     * @param uploadId    上传ID
+     * @param partNumber  分片序号
+     * @param partSize    分片大小
      * @param inputStream 分片数据流
      * @return 分片的ETag
      */
-    public static String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream) throws Exception {
-                return fileService.uploadPart(filePath, uploadId, partNumber, partSize, inputStream);
-            }
+    public static String uploadPart(String filePath, String uploadId, int partNumber, long partSize,
+            InputStream inputStream) throws Exception {
+        return fileService.uploadPart(filePath, uploadId, partNumber, partSize, inputStream);
+    }
 
     /**
      * 完成分片上传
+     * 
      * @param filePath 文件路径
      * @param uploadId 上传ID
      * @return 文件的最终路径
      */
-    public static String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags) throws Exception{
+    public static String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
+            throws Exception {
         return fileService.completeMultipartUpload(filePath, uploadId, partETags);
     }
 }

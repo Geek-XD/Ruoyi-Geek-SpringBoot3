@@ -159,7 +159,7 @@ public class LocalBucket implements StorageBucket {
         return new SysFilePartETag(partNumber, etag, partSize, null);
     }
 
-    public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partETags)
+    public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
             throws Exception {
         List<Map<String, Object>> storedParts = uploadMetadata.get(uploadId);
         if (storedParts == null) {
@@ -171,11 +171,11 @@ public class LocalBucket implements StorageBucket {
         // 验证每个分片的 ETag
         for (int i = 0; i < partETags.size(); i++) {
             Map<String, Object> expected = storedParts.get(i);
-            Map<String, Object> actual = partETags.get(i);
+            SysFilePartETag actual = partETags.get(i);
 
-            if (!expected.get("etag").equals(actual.get("etag")) ||
-                    !expected.get("partNumber").equals(actual.get("partNumber"))) {
-                throw new ServiceException("分片验证失败: 序号=" + expected.get("partNumber"));
+            if (!expected.get("etag").equals(actual.getETag()) ||
+                    !expected.get("partNumber").equals(actual.getPartNumber())) {
+                throw new ServiceException("分片验证失败: 序号=" + actual.getPartNumber());
             }
         }
         Path destPath = Paths.get(basePath, filePath);

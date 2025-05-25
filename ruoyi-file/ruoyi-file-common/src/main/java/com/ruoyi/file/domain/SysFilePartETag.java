@@ -7,17 +7,17 @@ import lombok.Data;
 @Data
 public class SysFilePartETag implements Serializable {
     private static final long serialVersionUID = 2471854027355307627L;
-    private int partNumber;
+    private Integer partNumber;
     private String eTag;
     private long partSize;
     private Long partCRC;
 
-    public SysFilePartETag(int partNumber, String eTag) {
+    public SysFilePartETag(Integer partNumber, String eTag) {
         this.partNumber = partNumber;
         this.eTag = eTag;
     }
 
-    public SysFilePartETag(int partNumber, String eTag, long partSize, Long partCRC) {
+    public SysFilePartETag(Integer partNumber, String eTag, long partSize, Long partCRC) {
         this.partNumber = partNumber;
         this.eTag = eTag;
         this.partSize = partSize;

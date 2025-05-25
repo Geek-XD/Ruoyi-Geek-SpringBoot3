@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -156,24 +155,23 @@ public class MinioBucket implements StorageBucket {
     /**
      * 完成分片上传并合并文件
      */
-    public String completeMultipartUpload(String filePath, String uploadId, List<Map<String, Object>> partInfos)
+    public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partInfos)
             throws Exception {
         if (partInfos == null || partInfos.isEmpty()) {
             throw new IllegalArgumentException("分片信息不能为空");
         }
 
         // 按分片序号排序
-        List<Map<String, Object>> sortedParts = partInfos.stream()
-                .sorted(Comparator.comparingInt(p -> ((Number) p.get("partNumber")).intValue()))
+        List<SysFilePartETag> sortedParts = partInfos.stream()
+                .sorted(Comparator.comparingInt(p -> p.getPartNumber()))
                 .collect(Collectors.toList());
 
         // 创建临时文件并合并分片
         Path tempFilePath = Files.createTempFile("minio-merge-", ".tmp");
         try (OutputStream fos = Files.newOutputStream(tempFilePath)) {
-            for (Map<String, Object> part : sortedParts) {
-                int partNumber = ((Number) part.get("partNumber")).intValue();
+            for (SysFilePartETag part : sortedParts) {
+                int partNumber = ((Number) part.getPartNumber()).intValue();
                 String partPath = String.format("%s.%s.part.%d", filePath, uploadId, partNumber);
-
                 try (InputStream is = client.getObject(
                         GetObjectArgs.builder()
                                 .bucket(bucketName)
@@ -200,8 +198,8 @@ public class MinioBucket implements StorageBucket {
         }
         // 清理临时文件和分片
         Files.deleteIfExists(tempFilePath);
-        for (Map<String, Object> part : sortedParts) {
-            int partNumber = ((Number) part.get("partNumber")).intValue();
+        for (SysFilePartETag part : sortedParts) {
+            int partNumber = ((Number) part.getPartNumber()).intValue();
             String partPath = String.format("%s.%s.part.%d", filePath, uploadId, partNumber);
             try {
                 client.removeObject(
