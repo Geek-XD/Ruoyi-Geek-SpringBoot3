@@ -1169,6 +1169,9 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
         // 暂时只处理用户任务上的表单
         if (StringUtils.isNotBlank(task.getFormKey())) {
             FormTemplate sysForm = formTemplateService.selectFormTemplateByFormId(Long.parseLong(task.getFormKey()));
+            if (Objects.isNull(sysForm)) {
+                throw new ServiceException("当前流程配置的表单不存在或已被删除");
+            }
             JSONObject data = JSONObject.parseObject(sysForm.getFormSchema());
             List<JSONObject> newFields = JSON.parseObject(
                     JSON.toJSONString(data.get("widgetList")),
