@@ -30,8 +30,8 @@ public class FlowTaskListener implements TaskListener {
     @Override
     public void notify(DelegateTask delegateTask) {
 
+        // 获取事件类型 delegateTask.getEventName(),可以通过监听器给任务执行人发送相应的通知消息
         log.info("任务监听器:{}", delegateTask, param.getValue(delegateTask));
-        // TODO 获取事件类型 delegateTask.getEventName(),可以通过监听器给任务执行人发送相应的通知消息
 
     }
 

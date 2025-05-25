@@ -1,7 +1,17 @@
 package com.ruoyi.flowable.flow;
 
-import com.googlecode.aviator.AviatorEvaluator;
-import com.googlecode.aviator.Expression;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CallActivity;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.Gateway;
+import org.flowable.bpmn.model.ParallelGateway;
 //import com.greenpineyu.fel.FelEngine;
 //import com.greenpineyu.fel.FelEngineImpl;
 //import com.greenpineyu.fel.context.FelContext;
@@ -10,11 +20,18 @@ import com.googlecode.aviator.Expression;
 //import org.apache.commons.jexl2.MapContext;
 //import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Process;
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.ReceiveTask;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.Task;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
 
-import java.util.*;
+import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Expression;
 
 /**
  * @author Tony
@@ -29,9 +46,11 @@ public class FindNextNodeUtil {
      * @param map
      * @return
      */
-    public static List<UserTask> getNextUserTasks(RepositoryService repositoryService, org.flowable.task.api.Task task, Map<String, Object> map) {
+    public static List<UserTask> getNextUserTasks(RepositoryService repositoryService, org.flowable.task.api.Task task,
+            Map<String, Object> map) {
         List<UserTask> data = new ArrayList<>();
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(task.getProcessDefinitionId()).singleResult();
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(task.getProcessDefinitionId()).singleResult();
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
         Process mainProcess = bpmnModel.getMainProcess();
         Collection<FlowElement> flowElements = mainProcess.getFlowElements();
@@ -48,7 +67,8 @@ public class FindNextNodeUtil {
      * @param map
      * @return
      */
-    public static List<UserTask> getNextUserTasksByStart(RepositoryService repositoryService, ProcessDefinition processDefinition, Map<String, Object> map) {
+    public static List<UserTask> getNextUserTasksByStart(RepositoryService repositoryService,
+            ProcessDefinition processDefinition, Map<String, Object> map) {
         List<UserTask> data = new ArrayList<>();
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
         Process mainProcess = bpmnModel.getMainProcess();
@@ -62,7 +82,7 @@ public class FindNextNodeUtil {
             }
         }
         FlowElement flowElement = bpmnModel.getFlowElement(key);
-        List<SequenceFlow> sequenceFlows = ((StartEvent)flowElement).getOutgoingFlows();
+        List<SequenceFlow> sequenceFlows = ((StartEvent) flowElement).getOutgoingFlows();
         // 获取出口连线, 此时从开始节点往后,只能是一个出口
         if (!sequenceFlows.isEmpty()) {
             SequenceFlow sequenceFlow = sequenceFlows.get(0);
@@ -72,7 +92,6 @@ public class FindNextNodeUtil {
         return data;
     }
 
-
     /**
      * 查找下一节点
      *
@@ -81,15 +100,16 @@ public class FindNextNodeUtil {
      * @param map
      * @param nextUser
      */
-    public static void next(Collection<FlowElement> flowElements, FlowElement flowElement, Map<String, Object> map, List<UserTask> nextUser) {
-        //如果是结束节点
+    public static void next(Collection<FlowElement> flowElements, FlowElement flowElement, Map<String, Object> map,
+            List<UserTask> nextUser) {
+        // 如果是结束节点
         if (flowElement instanceof EndEvent) {
-            //如果是子任务的结束节点
+            // 如果是子任务的结束节点
             if (getSubProcess(flowElements, flowElement) != null) {
                 flowElement = getSubProcess(flowElements, flowElement);
             }
         }
-        //获取Task的出线信息--可以拥有多个
+        // 获取Task的出线信息--可以拥有多个
         List<SequenceFlow> outGoingFlows = null;
         if (flowElement instanceof Task) {
             outGoingFlows = ((Task) flowElement).getOutgoingFlows();
@@ -103,22 +123,23 @@ public class FindNextNodeUtil {
             outGoingFlows = ((CallActivity) flowElement).getOutgoingFlows();
         }
         if (outGoingFlows != null && outGoingFlows.size() > 0) {
-            //遍历所有的出线--找到可以正确执行的那一条
+            // 遍历所有的出线--找到可以正确执行的那一条
             for (SequenceFlow sequenceFlow : outGoingFlows) {
-                //1.有表达式，且为true
-                //2.无表达式
+                // 1.有表达式，且为true
+                // 2.无表达式
                 String expression = sequenceFlow.getConditionExpression();
                 if (expression == null ||
-                        expressionResult(map, expression.substring(expression.lastIndexOf("{") + 1, expression.lastIndexOf("}")))) {
-                    //出线的下一节点
+                        expressionResult(map,
+                                expression.substring(expression.lastIndexOf("{") + 1, expression.lastIndexOf("}")))) {
+                    // 出线的下一节点
                     String nextFlowElementID = sequenceFlow.getTargetRef();
                     if (checkSubProcess(nextFlowElementID, flowElements, nextUser)) {
                         continue;
                     }
 
-                    //查询下一节点的信息
+                    // 查询下一节点的信息
                     FlowElement nextFlowElement = getFlowElementById(nextFlowElementID, flowElements);
-                    //调用流程
+                    // 调用流程
                     if (nextFlowElement instanceof CallActivity) {
                         CallActivity ca = (CallActivity) nextFlowElement;
                         if (ca.getLoopCharacteristics() != null) {
@@ -132,31 +153,31 @@ public class FindNextNodeUtil {
                         }
                         next(flowElements, nextFlowElement, map, nextUser);
                     }
-                    //用户任务
+                    // 用户任务
                     if (nextFlowElement instanceof UserTask) {
                         nextUser.add((UserTask) nextFlowElement);
                     }
-                    //排他网关
+                    // 排他网关
                     else if (nextFlowElement instanceof ExclusiveGateway) {
                         next(flowElements, nextFlowElement, map, nextUser);
                     }
-                    //并行网关
+                    // 并行网关
                     else if (nextFlowElement instanceof ParallelGateway) {
                         next(flowElements, nextFlowElement, map, nextUser);
                     }
-                    //接收任务
+                    // 接收任务
                     else if (nextFlowElement instanceof ReceiveTask) {
                         next(flowElements, nextFlowElement, map, nextUser);
                     }
-                    //服务任务
+                    // 服务任务
                     else if (nextFlowElement instanceof ServiceTask) {
                         next(flowElements, nextFlowElement, map, nextUser);
                     }
-                    //子任务的起点
+                    // 子任务的起点
                     else if (nextFlowElement instanceof StartEvent) {
                         next(flowElements, nextFlowElement, map, nextUser);
                     }
-                    //结束节点
+                    // 结束节点
                     else if (nextFlowElement instanceof EndEvent) {
                         next(flowElements, nextFlowElement, map, nextUser);
                     }
@@ -174,7 +195,7 @@ public class FindNextNodeUtil {
 
                 SubProcess sp = (SubProcess) flowElement1;
                 if (sp.getLoopCharacteristics() != null) {
-//                    String inputDataItem = sp.getLoopCharacteristics().getInputDataItem();
+                    // String inputDataItem = sp.getLoopCharacteristics().getInputDataItem();
                     UserTask userTask = new UserTask();
                     userTask.setId(sp.getId());
                     userTask.setLoopCharacteristics(sp.getLoopCharacteristics());
@@ -209,7 +230,6 @@ public class FindNextNodeUtil {
         return null;
     }
 
-
     /**
      * 根据ID查询流程节点对象, 如果是子任务，则返回子任务的开始节点
      *
@@ -220,7 +240,7 @@ public class FindNextNodeUtil {
     public static FlowElement getFlowElementById(String Id, Collection<FlowElement> flowElements) {
         for (FlowElement flowElement : flowElements) {
             if (flowElement.getId().equals(Id)) {
-                //如果是子任务，则查询出子任务的开始节点
+                // 如果是子任务，则查询出子任务的开始节点
                 if (flowElement instanceof SubProcess) {
                     return getStartFlowElement(((SubProcess) flowElement).getFlowElements());
                 }
@@ -261,6 +281,6 @@ public class FindNextNodeUtil {
     public static boolean expressionResult(Map<String, Object> map, String expression) {
         Expression exp = AviatorEvaluator.compile(expression);
         return (Boolean) exp.execute(map);
-//        return true;
+        // return true;
     }
 }
