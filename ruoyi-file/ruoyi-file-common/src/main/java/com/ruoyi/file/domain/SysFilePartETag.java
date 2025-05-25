@@ -9,8 +9,15 @@ public class SysFilePartETag implements Serializable {
     private static final long serialVersionUID = 2471854027355307627L;
     private Integer partNumber;
     private String eTag;
-    private long partSize;
+    private Long partSize;
     private Long partCRC;
+
+    public void seteTag(String eTag) {
+        this.eTag = eTag;
+    }
+
+    public SysFilePartETag() {
+    }
 
     public SysFilePartETag(Integer partNumber, String eTag) {
         this.partNumber = partNumber;

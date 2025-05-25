@@ -1,11 +1,8 @@
 package com.ruoyi.file.minio.domain;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +18,8 @@ import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.minio.exception.MinioClientErrorException;
 import com.ruoyi.file.storage.StorageBucket;
 
+import io.minio.ComposeObjectArgs;
+import io.minio.ComposeSource;
 import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
 import io.minio.GetPresignedObjectUrlArgs;
@@ -155,64 +154,42 @@ public class MinioBucket implements StorageBucket {
     /**
      * 完成分片上传并合并文件
      */
-    public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partInfos)
+    public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> filePartETags)
             throws Exception {
-        if (partInfos == null || partInfos.isEmpty()) {
+        if (filePartETags == null || filePartETags.isEmpty()) {
             throw new IllegalArgumentException("分片信息不能为空");
         }
 
         // 按分片序号排序
-        List<SysFilePartETag> sortedParts = partInfos.stream()
+        List<String> partPaths = filePartETags.stream()
                 .sorted(Comparator.comparingInt(p -> p.getPartNumber()))
+                .map(part -> String.format("%s.%s.part.%d", filePath, uploadId, part.getPartNumber()))
                 .collect(Collectors.toList());
 
-        // 创建临时文件并合并分片
-        Path tempFilePath = Files.createTempFile("minio-merge-", ".tmp");
-        try (OutputStream fos = Files.newOutputStream(tempFilePath)) {
-            for (SysFilePartETag part : sortedParts) {
-                int partNumber = ((Number) part.getPartNumber()).intValue();
-                String partPath = String.format("%s.%s.part.%d", filePath, uploadId, partNumber);
-                try (InputStream is = client.getObject(
-                        GetObjectArgs.builder()
-                                .bucket(bucketName)
-                                .object(partPath)
-                                .build())) {
-                    byte[] buffer = new byte[8192];
-                    int bytesRead;
-                    while ((bytesRead = is.read(buffer)) != -1) {
-                        fos.write(buffer, 0, bytesRead);
-                    }
-                }
-            }
-        }
-        // 上传合并后的文件
-        try (InputStream finalInputStream = Files.newInputStream(tempFilePath)) {
-            long fileSize = Files.size(tempFilePath);
-            PutObjectArgs putArgs = PutObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(filePath)
-                    .stream(finalInputStream, fileSize, -1)
-                    .build();
+        List<ComposeSource> sources = partPaths.stream()
+                .map(path -> ComposeSource.builder()
+                        .bucket(bucketName)
+                        .object(path)
+                        .build())
+                .toList();
 
-            client.putObject(putArgs);
-        }
-        // 清理临时文件和分片
-        Files.deleteIfExists(tempFilePath);
-        for (SysFilePartETag part : sortedParts) {
-            int partNumber = ((Number) part.getPartNumber()).intValue();
-            String partPath = String.format("%s.%s.part.%d", filePath, uploadId, partNumber);
+        client.composeObject(ComposeObjectArgs.builder()
+                .bucket(bucketName)
+                .object(filePath)
+                .sources(sources)
+                .build());
+
+        for (String partPath : partPaths) {
             try {
-                client.removeObject(
-                        RemoveObjectArgs.builder()
-                                .bucket(bucketName)
-                                .object(partPath)
-                                .build());
+                client.removeObject(RemoveObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(partPath)
+                        .build());
             } catch (Exception e) {
                 log.warn("清理分片失败: {}", e.getMessage());
             }
         }
-
-        log.info("分片合并完成: 文件={}, uploadId={}, 分片数={}", filePath, uploadId, sortedParts.size());
+        log.info("分片合并完成: 文件={}, uploadId={}, 分片数={}", filePath, uploadId, filePartETags.size());
         return filePath;
     }
 

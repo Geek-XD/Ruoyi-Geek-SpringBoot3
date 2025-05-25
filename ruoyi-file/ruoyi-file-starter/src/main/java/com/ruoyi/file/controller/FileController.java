@@ -272,9 +272,7 @@ public class FileController {
             List<SysFilePartETag> validParts = partETags.stream()
                     .filter(part -> part != null && part.getPartNumber() != null && part.getETag() != null)
                     .peek(part -> {
-                        int partNumber = ((Number) part.getPartNumber()).intValue();
-                        String etag = (String) part.getETag();
-                        if (partNumber <= 0 || etag == null || etag.isEmpty()) {
+                        if (part.getPartNumber() <= 0 || StringUtils.isEmpty(part.getETag())) {
                             throw new ServiceException("分片序号或ETag无效");
                         }
                     })
