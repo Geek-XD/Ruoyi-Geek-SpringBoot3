@@ -80,6 +80,7 @@ public class AliOssManagement implements StorageManagement {
         AliOssBucket ossBucket = AliOssBucket.builder()
                 .ossClient(client)
                 .bucketName(props.getBucketName())
+                .endpoint(props.getEndpoint())
                 .build();
         validateOssBucket(ossBucket);
         logger.info("数据桶：{} - 链接成功", name);
