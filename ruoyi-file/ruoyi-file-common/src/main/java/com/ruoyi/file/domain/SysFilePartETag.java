@@ -2,12 +2,15 @@ package com.ruoyi.file.domain;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 
 @Data
 public class SysFilePartETag implements Serializable {
     private static final long serialVersionUID = 2471854027355307627L;
     private Integer partNumber;
+    @JsonProperty("ETag")
     private String eTag;
     private Long partSize;
     private Long partCRC;
