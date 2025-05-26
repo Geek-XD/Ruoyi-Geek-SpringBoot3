@@ -14,6 +14,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.ruoyi.common.annotation.DataSource;
+import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.datasource.DynamicDataSourceContextHolder;
 
@@ -37,17 +38,12 @@ public class DataSourceAspect {
     @Around("dsPointCut()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         DataSource dataSource = getDataSource(point);
-
+        String name = DataSourceType.MASTER.name();
         if (StringUtils.isNotNull(dataSource)) {
-            if ("".equals(dataSource.name())) {
-                DynamicDataSourceContextHolder.setDataSourceType(dataSource.value().name());
-            } else {
-                DynamicDataSourceContextHolder.setDataSourceType(dataSource.name());
-            }
-
+            name = "".equals(dataSource.name()) ? dataSource.value().name() : dataSource.name();
         }
-
         try {
+            DynamicDataSourceContextHolder.setDataSourceType(name);
             return point.proceed();
         } finally {
             // 销毁数据源 在执行方法之后
@@ -64,7 +60,6 @@ public class DataSourceAspect {
         if (Objects.nonNull(dataSource)) {
             return dataSource;
         }
-
         return AnnotationUtils.findAnnotation(signature.getDeclaringType(), DataSource.class);
     }
 }

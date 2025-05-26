@@ -103,7 +103,8 @@ public class LogAspect {
 
             if (e != null) {
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());
-                operLog.setErrorMsg(StringUtils.substring(Convert.toStr(e.getMessage(), ExceptionUtil.getExceptionMessage(e)), 0, 2000));
+                operLog.setErrorMsg(StringUtils
+                        .substring(Convert.toStr(e.getMessage(), ExceptionUtil.getExceptionMessage(e)), 0, 2000));
             }
             // 设置方法名称
             String className = joinPoint.getTarget().getClass().getName();
