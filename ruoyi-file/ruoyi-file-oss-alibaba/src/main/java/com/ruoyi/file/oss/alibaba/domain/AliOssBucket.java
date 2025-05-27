@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -126,10 +127,10 @@ public class AliOssBucket implements StorageBucket {
             throw new ServiceException("分片ETag列表不能为空");
         }
         List<PartETag> partETags = sysFilePartETags.stream()
-                .map(part -> new PartETag(part.getPartNumber(), part.getETag(), part.getPartSize(), part.getPartCRC()))
-                .toList();
-        // 确保分片按顺序排列
-        partETags.sort(Comparator.comparingInt(PartETag::getPartNumber));
+                .map(part -> new PartETag(part.getPartNumber(), part.getETag().trim()))
+                .sorted(Comparator.comparingInt(PartETag::getPartNumber))
+                .collect(Collectors.toList());
+
         try {
             CompleteMultipartUploadRequest completeRequest = new CompleteMultipartUploadRequest(bucketName, filePath,
                     uploadId, partETags);
