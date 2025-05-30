@@ -101,6 +101,7 @@ public class FileController {
             AjaxResult ajax = AjaxResult.success();
             ajax.put("url", url);
             ajax.put("info", info);
+            ajax.put("fileName", file.getOriginalFilename());
             return ajax;
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
