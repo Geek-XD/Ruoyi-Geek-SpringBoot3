@@ -85,9 +85,9 @@ public class DySmsServiceImpl implements DySmsService {
     }
 
     @Override
-    public void doLogin(LoginBody loginBody) {
+    public void doLogin(LoginBody loginBody, boolean autoRegister) {
         SysUser sysUser = userService.selectUserByPhone(loginBody.getPhonenumber());
-        if (sysUser == null) {
+        if (sysUser == null && !autoRegister) {
             throw new ServiceException("该手机号未绑定用户");
         } else {
             sendCode(loginBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.LOGIN);
@@ -95,11 +95,19 @@ public class DySmsServiceImpl implements DySmsService {
     }
 
     @Override
-    public String doLoginVerify(LoginBody loginBody) {
+    public String doLoginVerify(LoginBody loginBody, boolean autoRegister) {
         if (checkCode(loginBody.getPhonenumber(), loginBody.getCode(), OauthVerificationUse.LOGIN)) {
             SysUser sysUser = userService.selectUserByPhone(loginBody.getPhonenumber());
             if (sysUser == null) {
-                throw new ServiceException("该手机号未绑定用户");
+                if (!autoRegister) {
+                    throw new ServiceException("该手机号未绑定用户");
+                }
+                sysUser = new SysUser();
+                sysUser.setUserName(loginBody.getPhonenumber());
+                sysUser.setNickName(loginBody.getPhonenumber());
+                sysUser.setPassword(SecurityUtils.encryptPassword(loginBody.getCode()));
+                sysUser.setPhonenumber(loginBody.getPhonenumber());
+                userService.registerUser(sysUser);
             }
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getUserName(), Constants.LOGIN_SUCCESS,
                     MessageUtils.message("user.login.success")));

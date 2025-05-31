@@ -1,5 +1,6 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "disabled",
     "maven.executable.options": "-T 4",
     "maven.pomfile.autoUpdateEffectivePOM": true,
     "java.debug.settings.hotCodeReplace": "auto",

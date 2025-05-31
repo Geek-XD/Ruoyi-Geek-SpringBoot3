@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ruoyi.auth.common.service.TfaService;
@@ -62,18 +63,20 @@ public class TfaController extends BaseController {
     @Operation(summary = "发送登录验证码")
     @PostMapping("/send/login")
     @Anonymous
-    public AjaxResult sendLogin(@PathVariable String channel, @RequestBody LoginBody loginBody) {
+    public AjaxResult sendLogin(@PathVariable String channel, @RequestBody LoginBody loginBody,
+            @RequestParam(defaultValue = "false") boolean autoRegister) {
         TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
-        tfaService.doLogin(loginBody);
+        tfaService.doLogin(loginBody, autoRegister);
         return success();
     }
 
     @Operation(summary = "验证登录验证码")
     @PostMapping("/verify/login")
     @Anonymous
-    public AjaxResult verifyLogin(@PathVariable String channel, @RequestBody LoginBody loginBody) {
+    public AjaxResult verifyLogin(@PathVariable String channel, @RequestBody LoginBody loginBody,
+            @RequestParam(defaultValue = "false") boolean autoRegister) {
         TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
-        return success(tfaService.doLoginVerify(loginBody));
+        return success(tfaService.doLoginVerify(loginBody, autoRegister));
     }
 
     @Operation(summary = "发送绑定验证码")

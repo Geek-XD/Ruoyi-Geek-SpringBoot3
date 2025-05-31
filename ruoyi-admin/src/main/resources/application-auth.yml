@@ -30,7 +30,8 @@ tfa:
 
 spring:
   mail:
-    host: smtp.qq.com
+    # 邮箱配置  smtp.qq.com   smtp.163.com
+    host: smtp.163.com
     # 邮箱地址
     username: email
     # 授权码

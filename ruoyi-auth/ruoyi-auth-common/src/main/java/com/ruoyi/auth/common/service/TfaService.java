@@ -47,7 +47,7 @@ public interface TfaService {
      *
      * @param loginBody 包含用户凭证的登录信息
      */
-    public void doLogin(LoginBody loginBody);
+    public void doLogin(LoginBody loginBody, boolean autoRegister);
 
     /**
      * 验证TFA登录流程的第二步并完成认证。
@@ -55,7 +55,7 @@ public interface TfaService {
      * @param loginBody 包含TFA验证码的登录信息
      * @return 已认证会话的字符串令牌或会话标识符
      */
-    public String doLoginVerify(LoginBody loginBody);
+    public String doLoginVerify(LoginBody loginBody, boolean autoRegister);
 
     /**
      * 启动TFA重置流程的第一步。

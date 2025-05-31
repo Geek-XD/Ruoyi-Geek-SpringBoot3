@@ -73,9 +73,9 @@ public class MailServiceImpl implements IMailService {
     }
 
     @Override
-    public void doLogin(LoginBody loginBody) {
+    public void doLogin(LoginBody loginBody, boolean autoRegister) {
         SysUser sysUser = userService.selectUserByEmail(loginBody.getEmail());
-        if (sysUser == null) {
+        if (sysUser == null && !autoRegister) {
             throw new ServiceException("该邮箱未绑定用户");
         } else {
             sendCode(loginBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.LOGIN);
@@ -83,11 +83,19 @@ public class MailServiceImpl implements IMailService {
     }
 
     @Override
-    public String doLoginVerify(LoginBody loginBody) {
+    public String doLoginVerify(LoginBody loginBody, boolean autoRegister) {
         if (checkCode(loginBody.getEmail(), loginBody.getCode(), OauthVerificationUse.LOGIN)) {
             SysUser sysUser = userService.selectUserByEmail(loginBody.getEmail());
             if (sysUser == null) {
-                throw new ServiceException("该邮箱未绑定用户");
+                if (!autoRegister) {
+                    throw new ServiceException("该邮箱未绑定用户");
+                }
+                sysUser = new SysUser();
+                sysUser.setUserName(loginBody.getEmail());
+                sysUser.setNickName(loginBody.getEmail());
+                sysUser.setPassword(SecurityUtils.encryptPassword(loginBody.getCode()));
+                sysUser.setEmail(loginBody.getEmail());
+                userService.registerUser(sysUser);
             }
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getUserName(), Constants.LOGIN_SUCCESS,
                     MessageUtils.message("user.login.success")));

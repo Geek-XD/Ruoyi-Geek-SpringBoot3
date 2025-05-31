@@ -42,7 +42,7 @@ public class CacheUtils {
      * @return
      */
     public static Set<String> getkeys(String cacheName) {
-        Cache cache = getCacheManager().getCache(cacheName);
+        Cache cache = getCache(cacheName);
         CacheKeys cacheGetKets = SpringUtils.getBean(CacheKeys.class);
         return cacheGetKets.getCachekeys(cache);
     }
@@ -88,7 +88,7 @@ public class CacheUtils {
      * @param <T>
      */
     public static <T> void put(String cacheName, String key, T value, long timeout, TimeUnit unit) {
-        Cache cache = getCacheManager().getCache(cacheName);
+        Cache cache = getCache(cacheName);
         if (cache instanceof JCacheCache) {
             JCacheCache ehcache = (JCacheCache) cache;
             ehcache.put(key, value);
@@ -112,7 +112,7 @@ public class CacheUtils {
      * @return
      */
     public static Cache.ValueWrapper get(String cacheName, String key) {
-        return getCacheManager().getCache(cacheName).get(key);
+        return getCache(cacheName).get(key);
     }
 
     /**
@@ -125,7 +125,7 @@ public class CacheUtils {
      * @return
      */
     public static <T> T get(String cacheName, String key, @Nullable Class<T> type) {
-        return getCacheManager().getCache(cacheName).get(key, type);
+        return getCache(cacheName).get(key, type);
     }
 
     /**
@@ -135,7 +135,7 @@ public class CacheUtils {
      * @param key
      */
     public static void remove(String cacheName, String key) {
-        getCacheManager().getCache(cacheName).evict(key);
+        getCache(cacheName).evict(key);
     }
 
     /**
@@ -156,6 +156,6 @@ public class CacheUtils {
      * @param cacheName
      */
     public static void clear(String cacheName) {
-        getCacheManager().getCache(cacheName).clear();
+        getCache(cacheName).clear();
     }
 }
