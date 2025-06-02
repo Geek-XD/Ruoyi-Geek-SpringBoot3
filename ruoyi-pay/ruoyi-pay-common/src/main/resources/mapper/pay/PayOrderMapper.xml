@@ -18,10 +18,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy" column="update_by" />
         <result property="updateTime" column="update_time" />
         <result property="remark" column="remark" />
+        <result property="payType" column="pay_type" />
+        <result property="payTime" column="pay_time" />
+        <result property="payBy" column="pay_by" />
     </resultMap>
 
     <sql id="selectPayOrderVo">
-        select order_id, order_number, order_status, total_amount, actual_amount, order_content, order_message, create_by, create_time, update_by, update_time, remark from pay_order
+        select order_id, order_number,third_number, order_status, total_amount, actual_amount, order_content, order_message, pay_type, pay_time, pay_by, create_by, create_time, update_by, update_time, remark from pay_order
     </sql>
 
     <select id="selectPayOrderList" parameterType="PayOrder" resultMap="PayOrderResult">
@@ -34,6 +37,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="actualAmount != null  and actualAmount != ''"> and actual_amount = #{actualAmount}</if>
             <if test="orderContent != null  and orderContent != ''"> and order_content = #{orderContent}</if>
             <if test="orderMessage != null  and orderMessage != ''"> and order_message = #{orderMessage}</if>
+            <if test="payType != null  and payType != ''"> and pay_type = #{payType}</if>
+            <if test="payTime != null"> and pay_time = #{payTime}</if>
+            <if test="payBy != null  and payBy != ''"> and pay_by = #{payBy}</if>
         </where>
     </select>
 
@@ -62,6 +68,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="remark != null">remark,</if>
+            <if test="payType != null">pay_type,</if>
+            <if test="payTime != null">pay_time,</if>
+            <if test="payBy != null">pay_by,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="orderNumber != null">#{orderNumber},</if>
@@ -76,6 +85,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>
+            <if test="payType != null">#{payType},</if>
+            <if test="payTime != null">#{payTime},</if>
+            <if test="payBy != null">#{payBy},</if>
         </trim>
     </insert>
 
@@ -94,6 +106,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="remark != null">remark = #{remark},</if>
+            <if test="payType != null">pay_type = #{payType},</if>
+            <if test="payTime != null">pay_time = #{payTime},</if>
+            <if test="payBy != null">pay_by = #{payBy},</if>
         </trim>
         where pay_order.order_id = #{orderId}
     </update>

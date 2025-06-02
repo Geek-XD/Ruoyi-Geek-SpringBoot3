@@ -8,7 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface PayService {
     String payUrl(PayOrder payOrder);
 
-    String notify(HttpServletRequest servletRequest, HttpServletResponse response);
+    String notify(HttpServletRequest servletRequest, HttpServletResponse response, PayOrder payOrder, String type)
+            throws Exception;
 
     PayOrder query(PayOrder payOrder);
 

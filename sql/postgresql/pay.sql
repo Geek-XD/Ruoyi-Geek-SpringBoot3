@@ -15,7 +15,10 @@ CREATE TABLE pay_order (
   create_time      timestamp       default CURRENT_TIMESTAMP,
   update_by        varchar(64)     default '',
   update_time      timestamp       default CURRENT_TIMESTAMP,
-  remark           varchar(500)    default null
+  remark           varchar(500)    default null,
+  pay_type         varchar(255)    NULL DEFAULT NULL, -- 支付方式
+  pay_time         timestamp       default NULL,      -- 支付时间
+  pay_by           varchar(64)     default ''         -- 支付人
 );
 
 COMMENT ON COLUMN pay_order.order_id IS '订单id';
@@ -31,6 +34,9 @@ COMMENT ON COLUMN pay_order.create_time IS '创建时间';
 COMMENT ON COLUMN pay_order.update_by IS '更新者';
 COMMENT ON COLUMN pay_order.update_time IS '更新时间';
 COMMENT ON COLUMN pay_order.remark IS '备注';
+COMMENT ON COLUMN pay_order.pay_type IS '支付方式';
+COMMENT ON COLUMN pay_order.pay_time IS '支付时间';
+COMMENT ON COLUMN pay_order.pay_by IS '支付人';
 
 -- ----------------------------
 -- 发票表

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.pay.domain.PayOrder;
 import com.ruoyi.pay.mapper.PayOrderMapper;
@@ -40,7 +41,12 @@ public class PayOrderServiceImpl implements IPayOrderService {
      */
     @Override
     public PayOrder selectPayOrderByOrderNumber(String orderNumber) {
-        return payOrderMapper.selectPayOrderByOrderNumber(orderNumber);
+        PayOrder payOrder = payOrderMapper.selectPayOrderByOrderNumber(orderNumber);
+        if (payOrder == null) {
+            throw new ServiceException("订单不存在，请检查订单号是否正确");
+        } else {
+            return payOrder;
+        }
     }
 
     /**

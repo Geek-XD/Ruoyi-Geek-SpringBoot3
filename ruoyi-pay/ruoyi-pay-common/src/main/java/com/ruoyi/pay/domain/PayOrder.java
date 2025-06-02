@@ -57,6 +57,21 @@ public class PayOrder extends BaseEntity {
     @Excel(name = "负载信息")
     private String orderMessage;
 
+    /** 支付方式 */
+    @Schema(title = "支付方式")
+    @Excel(name = "支付方式")
+    private String payType;
+
+    /** 支付时间 */
+    @Schema(title = "支付时间")
+    @Excel(name = "支付时间")
+    private java.util.Date payTime;
+
+    /** 支付人 */
+    @Schema(title = "支付人")
+    @Excel(name = "支付人")
+    private String payBy;
+
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
@@ -121,6 +136,30 @@ public class PayOrder extends BaseEntity {
         return orderMessage;
     }
 
+    public void setPayType(String payType) {
+        this.payType = payType;
+    }
+
+    public String getPayType() {
+        return payType;
+    }
+
+    public void setPayTime(java.util.Date payTime) {
+        this.payTime = payTime;
+    }
+
+    public java.util.Date getPayTime() {
+        return payTime;
+    }
+
+    public void setPayBy(String payBy) {
+        this.payBy = payBy;
+    }
+
+    public String getPayBy() {
+        return payBy;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -131,6 +170,9 @@ public class PayOrder extends BaseEntity {
                 .append("actualAmount", getActualAmount())
                 .append("orderContent", getOrderContent())
                 .append("orderMessage", getOrderMessage())
+                .append("payType", getPayType())
+                .append("payTime", getPayTime())
+                .append("payBy", getPayBy())
                 .append("createBy", getCreateBy())
                 .append("createTime", getCreateTime())
                 .append("updateBy", getUpdateBy())

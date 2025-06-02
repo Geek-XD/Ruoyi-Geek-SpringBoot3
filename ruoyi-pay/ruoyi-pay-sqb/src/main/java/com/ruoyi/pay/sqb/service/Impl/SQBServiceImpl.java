@@ -215,7 +215,11 @@ public class SQBServiceImpl implements ISqbPayService {
         if (payOrder.getRemark() == null) {
             payOrder.setRemark("支付");
         }
-        String orderNotifyUrl = sqbConfig.getNotifyUrl();
+        // sqbConfig.getNotifyUrl() + payOrder.getOrderNumber() + "/pay";
+        StringBuilder notifyUrlBuilder = new StringBuilder();
+        String orderNotifyUrl = notifyUrlBuilder.append(sqbConfig.getNotifyUrl())
+                .append("/").append(payOrder.getOrderNumber())
+                .append("/pay").toString();
         String param = "" +
                 "client_sn=" + payOrder.getOrderNumber() +
                 "&notify_url=" + orderNotifyUrl +
@@ -314,7 +318,7 @@ public class SQBServiceImpl implements ISqbPayService {
     }
 
     @Override
-    public String notify(HttpServletRequest request, HttpServletResponse response) {
+    public String notify(HttpServletRequest request, HttpServletResponse response, PayOrder payOrder, String type) {
         try {
             String requestBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
             JSONObject jsonObject = JSONObject.parseObject(requestBody);

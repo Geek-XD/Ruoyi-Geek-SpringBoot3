@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import com.alipay.easysdk.factory.Factory;
+import com.alipay.easysdk.kernel.Config;
 import com.alipay.easysdk.payment.common.models.AlipayTradeRefundResponse;
 import com.alipay.easysdk.payment.page.models.AlipayTradePagePayResponse;
 import com.ruoyi.common.exception.ServiceException;
@@ -27,14 +28,21 @@ public class AliPayService implements IAliPayService {
     @Autowired
     private IPayOrderService payOrderService;
 
+    @Autowired
+    Config config;
+
     public String payUrl(PayOrder payOrder) {
 
         try {
+            StringBuilder notifyUrlBuilder = new StringBuilder();
+            String orderNotifyUrl = notifyUrlBuilder.append(config.notifyUrl)
+                    .append("/").append(payOrder.getOrderNumber())
+                    .append("/pay").toString();
             AlipayTradePagePayResponse response = Factory.Payment.Page().pay(
                     payOrder.getOrderContent(),
                     payOrder.getOrderNumber(),
-                    payOrder.getActualAmount(),
-                    "");
+                    String.valueOf(Double.parseDouble(payOrder.getActualAmount()) / 100),
+                    orderNotifyUrl);
             return response.getBody();
         } catch (Exception e) {
             throw new ServiceException("创建支付宝支付URL失败");
@@ -42,18 +50,22 @@ public class AliPayService implements IAliPayService {
     }
 
     @Override
-    public String notify(HttpServletRequest request, HttpServletResponse response) {
-        if (request.getParameter("trade_status").equals("TRADE_SUCCESS")) {
-
+    public String notify(HttpServletRequest request, HttpServletResponse response, PayOrder payOrder, String type) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        if (parameterMap != null && !parameterMap.isEmpty()) {
             Map<String, String> params = new HashMap<>();
-            Map<String, String[]> requestParams = request.getParameterMap();
-            for (String name : requestParams.keySet()) {
+            for (String name : parameterMap.keySet()) {
                 params.put(name, request.getParameter(name));
             }
             String orderNumber = params.get("out_trade_no");
+            String theTradeNo = params.get("trade_no");
+            payOrder = payOrderService.selectPayOrderByOrderNumber(orderNumber);
+            payOrder.setPayType("alipay");
+            payOrder.setThirdNumber(theTradeNo);
             try {
                 if (Factory.Payment.Common().verifyNotify(params)) {
-                    payOrderService.updateStatus(orderNumber, "已支付");
+                    payOrder.setOrderStatus("已支付");
+                    payOrderService.updatePayOrder(payOrder);
                 }
                 return "success";
             } catch (Exception e) {
@@ -73,24 +85,12 @@ public class AliPayService implements IAliPayService {
             // 根据查询结果更新订单状态
             if ("10000".equals(response.code)) {
                 String tradeStatus = response.tradeStatus;
-                String orderStatus = "";
-
-                // 根据支付宝交易状态映射到系统订单状态
-                switch (tradeStatus) {
-                    case "TRADE_SUCCESS":
-                    case "TRADE_FINISHED":
-                        orderStatus = "已支付";
-                        break;
-                    case "WAIT_BUYER_PAY":
-                        orderStatus = "待支付";
-                        break;
-                    case "TRADE_CLOSED":
-                        orderStatus = "已关闭";
-                        break;
-                    default:
-                        orderStatus = "未知状态";
-                }
-
+                String orderStatus = switch (tradeStatus) {
+                    case "TRADE_SUCCESS", "TRADE_FINISHED" -> "已支付";
+                    case "WAIT_BUYER_PAY" -> "待支付";
+                    case "TRADE_CLOSED" -> "已关闭";
+                    default -> "未知状态" + tradeStatus;
+                };
                 // 更新订单信息
                 payOrderService.updateStatus(payOrder.getOrderNumber(), orderStatus);
             } else {
@@ -109,7 +109,7 @@ public class AliPayService implements IAliPayService {
             // 使用支付宝SDK进行退款
             AlipayTradeRefundResponse response = Factory.Payment.Common().refund(
                     payOrder.getOrderNumber(),
-                    payOrder.getActualAmount());
+                    String.valueOf(Double.parseDouble(payOrder.getActualAmount()) / 100));
 
             // 处理退款结果
             if ("10000".equals(response.code)) {

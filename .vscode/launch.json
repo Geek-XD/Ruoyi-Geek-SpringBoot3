@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Test1",
+            "request": "launch",
+            "mainClass": "com.ruoyi.Test1",
+            "projectName": "ruoyi-admin"
+        },
+        {
+            "type": "java",
+            "name": "AliPayService",
+            "request": "launch",
+            "mainClass": "com.ruoyi.pay.alipay.service.Impl.AliPayService",
+            "projectName": "ruoyi-pay-alipay"
+        },
+        {
+            "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "com.ruoyi.Test",
+            "projectName": "ruoyi-admin"
+        },
+        {
+            "type": "java",
             "name": "RuoYiApplication",
             "request": "launch",
             "mainClass": "com.ruoyi.RuoYiApplication",
