@@ -81,6 +81,7 @@ create table sys_user (
   del_flag          char(1)         default '0',
   login_ip          varchar(128)    default '',
   login_date        timestamp,
+  pwd_update_date   timestamp       default current_timestamp,
   create_by         varchar(64)     default '',
   create_time       timestamp       default current_timestamp,
   update_by         varchar(64)     default '',
@@ -102,6 +103,8 @@ comment on column sys_user.status is '账号状态（0正常 1停用）';
 comment on column sys_user.del_flag is '删除标志（0代表存在 2代表删除）';
 comment on column sys_user.login_ip is '最后登录IP';
 comment on column sys_user.login_date is '最后登录时间';
+comment on column sys_user.pwd_update_date is '密码最后更新时间';
+
 comment on column sys_user.create_by is '创建者';
 comment on column sys_user.create_time is '创建时间';
 comment on column sys_user.update_by is '更新者';
@@ -113,10 +116,10 @@ comment on table sys_user is '用户信息表';
 -- ----------------------------
 -- 初始化-用户信息表数据
 -- ----------------------------
-insert into sys_user (user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, remark)
-values(1,  103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', current_timestamp, 'admin', current_timestamp, '', null, '管理员');
-insert into sys_user (user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, remark)
-values(2,  105, 'ry',    '若依', '00', 'ry@qq.com',  '15666666666', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', current_timestamp, 'admin', current_timestamp, '', null, '测试员');
+insert into sys_user (user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time,pwd_update_date, remark)
+values(1,  103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', current_timestamp, 'admin', current_timestamp, '', null,current_timestamp, '管理员');
+insert into sys_user (user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time,pwd_update_date, remark)
+values(2,  105, 'ry',    '若依', '00', 'ry@qq.com',  '15666666666', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', current_timestamp, 'admin', current_timestamp, '', null,current_timestamp, '测试员');
 
 -- ----------------------------
 -- 3、岗位信息表
@@ -845,27 +848,31 @@ comment on column sys_config.remark is '备注';
 
 -- 初始化-参数配置表数据
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-green', 'Y', 'admin', '2023-04-13 20:46:20', 'admin', '2023-04-22 00:45:19', '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow');
+values('主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-green', 'Y', 'admin', current_timestamp, 'admin', current_timestamp, '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow');
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('用户管理-账号初始密码', 'sys.user.initPassword', '123456', 'Y', 'admin', '2023-04-13 20:46:20', '', null, '初始化密码 123456');
+values('用户管理-账号初始密码', 'sys.user.initPassword', '123456', 'Y', 'admin', current_timestamp, '', null, '初始化密码 123456');
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-light', 'Y', 'admin', '2023-04-13 20:46:20', 'admin', '2023-04-22 00:45:25', '深色主题theme-dark，浅色主题theme-light');
+values('主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-light', 'Y', 'admin', current_timestamp, 'admin', current_timestamp, '深色主题theme-dark，浅色主题theme-light');
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('账号自助-验证码开关', 'sys.account.captchaEnabled', 'true', 'Y', 'admin', '2023-04-13 20:46:20', '', null, '是否开启验证码功能（true开启，false关闭）');
+values('账号自助-验证码开关', 'sys.account.captchaEnabled', 'true', 'Y', 'admin', current_timestamp, '', null, '是否开启验证码功能（true开启，false关闭）');
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'true', 'Y', 'admin', '2023-04-13 20:46:20', 'admin', '2023-04-22 00:41:41', '是否开启注册用户功能（true开启，false关闭）');
+values('账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'true', 'Y', 'admin', current_timestamp, 'admin', current_timestamp, '是否开启注册用户功能（true开启，false关闭）');
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('主题颜色', 'sys.index.theme', '#11A983', 'Y', 'admin', '2023-04-22 00:57:18', 'admin', '2023-04-22 00:58:23', null);
+values('主题颜色', 'sys.index.theme', '#11A983', 'Y', 'admin', current_timestamp, 'admin', current_timestamp, '主题颜色');
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('开启TopNav', 'sys.index.topNav', 'false', 'Y', 'admin', '2023-04-22 00:58:59', '', null, null);
+values('开启TopNav', 'sys.index.topNav', 'false', 'Y', 'admin', current_timestamp, '', null, '是否开启TopNav（true开启，false关闭）');
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('开启Tags-Views', 'sys.index.tagsView', 'true', 'Y', 'admin', '2023-04-22 00:59:40', '', null, null);
+values('开启Tags-Views', 'sys.index.tagsView', 'true', 'Y', 'admin', current_timestamp, '', null, '开启Tags-Views功能（true开启，false关闭）');
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('显示Logo', 'sys.index.sidebarLogo', 'true', 'Y', 'admin', '2023-04-22 01:00:20', '', null, null);
+values('显示Logo', 'sys.index.sidebarLogo', 'true', 'Y', 'admin', current_timestamp, '', null, '是否显示Logo（true显示，false不显示）');
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('固定Header', 'sys.index.fixedHeader', 'true', 'Y', 'admin', '2023-04-22 01:00:53', '', null, null);
+values('固定Header', 'sys.index.fixedHeader', 'true', 'Y', 'admin', current_timestamp, '', null, '是否固定Header（true开启，false关闭）');
 insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
-values('动态标题', 'sys.index.dynamicTitle', 'true', 'Y', 'admin', '2023-04-22 01:01:26', 'admin', '2023-04-22 01:01:41', null);
+values('动态标题', 'sys.index.dynamicTitle', 'true', 'Y', 'admin', current_timestamp, 'admin', current_timestamp, '是否开启动态标题（true开启，false关闭），开启后浏览器标题会根据当前页面的标题动态变化，关闭后浏览器标题将一直显示为系统名称');
+insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
+values('用户管理-初始密码修改策略', 'sys.index.dynamicTitle', 'true', 'Y', 'admin', current_timestamp, 'admin', current_timestamp, '0：初始密码修改策略关闭，没有任何提示，1：提醒用户，如果未修改初始密码，则在登录时就会提醒修改密码对话框');
+insert into sys_config (config_name, config_key, config_value, config_type, create_by, create_time, update_by, update_time, remark)
+values('用户管理-账号密码更新周期', 'sys.account.passwordValidateDays', 'true', 'Y', 'admin', current_timestamp, 'admin', current_timestamp, '密码更新周期（填写数字，数据初始化值为0不限制，若修改必须为大于0小于365的正整数），如果超过这个周期登录系统时，则在登录时就会提醒修改密码对话框');
 
 
 -- ----------------------------
