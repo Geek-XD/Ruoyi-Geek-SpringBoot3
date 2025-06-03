@@ -19,6 +19,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.SysNotice;
 import com.ruoyi.system.service.ISysNoticeService;
 
@@ -42,10 +43,12 @@ public class SysNoticeController extends BaseController {
      * 获取通知公告列表
      */
     @Operation(summary = "获取通知公告列表")
-    @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/list")
     public TableDataInfo list(SysNotice notice) {
         startPage();
+        if (!SecurityUtils.hasPermi("system:notice:list")) {
+            notice.setStatus("0");
+        }
         List<SysNotice> list = noticeService.selectNoticeList(notice);
         return getDataTable(list);
     }

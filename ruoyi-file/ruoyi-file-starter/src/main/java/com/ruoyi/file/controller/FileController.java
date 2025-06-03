@@ -266,7 +266,7 @@ public class FileController {
             if (finalPath == null || finalPath.isEmpty()) {
                 throw new ServiceException("合并分片失败：未获取到最终文件路径");
             }
-            // 创建文件信息记录
+            // 创建文件记录
             SysFileInfo fileInfo = new SysFileInfo();
             fileInfo.setFileName(fileName);
             fileInfo.setFilePath(finalPath);

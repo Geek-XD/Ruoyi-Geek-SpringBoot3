@@ -42,37 +42,29 @@ COMMENT ON COLUMN sys_file_info.del_flag IS '删除标志（0代表存在 2代�
 -- ----------------------------
 -- 菜单 SQL
 -- ----------------------------
-SELECT setval('sys_menu_menu_id_seq', max(menu_id)) FROM sys_menu WHERE menu_id < 100;
-INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-VALUES ('文件管理', 0, 4, 'file', NULL, NULL, '', 1, 0, 'M', '0', '0', NULL, 'excel', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('文件管理', 1, 1, 'file', 'system/file/index', 1, 0, 'C', '0', '0', 'system:file:list', 'excel', 'admin', CURRENT_TIMESTAMP, '', NULL, '文件管理菜单');
 
 -- 文件管理菜单ID
 DO $$
 DECLARE
-    fileParentId INTEGER;
     parentId INTEGER;
 BEGIN
-    SELECT LASTVAL() INTO fileParentId;
-    
-    -- 文件信息菜单
-    INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-    VALUES ('文件信息', fileParentId, 1, 'info', 'file/info/index', 1, 0, 'C', '0', '0', 'file:info:list', 'excel', 'admin', CURRENT_TIMESTAMP, '', NULL, '文件信息菜单');
-    
     SELECT LASTVAL() INTO parentId;
     
     -- 按钮 SQL
     INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-    VALUES ('文件信息查询', parentId, 1, '#', '', 1, 0, 'F', '0', '0', 'file:info:query', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
+    VALUES ('文件信息查询', parentId, 1, '#', '', 1, 0, 'F', '0', '0', 'system:file:query', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
     
     INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-    VALUES ('文件信息新增', parentId, 2, '#', '', 1, 0, 'F', '0', '0', 'file:info:add', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
+    VALUES ('文件信息新增', parentId, 2, '#', '', 1, 0, 'F', '0', '0', 'system:file:add', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
     
     INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-    VALUES ('文件信息修改', parentId, 3, '#', '', 1, 0, 'F', '0', '0', 'file:info:edit', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
+    VALUES ('文件信息修改', parentId, 3, '#', '', 1, 0, 'F', '0', '0', 'system:file:edit', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
     
     INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-    VALUES ('文件信息删除', parentId, 4, '#', '', 1, 0, 'F', '0', '0', 'file:info:remove', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
+    VALUES ('文件信息删除', parentId, 4, '#', '', 1, 0, 'F', '0', '0', 'system:file:remove', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
     
     INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-    VALUES ('文件信息导出', parentId, 5, '#', '', 1, 0, 'F', '0', '0', 'file:info:export', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
+    VALUES ('文件信息导出', parentId, 5, '#', '', 1, 0, 'F', '0', '0', 'system:file:export', '#', 'admin', CURRENT_TIMESTAMP, '', NULL, '');
 END $$;

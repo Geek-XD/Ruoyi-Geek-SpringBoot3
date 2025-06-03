@@ -8,12 +8,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 文件信息对象 sys_file_info
+ * 文件对象 sys_file_info
  * 
  * @author ruoyi
  * @date 2025-04-25
  */
-@Schema(description = "文件信息对象")
+@Schema(description = "文件对象")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SysFileInfo extends BaseEntity {
