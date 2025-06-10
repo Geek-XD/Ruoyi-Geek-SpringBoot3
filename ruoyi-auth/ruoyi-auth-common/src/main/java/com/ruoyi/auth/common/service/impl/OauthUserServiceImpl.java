@@ -9,6 +9,7 @@ import com.ruoyi.auth.common.domain.OauthUser;
 import com.ruoyi.auth.common.mapper.OauthUserMapper;
 import com.ruoyi.auth.common.service.IOauthUserService;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysUserMapper;
 
 /**
@@ -103,7 +104,11 @@ public class OauthUserServiceImpl implements IOauthUserService {
 
     public SysUser selectSysUserByUUID(String uuid) {
         OauthUser oauthUser = oauthUserMapper.selectOauthUserByUUID(uuid);
-        return sysUserMapper.selectUserById(oauthUser.getUserId());
+        if (StringUtils.isNotNull(oauthUser)) {
+            return sysUserMapper.selectUserById(oauthUser.getUserId());
+        } else {
+            return null;
+        }
     }
 
     /**
