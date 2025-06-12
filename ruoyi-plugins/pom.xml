@@ -29,10 +29,25 @@
                 <version>${ehcache.version}</version>
             </dependency>
 
+            <!-- mybatis-plus -->
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <!-- netty -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <!-- atomikos分布式事务 -->
+            <dependency>
+                <groupId>com.atomikos</groupId>
+                <artifactId>transactions-spring-boot3-starter</artifactId>
+                <version>${transactions.version}</version>
             </dependency>
 
             <!-- ruoyi-ehcache-->
@@ -63,13 +78,6 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
-            <!-- plugins-->
-            <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-plugins-starter</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-mybatis-interceptor</artifactId>
@@ -83,28 +91,28 @@
             </dependency>
 
             <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-all</artifactId>
-                <version>${netty.version}</version>
-            </dependency>
-
-
-            <!-- atomikos-->
-            <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-atomikos</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
-
-
-            <!-- atomikos分布式事务 -->
             <dependency>
-                <groupId>com.atomikos</groupId>
-                <artifactId>transactions-spring-boot3-starter</artifactId>
-                <version>${transactions.version}</version>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-redis</artifactId>
+                <version>${ruoyi.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-rabbitmq</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-plugins-starter</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -118,6 +126,8 @@
         <module>ruoyi-mybatis-interceptor</module>
         <module>ruoyi-netty</module>
         <module>ruoyi-atomikos</module>
+        <module>ruoyi-rabbitmq</module>
+        <module>ruoyi-redis</module>
     </modules>
     <packaging>pom</packaging>
 </project>

@@ -63,11 +63,6 @@
             <artifactId>ruoyi-system</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-plugins-starter</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

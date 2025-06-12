@@ -56,6 +56,16 @@
             <artifactId>ruoyi-netty</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.ruoyi.geekxd</groupId>
+            <artifactId>ruoyi-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ruoyi.geekxd</groupId>
+            <artifactId>ruoyi-rabbitmq</artifactId>
+        </dependency>
+
         <!-- atomikos-->
         <!-- <dependency>
             <groupId>com.ruoyi.geekxd</groupId>

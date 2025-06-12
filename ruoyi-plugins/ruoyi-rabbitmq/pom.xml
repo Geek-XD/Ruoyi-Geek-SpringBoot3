@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>ruoyi-middleware</artifactId>
+        <artifactId>ruoyi-plugins</artifactId>
         <groupId>com.ruoyi.geekxd</groupId>
         <version>3.8.9-G</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ruoyi-middleware-redis</artifactId>
+    <artifactId>ruoyi-rabbitmq</artifactId>
 
     <description>
         中间件
@@ -19,13 +19,13 @@
         <!-- 通用工具-->
         <dependency>
             <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-framework</artifactId>
+            <artifactId>ruoyi-common</artifactId>
         </dependency>
 
-        <!-- redis 缓存操作 -->
+        <!--rabbitmq-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
     </dependencies>

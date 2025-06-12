@@ -88,10 +88,10 @@ public class GenController extends BaseController {
         Map<Long, GenTable> joinTableMap = new HashMap<Long, GenTable>();
         joinTableMap.put(tableId, table);
         selectGenJoinTableList.forEach(i -> {
-            if(Objects.isNull(joinTableMap.get(i.getLeftTableId()))) {
+            if (Objects.isNull(joinTableMap.get(i.getLeftTableId()))) {
                 joinTableMap.put(i.getLeftTableId(), genTableService.selectGenTableById(i.getLeftTableId()));
             }
-            if(Objects.isNull(joinTableMap.get(i.getRightTableId()))) {
+            if (Objects.isNull(joinTableMap.get(i.getRightTableId()))) {
                 joinTableMap.put(i.getRightTableId(), genTableService.selectGenTableById(i.getRightTableId()));
             }
         });
@@ -179,9 +179,7 @@ public class GenController extends BaseController {
         genTableService.validateEdit(genTable);
         genTableService.updateGenTable(genTable);
         genJoinTableService.deleteGenJoinTableByTableId(genTable.getTableId());
-        genTableVo.getJoinTablesMate().forEach(i -> {
-            genJoinTableService.insertGenJoinTable(i);
-        });
+        genTableVo.getJoinTablesMate().forEach(i -> genJoinTableService.insertGenJoinTable(i));
         return success();
     }
 
