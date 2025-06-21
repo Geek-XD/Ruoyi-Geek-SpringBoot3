@@ -511,35 +511,41 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
             flowTask.setProcDefVersion(pd.getVersion());
             // 当前所处流程
             List<Task> taskList = taskService.createTaskQuery().processInstanceId(hisIns.getId()).list();
-            if (CollectionUtils.isNotEmpty(taskList)) {
-                flowTask.setTaskId(taskList.get(0).getId());
-                flowTask.setTaskName(taskList.get(0).getName());
-                if (StringUtils.isNotBlank(taskList.get(0).getAssignee())) {
-                    // 当前任务节点办理人信息
-                    SysUser sysUser = sysUserService.selectUserById(Long.parseLong(taskList.get(0).getAssignee()));
-                    if (Objects.nonNull(sysUser)) {
-                        flowTask.setAssigneeId(sysUser.getUserId());
-                        flowTask.setAssigneeName(sysUser.getNickName());
-                        flowTask.setAssigneeDeptName(
-                                Objects.nonNull(sysUser.getDept()) ? sysUser.getDept().getDeptName() : "");
+            try {
+                if (CollectionUtils.isNotEmpty(taskList)) {
+                    flowTask.setTaskId(taskList.get(0).getId());
+                    flowTask.setTaskName(taskList.get(0).getName());
+                    if (StringUtils.isNotBlank(taskList.get(0).getAssignee())) {
+                        // 当前任务节点办理人信息
+                        SysUser sysUser = sysUserService.selectUserById(Long.parseLong(taskList.get(0).getAssignee()));
+                        if (Objects.nonNull(sysUser)) {
+                            flowTask.setAssigneeId(sysUser.getUserId());
+                            flowTask.setAssigneeName(sysUser.getNickName());
+                            flowTask.setAssigneeDeptName(
+                                    Objects.nonNull(sysUser.getDept()) ? sysUser.getDept().getDeptName() : "");
+                        }
+                    }
+                } else {
+                    List<HistoricTaskInstance> historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
+                            .processInstanceId(hisIns.getId()).orderByHistoricTaskInstanceEndTime().desc().list();
+                    flowTask.setTaskId(historicTaskInstance.get(0).getId());
+                    flowTask.setTaskName(historicTaskInstance.get(0).getName());
+                    if (StringUtils.isNotBlank(historicTaskInstance.get(0).getAssignee())) {
+                        // 当前任务节点办理人信息
+                        SysUser sysUser = sysUserService
+                                .selectUserById(Long.parseLong(historicTaskInstance.get(0).getAssignee()));
+                        if (Objects.nonNull(sysUser)) {
+                            flowTask.setAssigneeId(sysUser.getUserId());
+                            flowTask.setAssigneeName(sysUser.getNickName());
+                            flowTask.setAssigneeDeptName(
+                                    Objects.nonNull(sysUser.getDept()) ? sysUser.getDept().getDeptName() : "");
+                        }
                     }
                 }
-            } else {
-                List<HistoricTaskInstance> historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
-                        .processInstanceId(hisIns.getId()).orderByHistoricTaskInstanceEndTime().desc().list();
-                flowTask.setTaskId(historicTaskInstance.get(0).getId());
-                flowTask.setTaskName(historicTaskInstance.get(0).getName());
-                if (StringUtils.isNotBlank(historicTaskInstance.get(0).getAssignee())) {
-                    // 当前任务节点办理人信息
-                    SysUser sysUser = sysUserService
-                            .selectUserById(Long.parseLong(historicTaskInstance.get(0).getAssignee()));
-                    if (Objects.nonNull(sysUser)) {
-                        flowTask.setAssigneeId(sysUser.getUserId());
-                        flowTask.setAssigneeName(sysUser.getNickName());
-                        flowTask.setAssigneeDeptName(
-                                Objects.nonNull(sysUser.getDept()) ? sysUser.getDept().getDeptName() : "");
-                    }
-                }
+            } catch (Exception e) {
+                log.error("获取流程任务信息异常: {}", e.getMessage());
+                flowTask.setAssigneeDeptName("ERROR");
+                flowTask.setAssigneeName("ERROR");
             }
             flowList.add(flowTask);
         }

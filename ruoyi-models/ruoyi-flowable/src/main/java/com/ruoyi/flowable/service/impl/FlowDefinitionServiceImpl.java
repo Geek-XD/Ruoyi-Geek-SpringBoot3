@@ -10,6 +10,8 @@ import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
@@ -62,12 +64,11 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
 
     @Override
     public boolean exist(String processDefinitionKey) {
-        ProcessDefinitionQuery processDefinitionQuery
-                = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey);
+        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey(processDefinitionKey);
         long count = processDefinitionQuery.count();
         return count > 0 ? true : false;
     }
-
 
     /**
      * 流程定义列表
@@ -78,31 +79,35 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
      */
     @Override
     public List<FlowProcDefDto> list(String name, Integer pageNum, Integer pageSize) {
-//        Page<FlowProcDefDto> page = new Page<FlowProcDefDto>();
-//        // 流程定义列表数据查询
-//        final ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
-//        if (StringUtils.isNotEmpty(name)) {
-//            processDefinitionQuery.processDefinitionNameLike(name);
-//        }
-////        processDefinitionQuery.orderByProcessDefinitionKey().asc();
-//        page.setTotal(processDefinitionQuery.count());
-//        List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(pageSize * (pageNum - 1), pageSize);
-//
-//        List<FlowProcDefDto> dataList = new ArrayList<>();
-//        for (ProcessDefinition processDefinition : processDefinitionList) {
-//            String deploymentId = processDefinition.getDeploymentId();
-//            Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-//            FlowProcDefDto reProcDef = new FlowProcDefDto();
-//            BeanUtils.copyProperties(processDefinition, reProcDef);
-//            SysForm sysForm = sysDeployFormService.selectSysDeployFormByDeployId(deploymentId);
-//            if (Objects.nonNull(sysForm)) {
-//                reProcDef.setFormName(sysForm.getFormName());
-//                reProcDef.setFormId(sysForm.getFormId());
-//            }
-//            // 流程定义时间
-//            reProcDef.setDeploymentTime(deployment.getDeploymentTime());
-//            dataList.add(reProcDef);
-//        }
+        // Page<FlowProcDefDto> page = new Page<FlowProcDefDto>();
+        // // 流程定义列表数据查询
+        // final ProcessDefinitionQuery processDefinitionQuery =
+        // repositoryService.createProcessDefinitionQuery();
+        // if (StringUtils.isNotEmpty(name)) {
+        // processDefinitionQuery.processDefinitionNameLike(name);
+        // }
+        //// processDefinitionQuery.orderByProcessDefinitionKey().asc();
+        // page.setTotal(processDefinitionQuery.count());
+        // List<ProcessDefinition> processDefinitionList =
+        // processDefinitionQuery.listPage(pageSize * (pageNum - 1), pageSize);
+        //
+        // List<FlowProcDefDto> dataList = new ArrayList<>();
+        // for (ProcessDefinition processDefinition : processDefinitionList) {
+        // String deploymentId = processDefinition.getDeploymentId();
+        // Deployment deployment =
+        // repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+        // FlowProcDefDto reProcDef = new FlowProcDefDto();
+        // BeanUtils.copyProperties(processDefinition, reProcDef);
+        // SysForm sysForm =
+        // sysDeployFormService.selectSysDeployFormByDeployId(deploymentId);
+        // if (Objects.nonNull(sysForm)) {
+        // reProcDef.setFormName(sysForm.getFormName());
+        // reProcDef.setFormId(sysForm.getFormId());
+        // }
+        // // 流程定义时间
+        // reProcDef.setDeploymentTime(deployment.getDeploymentTime());
+        // dataList.add(reProcDef);
+        // }
         PageHelper.startPage(pageNum, pageSize);
         final List<FlowProcDefDto> dataList = flowDeployMapper.selectDeployList(name);
         // 加载挂表单
@@ -116,20 +121,22 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
         return dataList;
     }
 
-
     /**
      * 导入流程文件
      *
      * 当每个key的流程第一次部署时，指定版本为1。对其后所有使用相同key的流程定义，
      * 部署时版本会在该key当前已部署的最高版本号基础上加1。key参数用于区分流程定义
+     * 
      * @param name
      * @param category
      * @param in
      */
     @Override
     public void importFile(String name, String category, InputStream in) {
-        Deployment deploy = repositoryService.createDeployment().addInputStream(name + BPMN_FILE_SUFFIX, in).name(name).category(category).deploy();
-        ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
+        Deployment deploy = repositoryService.createDeployment().addInputStream(name + BPMN_FILE_SUFFIX, in).name(name)
+                .category(category).deploy();
+        ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deploy.getId())
+                .singleResult();
         repositoryService.setProcessDefinitionCategory(definition.getId(), category);
 
     }
@@ -142,8 +149,10 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
      */
     @Override
     public AjaxResult readXml(String deployId) throws IOException {
-        ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deployId).singleResult();
-        InputStream inputStream = repositoryService.getResourceAsStream(definition.getDeploymentId(), definition.getResourceName());
+        ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deployId)
+                .singleResult();
+        InputStream inputStream = repositoryService.getResourceAsStream(definition.getDeploymentId(),
+                definition.getResourceName());
         String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
         return AjaxResult.success("", result);
     }
@@ -156,11 +165,12 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
      */
     @Override
     public InputStream readImage(String deployId) {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployId).singleResult();
-        //获得图片流
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployId)
+                .singleResult();
+        // 获得图片流
         DefaultProcessDiagramGenerator diagramGenerator = new DefaultProcessDiagramGenerator();
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
-        //输出为图片
+        // 输出为图片
         return diagramGenerator.generateDiagram(
                 bpmnModel,
                 "png",
@@ -185,7 +195,8 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
     @Override
     public AjaxResult startProcessInstanceById(String procDefId, Map<String, Object> variables) {
         try {
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(procDefId)
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionId(procDefId)
                     .latestVersion().singleResult();
             if (Objects.nonNull(processDefinition) && processDefinition.isSuspended()) {
                 return AjaxResult.error("流程已被挂起,请先激活流程");
@@ -198,18 +209,35 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
             // 流程发起时 跳过发起人节点
             ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefId, variables);
             // 给第一步申请人节点设置任务执行人和意见
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId())
+                    .singleResult();
             if (Objects.nonNull(task)) {
-                taskService.addComment(task.getId(), processInstance.getProcessInstanceId(), FlowComment.NORMAL.getType(), sysUser.getNickName() + "发起流程申请");
+                taskService.addComment(task.getId(), processInstance.getProcessInstanceId(),
+                        FlowComment.NORMAL.getType(), sysUser.getNickName() + "发起流程申请");
                 taskService.complete(task.getId(), variables);
             }
             return AjaxResult.success("流程启动成功");
+        } catch (FlowableIllegalArgumentException e) {
+            e.printStackTrace();
+            if (e.getMessage().contains("Field definition uses non-existent field")) {
+                return AjaxResult.error("流程启动错误：流程定义中使用了不存在的字段，请检查流程定义");
+            } else {
+                return AjaxResult.error("流程启动错误，请检查字段是否正确");
+            }
+        } catch (FlowableException e) {
+            e.printStackTrace();
+            if (e.getMessage().contains("Unknown property used in expression")) {
+                return AjaxResult.error("流程启动错误：表达式中使用了未知属性");
+            } else if (e.getMessage().contains("Error while evaluating expression")) {
+                return AjaxResult.error("流程启动错误：表达式计算错误，请检查流程定义中的表达式");
+            } else {
+                return AjaxResult.error("流程启动错误，请检查流程定义是否正确");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return AjaxResult.error("流程启动错误");
         }
     }
-
 
     /**
      * 激活或挂起流程定义
@@ -219,7 +247,8 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
      */
     @Override
     public void updateState(Integer state, String deployId) {
-        ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery().deploymentId(deployId).singleResult();
+        ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery().deploymentId(deployId)
+                .singleResult();
         // 激活
         if (state == 1) {
             repositoryService.activateProcessDefinitionById(procDef.getId(), true, null);
@@ -229,7 +258,6 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
             repositoryService.suspendProcessDefinitionById(procDef.getId(), true, null);
         }
     }
-
 
     /**
      * 删除流程定义
@@ -241,6 +269,5 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
         // true 允许级联删除 ,不设置会导致数据库外键关联异常
         repositoryService.deleteDeployment(deployId, true);
     }
-
 
 }

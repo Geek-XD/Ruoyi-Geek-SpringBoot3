@@ -112,10 +112,6 @@ com.ruoyi
 │       └── minio                          // minio分布式文件服务
 │       └── oss-alibaba                    // alibaba的oss云储存服务
 │       └── starter                        // 第三方认证启动器
-├── ruoyi-middleware   // 中间件场景（可移除）
-│       └── rabbitmq			   // rabbitmq队列服务模块 
-│       └── redis			   // redis缓存服务模块（与ehcache插件同类，两者二选一） 
-│       └── starter  		 	   // 中间件整合模块
 ├── ruoyi-models   	// 业务场景
 │       └── online			   // 在线开发模块（可移除）
 │       └── quartz			   // 定时任务（可移除）
@@ -131,6 +127,8 @@ com.ruoyi
 │       └── mybatis-interceptor		   // mybatis-interceptor插件（可移除）（简化数据鉴权和分页，扩展性强）
 │       └── atomikos			   // atomikos分布式事务插件（可移除）
 │       └── netty			   // netty插件（可移除）
+│       └── rabbitmq			   // rabbitmq队列服务模块 
+│       └── redis			   // redis缓存服务模块（与ehcache插件同类，两者二选一） 
 │       └── websocket			   // websocket插件（可移除）
 │       └── starter  		 	   // 插件整合模块
 ├── ruoyi-system        // 系统代码

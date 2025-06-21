@@ -259,17 +259,24 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
-            <!-- 集成第三方登录启动器 -->
+            <!-- 第三方登录启动器 -->
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-auth-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
-            <!-- 集成支付启动器 -->
+            <!-- 支付管理启动器 -->
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-pay-starter</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- 文件管理启动器 -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-file-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
@@ -277,20 +284,6 @@
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-plugins-starter</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <!-- file-->
-            <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-file-starter</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <!-- 中间件启动器  -->
-            <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-middleware-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
@@ -311,7 +304,6 @@
         <module>ruoyi-auth</module>
         <module>ruoyi-pay</module>
         <module>ruoyi-file</module>
-        <module>ruoyi-middleware</module>
         <module>ruoyi-plugins</module>
         <module>ruoyi-models</module>
     </modules>
