@@ -9,6 +9,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -118,7 +119,6 @@ public class SecurityConfig {
                             .requestMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/*/api-docs",
                                     "/druid/**", "/*/api-docs/**")
                             .permitAll()
-                            .requestMatchers("/websocket/**").permitAll()
                             // 除上面外的所有请求全部需要鉴权认证
                             .anyRequest().authenticated();
                 })
@@ -130,6 +130,16 @@ public class SecurityConfig {
                 .addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class)
                 .addFilterBefore(corsFilter, LogoutFilter.class)
                 .build();
+    }
+    /**
+     * 忽略web安全配置
+     * 主要是忽略websocket的安全配置
+     *
+     * @return WebSecurityCustomizer
+     */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/websocket/**");
     }
 
     /**

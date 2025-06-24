@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-common</artifactId>
+            <artifactId>ruoyi-framework</artifactId>
         </dependency>
 
         <!-- SpringBoot Websocket -->

@@ -8,16 +8,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
-import jakarta.websocket.Session;
+import com.alibaba.fastjson2.JSONObject;
+import com.ruoyi.common.core.domain.R;
 
 /**
  * websocket 客户端用户集
  * 
  * @author ruoyi
  */
-public class WebSocketUsers
-{
+public class WebSocketUsers {
     /**
      * WebSocketUsers 日志控制器
      */
@@ -26,16 +28,15 @@ public class WebSocketUsers
     /**
      * 用户集
      */
-    private static Map<String, Session> USERS = new ConcurrentHashMap<String, Session>();
+    private static Map<String, WebSocketSession> USERS = new ConcurrentHashMap<String, WebSocketSession>();
 
     /**
      * 存储用户
      *
-     * @param key 唯一键
+     * @param key     唯一键
      * @param session 用户信息
      */
-    public static void put(String key, Session session)
-    {
+    public static void put(String key, WebSocketSession session) {
         USERS.put(key, session);
     }
 
@@ -46,25 +47,19 @@ public class WebSocketUsers
      *
      * @return 移除结果
      */
-    public static boolean remove(Session session)
-    {
+    public static boolean remove(WebSocketSession session) {
         String key = null;
         boolean flag = USERS.containsValue(session);
-        if (flag)
-        {
-            Set<Map.Entry<String, Session>> entries = USERS.entrySet();
-            for (Map.Entry<String, Session> entry : entries)
-            {
-                Session value = entry.getValue();
-                if (value.equals(session))
-                {
+        if (flag) {
+            Set<Map.Entry<String, WebSocketSession>> entries = USERS.entrySet();
+            for (Map.Entry<String, WebSocketSession> entry : entries) {
+                WebSocketSession value = entry.getValue();
+                if (value.equals(session)) {
                     key = entry.getKey();
                     break;
                 }
             }
-        }
-        else
-        {
+        } else {
             return true;
         }
         return remove(key);
@@ -75,18 +70,14 @@ public class WebSocketUsers
      *
      * @param key 键
      */
-    public static boolean remove(String key)
-    {
+    public static boolean remove(String key) {
         LOGGER.info("\n 正在移出用户 - {}", key);
-        Session remove = USERS.remove(key);
-        if (remove != null)
-        {
+        WebSocketSession remove = USERS.remove(key);
+        if (remove != null) {
             boolean containsValue = USERS.containsValue(remove);
             LOGGER.info("\n 移出结果 - {}", containsValue ? "失败" : "成功");
             return containsValue;
-        }
-        else
-        {
+        } else {
             return true;
         }
     }
@@ -96,8 +87,7 @@ public class WebSocketUsers
      *
      * @return 返回用户集合
      */
-    public static Map<String, Session> getUsers()
-    {
+    public static Map<String, WebSocketSession> getUsers() {
         return USERS;
     }
 
@@ -106,11 +96,9 @@ public class WebSocketUsers
      *
      * @param message 消息内容
      */
-    public static void sendMessageToUsersByText(String message)
-    {
-        Collection<Session> values = USERS.values();
-        for (Session value : values)
-        {
+    public static void sendMessageToUsersByText(String message) {
+        Collection<WebSocketSession> values = USERS.values();
+        for (WebSocketSession value : values) {
             sendMessageToUserByText(value, message);
         }
     }
@@ -118,25 +106,19 @@ public class WebSocketUsers
     /**
      * 发送文本消息
      *
-     * @param userName 自己的用户名
+     * @param session WebSocket会话
      * @param message 消息内容
      */
-    public static void sendMessageToUserByText(Session session, String message)
-    {
-        if (session != null)
-        {
-            try
-            {
-                session.getBasicRemote().sendText(message);
-            }
-            catch (IOException e)
-            {
+    public static void sendMessageToUserByText(WebSocketSession session, String message) {
+        if (session != null && session.isOpen()) {
+            try {
+                R<String> r = R.ok(message);
+                session.sendMessage(new TextMessage(JSONObject.toJSONString(r)));
+            } catch (IOException e) {
                 LOGGER.error("\n[发送消息异常]", e);
             }
-        }
-        else
-        {
-            LOGGER.info("\n[你已离线]");
+        } else {
+            LOGGER.info("\n[连接已断开或不存在]");
         }
     }
 }
