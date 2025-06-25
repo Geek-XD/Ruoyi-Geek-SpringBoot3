@@ -58,7 +58,8 @@ public class TokenService {
      */
     public LoginUser getLoginUser(HttpServletRequest request) {
         // 获取请求携带的令牌
-        String token = getToken(request);
+        String token = request.getHeader(header);
+
         return getLoginUser(token);
     }
 
@@ -70,6 +71,9 @@ public class TokenService {
     public LoginUser getLoginUser(String token) {
         if (StringUtils.isNotEmpty(token)) {
             try {
+                if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX)) {
+                    token = token.replace(Constants.TOKEN_PREFIX, "");
+                }
                 Claims claims = parseToken(token);
                 // 解析对应的权限以及用户信息
                 String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
@@ -194,19 +198,5 @@ public class TokenService {
     public String getUsernameFromToken(String token) {
         Claims claims = parseToken(token);
         return claims.getSubject();
-    }
-
-    /**
-     * 获取请求token
-     *
-     * @param request
-     * @return token
-     */
-    private String getToken(HttpServletRequest request) {
-        String token = request.getHeader(header);
-        if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX)) {
-            token = token.replace(Constants.TOKEN_PREFIX, "");
-        }
-        return token;
     }
 }

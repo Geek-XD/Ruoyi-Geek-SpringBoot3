@@ -10,8 +10,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author ruoyi
  */
-public class SemaphoreUtils
-{
+public class SemaphoreUtils {
     /**
      * SemaphoreUtils 日志控制器
      */
@@ -23,16 +22,12 @@ public class SemaphoreUtils
      * @param semaphore
      * @return
      */
-    public static boolean tryAcquire(Semaphore semaphore)
-    {
+    public static boolean tryAcquire(Semaphore semaphore) {
         boolean flag = false;
 
-        try
-        {
+        try {
             flag = semaphore.tryAcquire();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             LOGGER.error("获取信号量异常", e);
         }
 
@@ -44,15 +39,11 @@ public class SemaphoreUtils
      * 
      * @param semaphore
      */
-    public static void release(Semaphore semaphore)
-    {
+    public static void release(Semaphore semaphore) {
 
-        try
-        {
+        try {
             semaphore.release();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             LOGGER.error("释放信号量异常", e);
         }
     }

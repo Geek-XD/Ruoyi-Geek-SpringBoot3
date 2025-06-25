@@ -13,6 +13,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.model.LoginUser;
 
 /**
  * websocket 客户端用户集
@@ -26,9 +27,14 @@ public class WebSocketUsers {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketUsers.class);
 
     /**
+     * session集
+     */
+    private static final Map<String, WebSocketSession> SESSIONS = new ConcurrentHashMap<>();
+
+    /**
      * 用户集
      */
-    private static Map<String, WebSocketSession> USERS = new ConcurrentHashMap<String, WebSocketSession>();
+    private static Map<String, LoginUser> USERS = new ConcurrentHashMap<>();
 
     /**
      * 存储用户
@@ -37,7 +43,7 @@ public class WebSocketUsers {
      * @param session 用户信息
      */
     public static void put(String key, WebSocketSession session) {
-        USERS.put(key, session);
+        SESSIONS.put(key, session);
     }
 
     /**
@@ -49,9 +55,9 @@ public class WebSocketUsers {
      */
     public static boolean remove(WebSocketSession session) {
         String key = null;
-        boolean flag = USERS.containsValue(session);
+        boolean flag = SESSIONS.containsValue(session);
         if (flag) {
-            Set<Map.Entry<String, WebSocketSession>> entries = USERS.entrySet();
+            Set<Map.Entry<String, WebSocketSession>> entries = SESSIONS.entrySet();
             for (Map.Entry<String, WebSocketSession> entry : entries) {
                 WebSocketSession value = entry.getValue();
                 if (value.equals(session)) {
@@ -72,9 +78,9 @@ public class WebSocketUsers {
      */
     public static boolean remove(String key) {
         LOGGER.info("\n 正在移出用户 - {}", key);
-        WebSocketSession remove = USERS.remove(key);
+        WebSocketSession remove = SESSIONS.remove(key);
         if (remove != null) {
-            boolean containsValue = USERS.containsValue(remove);
+            boolean containsValue = SESSIONS.containsValue(remove);
             LOGGER.info("\n 移出结果 - {}", containsValue ? "失败" : "成功");
             return containsValue;
         } else {
@@ -88,7 +94,7 @@ public class WebSocketUsers {
      * @return 返回用户集合
      */
     public static Map<String, WebSocketSession> getUsers() {
-        return USERS;
+        return SESSIONS;
     }
 
     /**
@@ -97,7 +103,7 @@ public class WebSocketUsers {
      * @param message 消息内容
      */
     public static void sendMessageToUsersByText(String message) {
-        Collection<WebSocketSession> values = USERS.values();
+        Collection<WebSocketSession> values = SESSIONS.values();
         for (WebSocketSession value : values) {
             sendMessageToUserByText(value, message);
         }

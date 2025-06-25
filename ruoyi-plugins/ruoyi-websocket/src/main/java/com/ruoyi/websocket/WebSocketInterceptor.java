@@ -6,6 +6,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,9 @@ import com.ruoyi.framework.web.service.TokenService;
 public class WebSocketInterceptor implements HandshakeInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketInterceptor.class);
 
+    @Value("${token.header}")
+    private String header;
+
     @Autowired
     private TokenService tokenService;
 
@@ -45,22 +49,22 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
             }
         }
 
+        String token = (String) attributes.get(header);
         // 获取 Sec-WebSocket-Protocol 头部信息（前端通过第二个参数传递的 authorization）
         List<String> protocols = request.getHeaders().get("Sec-WebSocket-Protocol");
-        if (protocols != null && !protocols.isEmpty()) {
-            String authorization = protocols.get(0);
-            attributes.put("authorization", authorization);
-            LOGGER.info("WebSocket 连接携带 authorization: {}", authorization);
-
-            // 这里可以进行token验证逻辑
-            if (!validateToken(authorization)) {
-                LOGGER.warn("WebSocket 连接认证失败: {}", authorization);
-                return false;
-            }
+        if (token == null && protocols != null && !protocols.isEmpty()) {
+            token = protocols.get(0);
+            LOGGER.info("WebSocket 连接携带 authorization: {}", token);
         }
 
-        LOGGER.info("WebSocket 握手成功，远程地址: {}", request.getRemoteAddress());
-        return true;
+        attributes.put(header, token);
+        if (!validateToken(token)) {
+            LOGGER.warn("WebSocket 连接认证失败: {}", token);
+            return false;
+        } else {
+            LOGGER.info("WebSocket 握手成功，远程地址: {}", request.getRemoteAddress());
+            return true;
+        }
     }
 
     @Override

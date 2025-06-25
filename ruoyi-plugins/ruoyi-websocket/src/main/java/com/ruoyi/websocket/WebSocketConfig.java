@@ -13,17 +13,15 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
  */
 @Configuration
 @EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer
-{
+public class WebSocketConfig implements WebSocketConfigurer {
     @Autowired
     private WebSocketServer webSocketServer;
-    
+
     @Autowired
     private WebSocketInterceptor webSocketInterceptor;
 
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry)
-    {
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(webSocketServer, "/websocket/message")
                 .addInterceptors(webSocketInterceptor)
                 .setAllowedOrigins("*"); // 允许跨域，生产环境建议配置具体域名
