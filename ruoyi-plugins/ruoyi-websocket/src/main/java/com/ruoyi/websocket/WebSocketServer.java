@@ -47,7 +47,7 @@ public class WebSocketServer extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         boolean semaphoreFlag = false;
         // 尝试获取信号量
-        semaphoreFlag = SemaphoreUtils.tryAcquire(socketSemaphore);
+        semaphoreFlag = socketSemaphore.tryAcquire();
         if (!semaphoreFlag) {
             // 未获取到信号量
             LOGGER.error("\n 当前在线人数超过限制数- {}", socketMaxOnlineCount);
@@ -56,12 +56,12 @@ public class WebSocketServer extends TextWebSocketHandler {
         } else {
             // 获取 authorization 信息
             String authorization = (String) session.getAttributes().get(header);
-            
+            LoginUser loginUser = tokenService.getLoginUser(authorization);
+            session.getAttributes().put("USER", loginUser);
             // 添加用户
-            WebSocketUsers.put(session.getId(), session);
+            WebSocketUsers.put(session.getId(), session, loginUser);
             LOGGER.info("\n 建立连接 - {}", session.getId());
             LOGGER.info("\n 当前人数 - {}", WebSocketUsers.getUsers().size());
-            LoginUser loginUser = tokenService.getLoginUser(authorization);
             WebSocketUsers.sendMessageToUserByText(session, "连接成功,你好" + loginUser.getUsername());
         }
     }
@@ -75,7 +75,7 @@ public class WebSocketServer extends TextWebSocketHandler {
         // 移除用户
         WebSocketUsers.remove(session.getId());
         // 获取到信号量则需释放
-        SemaphoreUtils.release(socketSemaphore);
+        socketSemaphore.release();
     }
 
     /**
@@ -93,7 +93,7 @@ public class WebSocketServer extends TextWebSocketHandler {
         // 移出用户
         WebSocketUsers.remove(sessionId);
         // 获取到信号量则需释放
-        SemaphoreUtils.release(socketSemaphore);
+        socketSemaphore.release();
     }
 
     /**

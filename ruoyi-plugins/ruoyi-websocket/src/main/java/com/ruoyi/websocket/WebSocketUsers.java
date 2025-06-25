@@ -3,7 +3,6 @@ package com.ruoyi.websocket;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -30,11 +29,8 @@ public class WebSocketUsers {
      * session集
      */
     private static final Map<String, WebSocketSession> SESSIONS = new ConcurrentHashMap<>();
-
-    /**
-     * 用户集
-     */
-    private static Map<String, LoginUser> USERS = new ConcurrentHashMap<>();
+    private static final Map<String, WebSocketSession> USERNAME = new ConcurrentHashMap<>();
+    private static final Map<String, LoginUser> LOGINUSER = new ConcurrentHashMap<>();
 
     /**
      * 存储用户
@@ -42,33 +38,12 @@ public class WebSocketUsers {
      * @param key     唯一键
      * @param session 用户信息
      */
-    public static void put(String key, WebSocketSession session) {
+    public static void put(String key, WebSocketSession session, LoginUser loginUser) {
         SESSIONS.put(key, session);
-    }
-
-    /**
-     * 移除用户
-     *
-     * @param session 用户信息
-     *
-     * @return 移除结果
-     */
-    public static boolean remove(WebSocketSession session) {
-        String key = null;
-        boolean flag = SESSIONS.containsValue(session);
-        if (flag) {
-            Set<Map.Entry<String, WebSocketSession>> entries = SESSIONS.entrySet();
-            for (Map.Entry<String, WebSocketSession> entry : entries) {
-                WebSocketSession value = entry.getValue();
-                if (value.equals(session)) {
-                    key = entry.getKey();
-                    break;
-                }
-            }
-        } else {
-            return true;
+        if (loginUser != null) {
+            LOGINUSER.put(key, loginUser);
+            USERNAME.put(loginUser.getUsername(), session);
         }
-        return remove(key);
     }
 
     /**
@@ -78,14 +53,12 @@ public class WebSocketUsers {
      */
     public static boolean remove(String key) {
         LOGGER.info("\n 正在移出用户 - {}", key);
-        WebSocketSession remove = SESSIONS.remove(key);
-        if (remove != null) {
-            boolean containsValue = SESSIONS.containsValue(remove);
-            LOGGER.info("\n 移出结果 - {}", containsValue ? "失败" : "成功");
-            return containsValue;
-        } else {
-            return true;
+        SESSIONS.remove(key);
+        LoginUser loginUser = LOGINUSER.remove(key);
+        if (loginUser != null) {
+            USERNAME.remove(loginUser.getUsername());
         }
+        return true;
     }
 
     /**
@@ -93,7 +66,11 @@ public class WebSocketUsers {
      *
      * @return 返回用户集合
      */
-    public static Map<String, WebSocketSession> getUsers() {
+    public static Collection<LoginUser> getUsers() {
+        return LOGINUSER.values();
+    }
+
+    public static Map<String, WebSocketSession> getSessions() {
         return SESSIONS;
     }
 
