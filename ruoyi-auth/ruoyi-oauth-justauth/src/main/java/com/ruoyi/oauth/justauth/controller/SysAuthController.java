@@ -82,6 +82,25 @@ public class SysAuthController extends BaseController {
     }
 
     /**
+     * 认证授权
+     * 
+     * @param source
+     * @throws IOException
+     */
+    @Anonymous
+    @GetMapping("/login/{source}")
+    @ResponseBody
+    public AjaxResult login(@PathVariable("source") String source, HttpServletRequest request)
+            throws IOException {
+        if (!justAuthConfig.isEnabled(source)) {
+            return error(source + "平台账号暂不支持");
+        }
+        AuthRequest authRequest = justAuthConfig.getAuthRequest(source);
+        String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
+        return success(authorizeUrl);
+    }
+
+    /**
      * 第三方登录回调
      * 
      * @param source
