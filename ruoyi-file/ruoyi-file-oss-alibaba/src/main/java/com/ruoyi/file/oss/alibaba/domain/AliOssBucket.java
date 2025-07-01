@@ -87,7 +87,7 @@ public class AliOssBucket implements StorageBucket {
         StringBuilder sb = new StringBuilder();
         sb.append("https://").append(getBucketName())
                 .append(".").append(getEndpoint())
-                .append("/").append(filePath.replace("\\", "/"));
+                .append(filePath.replace("\\", "/"));
         return URI.create(sb.toString()).toURL();
     }
 

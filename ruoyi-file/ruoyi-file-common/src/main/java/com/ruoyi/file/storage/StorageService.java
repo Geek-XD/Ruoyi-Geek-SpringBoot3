@@ -11,7 +11,7 @@ import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.file.domain.SysFilePartETag;
 
 /**
- * 文件操作接口
+ * 存储操作业务
  */
 public interface StorageService {
 

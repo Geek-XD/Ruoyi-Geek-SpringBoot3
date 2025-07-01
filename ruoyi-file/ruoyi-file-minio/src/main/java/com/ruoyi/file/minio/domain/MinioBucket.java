@@ -100,7 +100,7 @@ public class MinioBucket implements StorageBucket {
         StringBuilder sb = new StringBuilder();
         sb.append(getUrl())
                 .append("/").append(getBucketName())
-                .append("/").append(filePath.replace("\\", "/"));
+                .append(filePath.replace("\\", "/"));
         return URI.create(sb.toString()).toURL();
     }
 

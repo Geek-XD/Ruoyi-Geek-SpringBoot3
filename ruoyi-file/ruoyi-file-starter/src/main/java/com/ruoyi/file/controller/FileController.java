@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,11 +41,12 @@ import com.ruoyi.file.service.ISysFileInfoService;
 import com.ruoyi.file.storage.StorageBucket;
 import com.ruoyi.file.storage.StorageEntity;
 import com.ruoyi.file.storage.StorageManagement;
-import com.ruoyi.file.storage.StorageManagements;
+import com.ruoyi.file.storage.StorageService;
 import com.ruoyi.file.utils.FileOperateUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -52,11 +55,28 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/file")
 public class FileController {
 
+    private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+
     @Autowired
     private ISysFileInfoService sysFileInfoService;
 
-    @Autowired
-    StorageManagements storageManagement;
+    @Autowired(required = false)
+    private Map<String, StorageService> storageServiceMap;
+
+    @Autowired(required = false)
+    private Map<String, StorageManagement> storageManagementMap;
+
+    @PostConstruct
+    public void init() {
+        if (storageServiceMap == null) {
+            storageServiceMap = new HashMap<>();
+            logger.warn("请注意，没有加载任何存储服务");
+        } else {
+            storageServiceMap.forEach((k, v) -> {
+                logger.info("已加载存储服务 {}", k);
+            });
+        }
+    }
 
     /**
      * 获取所有可用存储渠道及其client列表
@@ -64,9 +84,8 @@ public class FileController {
     @GetMapping("/client-list")
     public AjaxResult getClientList() {
         Map<String, List<String>> result = new HashMap<>();
-        Map<String, StorageManagement> configs = storageManagement.getStorageTypes();
-        for (String storageType : configs.keySet()) {
-            StorageManagement config = configs.get(storageType);
+        for (String storageType : storageManagementMap.keySet()) {
+            StorageManagement config = storageManagementMap.get(storageType);
             result.put(storageType, new ArrayList<>(config.getClient().keySet()));
         }
         return AjaxResult.success(result);
@@ -86,8 +105,8 @@ public class FileController {
             if (file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")) {
                 fileType = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
             }
-            String filePath = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
+            String filePath = "/upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            StorageBucket storageBucket = storageManagementMap.get(storageType).getBucket(clientName);
             storageBucket.put(filePath, file);
             String url = storageBucket.getUrl(filePath).toString();
             SysFileInfo info = new SysFileInfo();
@@ -101,7 +120,7 @@ public class FileController {
             AjaxResult ajax = AjaxResult.success();
             ajax.put("url", url);
             ajax.put("info", info);
-            ajax.put("fileName", file.getOriginalFilename());
+            ajax.put("fileName", info.getFileName());
             return ajax;
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
@@ -118,7 +137,7 @@ public class FileController {
             @RequestParam("filePath") String filePath,
             HttpServletResponse response) throws Exception {
         try {
-            StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
+            StorageBucket storageBucket = storageManagementMap.get(storageType).getBucket(clientName);
             StorageEntity fileEntity = storageBucket.get(filePath);
             response.setContentType("application/octet-stream");
             response.setHeader("Content-Disposition",
@@ -142,7 +161,7 @@ public class FileController {
             HttpServletResponse response) throws Exception {
         try {
             filePath = URLDecoder.decode(filePath, "UTF-8");
-            StorageBucket storageBucket = storageManagement.getStorageBucket(storageType, clientName);
+            StorageBucket storageBucket = storageManagementMap.get(storageType).getBucket(clientName);
             StorageEntity fileEntity = storageBucket.get(filePath);
             String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(filePath));
             if (contentType == null) {
@@ -280,8 +299,7 @@ public class FileController {
             fileInfo.setUpdateTime(new Date());
             fileInfo.setDelFlag("0");
             sysFileInfoService.insertSysFileInfo(fileInfo);
-            return AjaxResult.success(Map.of("fileId", fileInfo.getFileId(), "fileName", fileName,
-                    "filePath", finalPath, "fileSize", fileSize, "storageType", RuoYiConfig.getFileServer()));
+            return AjaxResult.success(fileInfo);
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
         }

@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.file.domain.SysFilePartETag;
 
+/** 存储桶 */
 public interface StorageBucket {
 
     /**

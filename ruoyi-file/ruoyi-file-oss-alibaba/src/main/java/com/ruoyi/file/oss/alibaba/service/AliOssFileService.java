@@ -1,7 +1,6 @@
 package com.ruoyi.file.oss.alibaba.service;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,15 +78,7 @@ public class AliOssFileService implements StorageService {
         if (partETags == null || partETags.isEmpty()) {
             throw new IllegalArgumentException("分片ETag列表不能为空");
         }
-
-        // 将Map转换为PartETag对象
-        List<SysFilePartETag> ossPartETags = new ArrayList<>();
-        for (SysFilePartETag part : partETags) {
-            int partNumber = ((Number) part.getPartNumber()).intValue();
-            String etag = part.getETag();
-            ossPartETags.add(new SysFilePartETag(partNumber, etag));
-        }
-        return aliOssConfig.getPrimaryBucket().completeMultipartUpload(filePath, uploadId, ossPartETags);
+        return aliOssConfig.getPrimaryBucket().completeMultipartUpload(filePath, uploadId, partETags);
     }
 
 }

@@ -23,7 +23,7 @@ import com.ruoyi.file.storage.StorageService;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * 文件上传工具类
+ * 文件操作工具类
  *
  * @author ruoyi
  */

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.InitializingBean;
 
+/** 存储管理器 */
 public interface StorageManagement extends InitializingBean {
     /**
      * 获取存储桶
