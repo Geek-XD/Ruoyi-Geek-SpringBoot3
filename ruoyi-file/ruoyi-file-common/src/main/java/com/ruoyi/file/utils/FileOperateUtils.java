@@ -122,7 +122,7 @@ public class FileOperateUtils {
      * 根据文件路径下载
      *
      * @param filepath 下载文件路径
-     * @param response 相应
+     * @param response 响应
      * @return 文件名称
      * @throws IOException
      */
@@ -161,7 +161,7 @@ public class FileOperateUtils {
     /**
      * 根据md5获取文件的路径
      *
-     * @param md5 文件的md5
+     * @param filePath 文件路径
      * @return 文件路径
      */
     public static String getMd5ForFilePath(String filePath) {
@@ -246,6 +246,7 @@ public class FileOperateUtils {
      * 
      * @param filePath 文件路径
      * @param uploadId 上传ID
+     * @param partETags 分片的ETag列表
      * @return 文件的最终路径
      */
     public static String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)

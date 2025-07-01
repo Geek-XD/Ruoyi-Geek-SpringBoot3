@@ -115,6 +115,7 @@ public interface StorageService {
      * 完成分片上传
      * @param filePath 文件路径
      * @param uploadId 上传ID
+     * @param partETags 分片的ETag列表
      * @return 文件的最终路径
      */
     public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)

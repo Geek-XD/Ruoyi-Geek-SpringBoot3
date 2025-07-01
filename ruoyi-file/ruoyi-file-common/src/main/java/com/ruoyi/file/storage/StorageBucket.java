@@ -41,6 +41,7 @@ public interface StorageBucket {
      * 生成预签名URL
      * 
      * @param filePath
+     * @param expireTime 过期时间（秒）
      * @return
      * @throws Exception
      */
@@ -103,6 +104,7 @@ public interface StorageBucket {
      * 
      * @param filePath 文件路径
      * @param uploadId 上传ID
+     * @param partETags 分片的ETag列表
      * @return 文件的最终路径
      */
     public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
