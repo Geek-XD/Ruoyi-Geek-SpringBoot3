@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ruoyi.common.annotation.Log;
@@ -22,7 +21,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.modelMessage.domain.MessageVariable;
 import com.ruoyi.modelMessage.service.IMessageVariableService;
-import com.ruoyi.modelMessage.utils.MessageSystemUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,9 +39,6 @@ public class MessageVariableController extends BaseController
 {
     @Autowired
     private IMessageVariableService messageVariableService;
-
-    @Autowired 
-    private MessageSystemUtils messageVariableUtils;
 
     /**
      * 查询变量管理列表
@@ -122,18 +117,9 @@ public class MessageVariableController extends BaseController
     /**
      * 查询变量
      */
-    @Operation(summary = "查询变量")
+    @Operation(summary = "查询变量下拉框")
     @GetMapping("/selectMessageVariable")
     public AjaxResult selectMessageVariable() {
        return success(messageVariableService.selectMessageVariable());
-    }
-
-    /**
-     * 根据变量类型生成不同的变量内容
-     */
-    @Operation(summary = "根据内置变量生成不同内容")
-    @GetMapping("/generate")
-    public AjaxResult generateVariableContent(@RequestParam String variableContent) {
-       return success(messageVariableUtils.generateVariableContent(variableContent));
     }
 }

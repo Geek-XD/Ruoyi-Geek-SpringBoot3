@@ -114,5 +114,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 NOW(), #{item.remark} )
         </foreach>
     </insert>
-    
-    </mapper>
+
+    <select id="selectUserBySendMode" resultType="com.ruoyi.common.core.domain.entity.SysUser">
+        SELECT user_id, dept_id, user_name, phonenumber, email FROM sys_user
+        <where>
+            <if test="filterType == 'phone'">
+                AND phonenumber IS NOT NULL AND phonenumber != ''
+            </if>
+            <if test="filterType == 'email'">
+                AND email IS NOT NULL AND email != ''
+            </if>
+        </where>
+    </select>  
+</mapper>

@@ -113,4 +113,14 @@ public class MessageTemplateController extends BaseController
     {
         return toAjax(messageTemplateService.deleteMessageTemplateByTemplateIds(templateIds));
     }
+
+     /**
+     * 查询模版签名
+     * @return 模版信息列表
+     */
+    @Operation(summary = "查询模版下拉框")
+    @GetMapping("/selecTemplates")
+    public AjaxResult selecTemplates() {
+        return success(messageTemplateService.selecTemplates());
+    }
 }

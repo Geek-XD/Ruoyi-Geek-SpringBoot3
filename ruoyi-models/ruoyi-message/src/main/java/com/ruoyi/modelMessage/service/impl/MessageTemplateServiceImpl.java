@@ -101,4 +101,11 @@ public class MessageTemplateServiceImpl implements IMessageTemplateService
     {
         return messageTemplateMapper.deleteMessageTemplateByTemplateId(templateId);
     }
+
+    // 查询模版签名
+    @Override
+    public List<MessageTemplate> selecTemplates() {
+        List<MessageTemplate> templates = messageTemplateMapper.selecTemplates();
+        return templates;
+    }
 }

@@ -9,7 +9,6 @@ import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.modelMessage.domain.MessageSystem;
-import com.ruoyi.modelMessage.domain.MessageTemplate;
 
 /**
  * 消息管理Mapper接口
@@ -80,14 +79,7 @@ public interface MessageSystemMapper
     public List<SysDept> selectDept();
 
     // 根据发送方式过滤用户 (短信或邮箱)
-    @Select("<script>" +
-        "SELECT user_id, dept_id, user_name, phonenumber, email FROM `sys_user`" +
-        "<where>" +
-            "<if test='filterType == \"phone\"'>AND phonenumber IS NOT NULL AND phonenumber != ''</if>" +
-            "<if test='filterType == \"email\"'>AND email IS NOT NULL AND email != ''</if>" +
-        "</where>" +
-        "</script>")
-    List<SysUser> selectUserBySendMode(String filterType);
+    public List<SysUser> selectUserBySendMode(String filterType);
 
     //将信息状态未读信息变为已读
     @Update("update message_system set message_status = 1 where message_id = #{messageId} and message_recipient = #{userName}")
@@ -111,10 +103,6 @@ public interface MessageSystemMapper
      */
     @Select("SELECT u.user_name FROM sys_user u JOIN sys_user_role ur ON u.user_id = ur.user_id WHERE ur.role_id = #{roleId}")
     public List<SysUser> selectUsersByRoleId(Long roleId);
-
-    //查询模版签名
-    @Select("SELECT template_id,template_code FROM `message_template`")
-    public List<MessageTemplate> selecTemplates();
 
     //批量发送信息
     public int batchInsertMessageSystem(List<MessageSystem> messageSystemList);

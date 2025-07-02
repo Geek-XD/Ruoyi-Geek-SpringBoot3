@@ -2,11 +2,7 @@ package com.ruoyi.modelMessage.service;
 
 import java.util.List;
 
-import com.ruoyi.common.core.domain.entity.SysDept;
-import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.modelMessage.domain.MessageSystem;
-import com.ruoyi.modelMessage.domain.MessageTemplate;
 
 /**
  * 消息管理Service接口
@@ -64,45 +60,22 @@ public interface IMessageSystemService
      */
     public int deleteMessageSystemByMessageId(Long messageId);
 
-    //查询系统资源用户信息
-     public List<SysUser> selectUser();
-
-    //将信息状态未读信息变为已读
+    //点击信息详情状态调整为已读
     public int updateState(Long messageId);
 
     //根据发送方式 执行不同操作
     public void processMessageSystem(MessageSystem messageSystem);
 
-    // 根据发送方式过滤用户 (短信或邮箱)
-    public List<SysUser> getUsersFilteredBySendMode(String filterType);
-
-    //查询角色信息 然后根据角色把消息发给某角色
-    public List<SysRole> selectRole();
-
-    //查询部门信息 然后根据部门把消息发给某部门
-    public List<SysDept> selectDept();
-
-    /**
-     * 根据角色ID获取用户列表。
-     *
-     * @param roleId 角色ID
-     * @return 
-     * 
-     * */
-    public List<SysUser> selectUsersByRoleId(Long roleId);
-
-    /**
-     * 根据部门ID获取用户列表。
-     *
-     * @param deptId 部门ID
-     * @return 
-     * 
-     * */
-    public List<SysUser> getUserNameByDeptId(Long deptId);
-
-    // 查询模版签名
-    public List<MessageTemplate> selecTemplates();
-
     // 批量发送信息
     public int batchInsertMessageSystem(List<MessageSystem> messageSystemList);
+
+     /**
+     * 统一查询系统资源信息（角色、部门、用户）
+     *
+     * @param type     查询类型：role-角色信息, dept-部门信息, user-用户信息, usersbyrole-根据角色查用户, usersbydept-根据部门查用户, usersbysendmode-根据发送方式查用户
+     * @param id       可选参数，当查询特定角色或部门下的用户时使用
+     * @param sendMode 可选参数，当查询特定发送方式的用户时使用（phone/email）
+     * @return 查询结果
+     */
+    public Object querySystemResource(String type, Long id, String sendMode);
 }
