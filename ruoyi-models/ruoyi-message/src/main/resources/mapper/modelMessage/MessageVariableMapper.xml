@@ -84,7 +84,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!-- 查询在使用模版签名时用到了那些变量一一赋值 -->
     <select id="selectMessageVariables" parameterType="java.util.List" resultType="MessageVariable">
-        SELECT variable_id, variable_name, variable_type, variable_content FROM message_variable WHERE variable_content IN
+        SELECT variable_id, variable_name, variable_type, variable_content FROM message_variable
+        WHERE variable_content IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        OR variable_name IN
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item}
         </foreach>

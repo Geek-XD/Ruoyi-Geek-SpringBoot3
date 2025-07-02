@@ -59,4 +59,7 @@ public interface IMessageTemplateService
      * @return 结果
      */
     public int deleteMessageTemplateByTemplateId(Long templateId);
+
+    // 查询模版签名
+    public List<MessageTemplate> selecTemplates();
 }

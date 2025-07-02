@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.ServiceException;
@@ -114,101 +113,46 @@ public class MessageSystemController extends BaseController
     /**
      * 批量发送消息
      */
-    @Operation(summary = "发送消息")
-    @Log(title = "发送消息", businessType = BusinessType.INSERT)
+    @Operation(summary = "批量发送消息")
+    @Log(title = "批量发送消息", businessType = BusinessType.INSERT)
     @PostMapping
     @Transactional
     public AjaxResult batchAdd(@RequestBody List<MessageSystem> messageSystemList) {
         try {
             messageSystemList.forEach(messageSystemService::processMessageSystem);
             messageSystemService.batchInsertMessageSystem(messageSystemList);
-            return AjaxResult.success("消息发送成功！");
+            return AjaxResult.success("消息发送成功!");
         } catch (Exception e) {
             return AjaxResult.error("消息发送失败", e);
         }
     }
 
     /**
-     * 用户点击标题调整信息状态
+     * 点击信息详情状态调整为已读
      */
-    @Operation(summary = "用户点击标题调整信息状态")
+    @Operation(summary = "点击信息详情状态调整为已读")
     @PostMapping("/{messageId}")
     public AjaxResult update(@PathVariable Long messageId){
         return success(messageSystemService.updateState(messageId));
     }
 
     /**
-     * 查询平台用户 sendMode 进行过滤。
+     * 统一查询系统资源信息（角色、部门、用户）
+     *
+     * @param type     查询类型：role-角色信息, dept-部门信息, user-用户信息, usersbyrole-根据角色查用户, usersbydept-根据部门查用户, usersbysendmode-根据发送方式查用户
+     * @param id       可选参数，当查询特定角色或部门下的用户时使用
+     * @param sendMode 可选参数，当查询特定发送方式的用户时使用（phone/email）
+     * @return 查询结果
      */
-    @Operation(summary = "查询平台用户")
-    @GetMapping("/selectUser")
-    public AjaxResult selectUser(@RequestParam(required = false) String sendMode) {
+    @Operation(summary = "统一查询系统资源信息")
+    @GetMapping("/systemResource")
+    public AjaxResult getSystemResource(@RequestParam String type, @RequestParam(required = false) Long id,
+            @RequestParam(required = false) String sendMode) {
         try {
-            // 非空检查并提供默认值
-            if (sendMode == null || sendMode.trim().isEmpty()) {
-                sendMode = "default";
-            }
-            List<SysUser> list;
-            switch (sendMode) {
-                case "1": list = messageSystemService.getUsersFilteredBySendMode("phone"); break; // 短信  
-                case "2": list = messageSystemService.getUsersFilteredBySendMode("email");  break;// 邮件
-                default:  list = messageSystemService.selectUser(); break; //默认查询全部的用户
-            }
-            return success(list);
+            Object result = messageSystemService.querySystemResource(type, id, sendMode);
+            return AjaxResult.success(result);
         } catch (ServiceException e) {
             return AjaxResult.error(e.getMessage());
         }
-    }
-
-    /**
-     * 查询角色信息
-     */
-    @Operation(summary = "查询角色")
-    @GetMapping("/selectRole")
-    public AjaxResult selectRole() {
-       return success(messageSystemService.selectRole());
-    }
-
-    /**
-     * 查询所有部门信息
-     */
-    @Operation(summary = "查询部门")
-    @GetMapping("/selectDept")
-    public AjaxResult selectDept() {
-       return success(messageSystemService.selectDept());
-    }
-
-    /**
-     * 根据角色ID获取所有符合条件的用户信息。
-     *
-     * @param roleId 角色ID
-     * @return 用户信息列表
-     */
-    @Operation(summary = "根据角色Id查询所有符合条件的用户信息")
-    @GetMapping("/getUsersByRole/{roleId}")
-    public AjaxResult selectUsersByRoleId(@PathVariable Long roleId) {
-       return success(messageSystemService.selectUsersByRoleId(roleId));
-    }
-
-    /**
-     * 根据部门ID获取所有符合条件的用户信息。
-     *
-     * @param deptId 部门ID
-     * @return 用户信息列表
-     */
-    @Operation(summary = "根据部门Id查询所有符合条件的用户信息")
-    @GetMapping("/getUserNameByDeptId/{deptId}")
-    public AjaxResult getUserNameByDeptId(@PathVariable Long deptId) {
-        return success(messageSystemService.getUserNameByDeptId(deptId));
-    }
-
-    /**
-     * 查询模版签名
-     * @return 模版信息列表
-     */
-    @Operation(summary = "查询模版签名")
-    @GetMapping("/selecTemplates")
-    public AjaxResult selecTemplates() {
-        return success(messageSystemService.selecTemplates());
     }
 }
