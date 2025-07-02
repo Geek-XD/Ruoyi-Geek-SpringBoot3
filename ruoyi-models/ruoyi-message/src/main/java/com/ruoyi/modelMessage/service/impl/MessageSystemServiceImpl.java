@@ -459,16 +459,21 @@ public class MessageSystemServiceImpl implements IMessageSystemService {
                     String keyToUse = matchByContent ? variableContent : variableName;
                     // 处理内置变量
                     if (BuiltInVariableType.isBuiltInVariable(variableContent)) {
-                        // 使用变量内容作为标识符生成值，但用keyToUse作为参数名
-                        params.put(keyToUse, BuiltInVariableType.fromIdentifier(variableContent).generateValue(message));
+                        // 只有当参数不存在或为空时才生成内置变量的值
+                        if (!params.containsKey(keyToUse) || params.get(keyToUse) == null || params.get(keyToUse).isEmpty()) {
+                            params.put(keyToUse, BuiltInVariableType.fromIdentifier(variableContent).generateValue(message));
+                        }
                     } else if ("recipients".equals(variableContent) || "收件人".equals(variableName)) {
-
+                        // 收件人变量总是使用实际的收件人信息
                         params.put(keyToUse, message.getMessageRecipient());
                     }
                 }
             } else if ("指定文本".equals(variableType)) {
                 if (BuiltInVariableType.isBuiltInVariable(variableContent) && variableNameSet.contains(variableContent)) {
-                    params.put(variableContent, BuiltInVariableType.fromIdentifier(variableContent).generateValue(message));
+                    // 只有当参数不存在或为空时才生成内置变量的值
+                    if (!params.containsKey(variableContent) || params.get(variableContent) == null || params.get(variableContent).isEmpty()) {
+                        params.put(variableContent, BuiltInVariableType.fromIdentifier(variableContent).generateValue(message));
+                    }
                 } else if ("recipients".equals(variableContent) && variableNameSet.contains(variableName)) {
                     params.put(variableName, message.getMessageRecipient());
                 } else if (variableNameSet.contains(variableName)) {
@@ -478,7 +483,10 @@ public class MessageSystemServiceImpl implements IMessageSystemService {
                 }
             } else {
                 if (BuiltInVariableType.isBuiltInVariable(variableContent) && variableNameSet.contains(variableContent)) {
-                    params.put(variableContent, BuiltInVariableType.fromIdentifier(variableContent).generateValue(message));
+                    // 只有当参数不存在或为空时才生成内置变量的值
+                    if (!params.containsKey(variableContent) || params.get(variableContent) == null || params.get(variableContent).isEmpty()) {
+                        params.put(variableContent, BuiltInVariableType.fromIdentifier(variableContent).generateValue(message));
+                    }
                 } else if ("recipients".equals(variableContent) && variableNameSet.contains(variableName)) {
                     params.put(variableName, message.getMessageRecipient());
                 }
