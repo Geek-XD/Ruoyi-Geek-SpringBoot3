@@ -9,18 +9,20 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class Message {
 
-    /** 消息唯一标识符 */ 
+    /** 消息唯一标识符 */
     private String messageId;
-    /** 发送者标识 */ 
+    /** 发送者标识 */
     private String sender;
-    /** 接收者标识 */ 
+    /** 接收者标识 */
     private String receiver;
-    /** 消息时间戳 */ 
+    /** 消息时间戳 */
     private Instant timestamp;
     /** 消息类型（如命令、聊天、日志、事件等） */
     private String type;
     /** 消息主题或事件名称 */
     private String subject;
+    /** 消息数据内容 */
+    private String content;
     /** 消息数据负载 */
     private Map<String, Object> payload;
     /** 元数据，用于存储额外的信息 */
@@ -152,6 +154,15 @@ public class Message {
         return this;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public Message setContent(String content) {
+        this.content = content;
+        return this;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -161,6 +172,7 @@ public class Message {
                 .append("timestamp", getTimestamp())
                 .append("type", getType())
                 .append("subject", getSubject())
+                .append("content", getContent())
                 .append("payload", getPayload())
                 .append("metadata", getMetadata())
                 .append("status", getStatus())

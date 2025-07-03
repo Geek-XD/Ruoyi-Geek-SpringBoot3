@@ -12,6 +12,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.ruoyi.common.core.domain.Message;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.framework.web.service.TokenService;
 
@@ -48,10 +50,13 @@ public class WebSocketServer extends TextWebSocketHandler {
         boolean semaphoreFlag = false;
         // 尝试获取信号量
         semaphoreFlag = socketSemaphore.tryAcquire();
+        Message message = new Message();
+        message.setSender("system");
         if (!semaphoreFlag) {
             // 未获取到信号量
             LOGGER.error("\n 当前在线人数超过限制数- {}", socketMaxOnlineCount);
-            WebSocketUsers.sendMessageToUserByText(session, "当前在线人数超过限制数：" + socketMaxOnlineCount);
+            message.setContent("当前在线人数超过限制数：" + socketMaxOnlineCount);
+            WebSocketUsers.sendMessageToUser(session, message);
             session.close();
         } else {
             // 获取 authorization 信息
@@ -62,7 +67,8 @@ public class WebSocketServer extends TextWebSocketHandler {
             WebSocketUsers.put(session.getId(), session, loginUser);
             LOGGER.info("\n 建立连接 - {}", session.getId());
             LOGGER.info("\n 当前人数 - {}", WebSocketUsers.getUsers().size());
-            WebSocketUsers.sendMessageToUserByText(session, "连接成功,你好" + loginUser.getUsername());
+            message.setContent("连接成功,你好" + loginUser.getUsername());
+            WebSocketUsers.sendMessageToUser(session, message);
         }
     }
 
@@ -102,7 +108,12 @@ public class WebSocketServer extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        String msg = payload.replace("你", "我").replace("吗", "");
-        WebSocketUsers.sendMessageToUserByText(session, msg);
+        Message msg = JSONObject.parseObject(payload, Message.class);
+        WebSocketSession receiver = WebSocketUsers.USERNAME.get(msg.getReceiver());
+        if (receiver == null) {
+            LOGGER.error("\n 无法找到接收者 - {}", msg.getReceiver());
+            return;
+        }
+        WebSocketUsers.sendMessageToUser(receiver, msg);
     }
 }

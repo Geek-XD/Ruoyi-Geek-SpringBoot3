@@ -11,7 +11,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.Message;
 import com.ruoyi.common.core.domain.model.LoginUser;
 
 /**
@@ -28,9 +28,9 @@ public class WebSocketUsers {
     /**
      * session集
      */
-    private static final Map<String, WebSocketSession> SESSIONS = new ConcurrentHashMap<>();
-    private static final Map<String, WebSocketSession> USERNAME = new ConcurrentHashMap<>();
-    private static final Map<String, LoginUser> LOGINUSER = new ConcurrentHashMap<>();
+    public static final Map<String, WebSocketSession> SESSIONS = new ConcurrentHashMap<>();
+    public static final Map<String, WebSocketSession> USERNAME = new ConcurrentHashMap<>();
+    public static final Map<String, LoginUser> LOGINUSER = new ConcurrentHashMap<>();
 
     /**
      * 存储用户
@@ -95,8 +95,25 @@ public class WebSocketUsers {
     public static void sendMessageToUserByText(WebSocketSession session, String message) {
         if (session != null && session.isOpen()) {
             try {
-                R<String> r = R.ok(message);
-                session.sendMessage(new TextMessage(JSONObject.toJSONString(r)));
+                session.sendMessage(new TextMessage(message));
+            } catch (IOException e) {
+                LOGGER.error("\n[发送消息异常]", e);
+            }
+        } else {
+            LOGGER.info("\n[连接已断开或不存在]");
+        }
+    }
+
+    /**
+     * 发送消息
+     *
+     * @param session WebSocket会话
+     * @param message 消息内容
+     */
+    public static void sendMessageToUser(WebSocketSession session, Message message) {
+        if (session != null && session.isOpen()) {
+            try {
+                session.sendMessage(new TextMessage(JSONObject.toJSONString(message)));
             } catch (IOException e) {
                 LOGGER.error("\n[发送消息异常]", e);
             }
