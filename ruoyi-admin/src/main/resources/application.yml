@@ -80,7 +80,7 @@ spring:
     # 国际化资源文件路径
     basename: i18n/messages
   profiles:
-    active: druid,mybatis,auth,pay,middleware,lp,file
+    active: druid,file,auth,pay,plugins,model
   # 文件上传
   servlet:
     multipart:
@@ -119,9 +119,30 @@ xss:
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
 
+createSqlSessionFactory:
+  # 选择MyBatis配置方式，mybatis / mybatis-plus
+  use: mybatis-plus
 
-flowable:
-  # 开启定时任务JOB
-  async-executor-activate: false
-  # 在引擎启动时，会自动更新数据库架构
-  database-schema-update: true
+# PageHelper分页插件
+pagehelper:
+  helperDialect: mysql
+  supportMethodsArguments: true
+  params: count=countSql
+
+# MyBatis配置
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: com.ruoyi.**.domain
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  # 加载全局的配置文件
+  configLocation: classpath:mybatis/mybatis-config.xml
+
+# MyBatis Plus配置
+mybatis-plus:
+  # 搜索指定包别名
+  typeAliasesPackage: com.ruoyi.**.domain
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  # 加载全局的配置文件
+  configLocation: classpath:mybatis/mybatis-config.xml

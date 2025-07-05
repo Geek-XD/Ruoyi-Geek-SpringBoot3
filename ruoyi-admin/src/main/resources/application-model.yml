@@ -1,4 +1,4 @@
-# 基础配置
+# generator(代码生成器)模块： 基础配置
 gen:
   # 作者
   author: ruoyi
@@ -8,3 +8,10 @@ gen:
   autoRemovePre: false
   # 表前缀（生成类名不会包含表前缀，多个用逗号分隔）
   tablePrefix: sys_
+
+# flowable(工作流)模块： 基础配置
+flowable:
+  # 开启定时任务JOB
+  async-executor-activate: false
+  # 在引擎启动时，会自动更新数据库架构
+  database-schema-update: true

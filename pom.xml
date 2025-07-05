@@ -5,14 +5,14 @@
 
     <groupId>com.ruoyi.geekxd</groupId>
     <artifactId>ruoyi</artifactId>
-    <version>3.8.9-G</version>
+    <version>3.9.0-G</version>
 
     <name>ruoyi</name>
     <url>https://gitee.com/geek-xd/ruoyi-geek-springboot3.git</url>
     <description>若依Geek管理系统</description>
 
     <properties>
-        <ruoyi.version>3.8.9-G</ruoyi.version>
+        <ruoyi.version>3.9.0-G</ruoyi.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>

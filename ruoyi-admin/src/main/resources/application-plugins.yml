@@ -32,3 +32,10 @@ spring:
     password: guest
 
 
+netty:
+  websocket:
+      maxMessageSize: 65536
+      bossThreads: 4
+      workerThreads: 16
+      port: 8081
+      enable: true

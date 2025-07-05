@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>ruoyi-file</artifactId>
 		<groupId>com.ruoyi.geekxd</groupId>
-		<version>3.8.9-G</version>
+		<version>3.9.0-G</version>
 	</parent>
 	<groupId>com.ruoyi.geekxd</groupId>
 	<artifactId>ruoyi-file-oss-alibaba</artifactId>

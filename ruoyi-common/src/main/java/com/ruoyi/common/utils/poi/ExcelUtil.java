@@ -190,11 +190,6 @@ public class ExcelUtil<T>
     private Map<Integer, Double> statistics = new HashMap<Integer, Double>();
 
     /**
-     * 数字格式
-     */
-    private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("######0.00");
-
-    /**
      * 实体对象
      */
     public Class<T> clazz;
@@ -865,6 +860,7 @@ public class ExcelUtil<T>
         style = wb.createCellStyle();
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setDataFormat(dataFormat.getFormat("######0.00"));
         Font totalFont = wb.createFont();
         totalFont.setFontName("Arial");
         totalFont.setFontHeightInPoints((short) 10);
@@ -1445,7 +1441,7 @@ public class ExcelUtil<T>
             {
                 cell = row.createCell(key);
                 cell.setCellStyle(styles.get("total"));
-                cell.setCellValue(DOUBLE_FORMAT.format(statistics.get(key)));
+                cell.setCellValue(statistics.get(key));
             }
             statistics.clear();
         }
