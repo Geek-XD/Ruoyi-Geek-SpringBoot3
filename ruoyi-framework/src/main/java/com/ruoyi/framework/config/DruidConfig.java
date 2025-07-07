@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot3.autoconfigure.properties.DruidStatProperties;
 import com.alibaba.druid.util.Utils;
+import com.ruoyi.framework.config.properties.DynamicDataSourceProperties;
 
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.Filter;
