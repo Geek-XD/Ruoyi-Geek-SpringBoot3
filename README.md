@@ -214,6 +214,59 @@ com.ruoyi
     </tr>
 </table>
 
-# 联系我们：
+## 📚 详细文档
+
+- **[项目介绍](./INTRODUCTION.md)** - 完整的项目介绍和功能特性
+- **[架构设计](./ARCHITECTURE.md)** - 技术架构和系统设计文档
+- **[模块说明](./MODULES.md)** - 各个模块的详细功能介绍
+- **[快速开始](./GETTING_STARTED.md)** - 环境搭建和快速部署指南
+- **[开发指南](./DEVELOPMENT.md)** - 开发规范和最佳实践
+- **[权限控制](./doc/权限控制.md)** - 权限系统使用说明
+
+## 🤝 参与贡献
+
+我们欢迎所有形式的贡献，包括但不限于：
+
+- 🐛 报告问题和错误
+- 💡 提出新功能建议
+- 📝 改进文档
+- 🔧 提交代码修复
+- ⭐ 为项目点星支持
+
+### 贡献流程
+
+1. Fork 本项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 提交 Pull Request
+
+### 问题反馈
+
+- **GitHub Issues**: [提交问题](https://github.com/Geek-XD/Ruoyi-Geek-SpringBoot3/issues)
+- **QQ交流群**: 744785891
+- **Email**: 技术支持邮箱
+
+## 📄 开源协议
+
+本项目基于 [MIT License](LICENSE) 开源协议发布。
+
+## 🙏 特别感谢
+
+感谢以下开源项目和贡献者：
+
+- [RuoYi](https://gitee.com/y_project/RuoYi) - 原始框架
+- [Vue.js](https://vuejs.org/) - 前端框架
+- [Element Plus](https://element-plus.org/) - UI组件库
+- [Spring Boot](https://spring.io/projects/spring-boot) - 后端框架
+- [MyBatis](https://mybatis.org/) - 持久层框架
+
+## 联系我们
 
 QQ交流群：744785891
+
+---
+
+<p align="center">
+    <b>如果这个项目对您有帮助，请给我们一个 ⭐ 支持！</b>
+</p>
