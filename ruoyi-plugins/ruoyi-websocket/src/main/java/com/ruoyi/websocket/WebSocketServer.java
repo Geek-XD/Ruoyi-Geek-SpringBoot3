@@ -15,6 +15,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.core.domain.Message;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.enums.MessageType;
 import com.ruoyi.framework.web.service.TokenService;
 
 /**
@@ -110,10 +111,14 @@ public class WebSocketServer extends TextWebSocketHandler {
         String payload = message.getPayload();
         Message msg = JSONObject.parseObject(payload, Message.class);
         WebSocketSession receiver = WebSocketUsers.USERNAME.get(msg.getReceiver());
-        if (receiver == null) {
-            LOGGER.error("\n 无法找到接收者 - {}", msg.getReceiver());
-            return;
+        if (msg.getType().equals(MessageType.ASYNC_MESSAGE)) {
+            WebSocketUsers.sendMessageToUser(session, msg);
+        } else {
+            if (receiver == null) {
+                LOGGER.error("\n 无法找到接收者 - {}", msg.getReceiver());
+                return;
+            }
+            WebSocketUsers.sendMessageToUser(receiver, msg);
         }
-        WebSocketUsers.sendMessageToUser(receiver, msg);
     }
 }

@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.ruoyi.common.enums.MessageType;
+
 public class Message {
 
     /** 消息唯一标识符 */
@@ -18,7 +20,7 @@ public class Message {
     /** 消息时间戳 */
     private Instant timestamp;
     /** 消息类型（如命令、聊天、日志、事件等） */
-    private String type;
+    private MessageType type;
     /** 消息主题或事件名称 */
     private String subject;
     /** 消息数据内容 */
@@ -82,11 +84,11 @@ public class Message {
         return this;
     }
 
-    public String getType() {
+    public MessageType getType() {
         return type;
     }
 
-    public Message setType(String type) {
+    public Message setType(MessageType type) {
         this.type = type;
         return this;
     }
