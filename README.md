@@ -117,7 +117,7 @@ com.ruoyi
 │       └── quartz			   // 定时任务（可移除）
 │       └── generator			   // 代码生成（可移除）
 │       └── form			   // 自定义在线表单（可移除）
-│       └── flowable			   // 流程管理（可移除）（依赖于form模块）
+│       └── flowable			   // 流程管理（可移除）（依赖于form模块，mysql>=8.0.32）
 │       └── message			   // 消息模块（可移除）（可以与phone、email模块协同）
 │       └── starter  		 	   // 业务场景启动器
 ├── ruoyi-plugins   	// 插件
