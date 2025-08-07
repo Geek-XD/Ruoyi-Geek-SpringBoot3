@@ -15,7 +15,7 @@ pay:
     notifyUrl: http://e2vca6.natappfree.cc/pay/sqb/notify
   # https://opendocs.alipay.com/open/02np95
   alipay:
-    enabled: true
+    enabled: false
     appId: appid
     # 文件内容没有换行符也没有PEM起始标记和结束标记
     appPrivateKey: classpath:pay/alipay/alipay_private_key.pem
