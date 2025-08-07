@@ -25,10 +25,22 @@ public class AliPayConfig {
     private String appId;
     @Value("${pay.alipay.notifyUrl}")
     private String notifyUrl;
-    @Value("${pay.alipay.appPrivateKey}")
+    @Value("${pay.alipay.appPrivateKey:}")
     private String appPrivateKey;
-    @Value("${pay.alipay.alipayPublicKey}")
+    @Value("${pay.alipay.alipayPublicKey:}")
     private String alipayPublicKey;
+    @Value("${pay.alipay.signType:RSA2}")
+    private String signType;
+    @Value("${pay.alipay.merchantCertPath:}")
+    private String merchantCertPath;
+    @Value("${pay.alipay.alipayCertPath:}")
+    private String alipayCertPath;
+    @Value("${pay.alipay.alipayRootCertPath:}")
+    private String alipayRootCertPath;
+    @Value("${pay.alipay.gatewayHost:openapi.alipay.com}")
+    private String gatewayHost;
+    @Value("${pay.alipay.protocol:https}")
+    private String protocol;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -61,19 +73,19 @@ public class AliPayConfig {
     protected Config alipayBaseConfig() throws Exception {
         // 设置参数（全局只需设置一次）
         Config config = new Config();
-        config.protocol = "https";
-        config.gatewayHost = "openapi.alipay.com";// openapi-sandbox.dl.alipaydev.com||openapi.alipay.com
-        config.signType = "RSA2";
-        config.appId = "2021004142654036";
+        config.protocol = protocol;
+        config.gatewayHost = gatewayHost;// openapi-sandbox.dl.alipaydev.com||openapi.alipay.com
+        config.signType = signType;
+        config.appId = appId;
         // 为避免私钥随源码泄露，推荐从文件中读取私钥字符串而不是写入源码中
         config.merchantPrivateKey = getAppPrivateKey();
         // 注：证书文件路径支持设置为文件系统中的路径或CLASS_PATH中的路径，优先从文件系统中加载，加载失败后会继续尝试从CLASS_PATH中加载
         // 请填写您的应用公钥证书文件路径，例如：/foo/appCertPublicKey_2019051064521003.crt
-        // config.merchantCertPath = "";
+        config.merchantCertPath = merchantCertPath;
         // 请填写您的支付宝公钥证书文件路径，例如：/foo/alipayCertPublicKey_RSA2.crt
-        // config.alipayCertPath = "";
+        config.alipayCertPath = alipayCertPath;
         // 请填写您的支付宝根证书文件路径，例如：/foo/alipayRootCert.crt
-        // config.alipayRootCertPath = "";
+        config.alipayRootCertPath = alipayRootCertPath;
         // 注：如果采用非证书模式，则无需赋值上面的三个证书路径，改为赋值如下的支付宝公钥字符串即可
         config.alipayPublicKey = getAlipayPublicKey();
         config.notifyUrl = this.notifyUrl;
