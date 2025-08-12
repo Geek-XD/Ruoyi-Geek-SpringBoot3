@@ -69,35 +69,36 @@ public class MybatisInterceptor implements Interceptor {
       Executor targetExecutor = (Executor) invocation.getTarget();
       Object[] args = invocation.getArgs();
       if (args.length < 6) {
-         if (preHandlersChain != null && preHandlersChain.size() > 0) {
-            MappedStatement ms = (MappedStatement) args[0];
-            Object parameterObject = args[1];
-            RowBounds rowBounds = (RowBounds) args[2];
-            Executor executor = (Executor) invocation.getTarget();
-            BoundSql boundSql = ms.getBoundSql(parameterObject);
-            // 可以对参数做各种处理
-            CacheKey cacheKey = executor.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+         MappedStatement ms = (MappedStatement) args[0];
+         
+         Object parameterObject = args[1];
+         RowBounds rowBounds = (RowBounds) args[2];
+         ResultHandler<?> resultHandler = (ResultHandler<?>) args[3];
+         BoundSql boundSql = ms.getBoundSql(parameterObject);
+         CacheKey cacheKey = targetExecutor.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+
+         if (preHandlersChain != null && !preHandlersChain.isEmpty()) {
             for (MybatisPreHandler item : preHandlersChain) {
-               item.preHandle(targetExecutor, ms, args[1], (RowBounds) args[2],
-                     (ResultHandler<?>) args[3], cacheKey, boundSql);
+               item.preHandle(targetExecutor, ms, parameterObject, rowBounds,
+                     resultHandler, cacheKey, boundSql);
             }
          }
-         Object result = invocation.proceed();
-         if (afterHandlersChain != null && afterHandlersChain.size() > 0) {
+         Object result = targetExecutor.query(ms, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
+         if (afterHandlersChain != null && !afterHandlersChain.isEmpty()) {
             for (MybatisAfterHandler item : afterHandlersChain) {
-               item.handleObject(result);
+               result = item.handleObject(result);
             }
          }
          return result;
       }
-      if (preHandlersChain != null && preHandlersChain.size() > 0) {
+      if (preHandlersChain != null && !preHandlersChain.isEmpty()) {
          for (MybatisPreHandler item : preHandlersChain) {
             item.preHandle(targetExecutor, (MappedStatement) args[0], args[1], (RowBounds) args[2],
                   (ResultHandler<?>) args[3], (CacheKey) args[4], (BoundSql) args[5]);
          }
       }
       Object result = invocation.proceed();
-      if (afterHandlersChain != null && afterHandlersChain.size() > 0) {
+      if (afterHandlersChain != null && !afterHandlersChain.isEmpty()) {
          for (MybatisAfterHandler item : afterHandlersChain) {
             result = item.handleObject(result);
          }
