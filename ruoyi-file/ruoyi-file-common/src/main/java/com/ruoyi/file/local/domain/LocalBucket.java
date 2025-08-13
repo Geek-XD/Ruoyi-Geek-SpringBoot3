@@ -45,7 +45,7 @@ public class LocalBucket implements StorageBucket {
 
     @Override
     public void put(String filePath, MultipartFile file) {
-        Path dest = Paths.get(basePath, filePath);
+        Path dest = Paths.get(getBasePath(), filePath);
         try (InputStream inputStream = file.getInputStream()) {
             Files.createDirectories(dest.getParent());
             Files.copy(inputStream, dest);
@@ -56,7 +56,7 @@ public class LocalBucket implements StorageBucket {
 
     @Override
     public StorageEntity get(String filePath) throws IOException {
-        Path file = Paths.get(basePath, filePath);
+        Path file = Paths.get(getBasePath(), filePath);
         StorageEntity fileEntity = new StorageEntity();
         fileEntity.setFilePath(filePath);
         fileEntity.setInputStream(new FileInputStream(file.toFile()));
@@ -66,7 +66,7 @@ public class LocalBucket implements StorageBucket {
 
     @Override
     public void remove(String filePath) throws IOException {
-        Path file = Paths.get(basePath, filePath);
+        Path file = Paths.get(getBasePath(), filePath);
         Files.deleteIfExists(file);
     }
 
@@ -93,7 +93,7 @@ public class LocalBucket implements StorageBucket {
         StringBuilder sb = new StringBuilder();
         sb.append(url.delete(url.length() - request.getRequestURI().length(), url.length())
                 .append(contextPath).toString()).append(getApi())
-                .append(filePath.replace("\\", "/"));
+                .append("/").append(filePath.replace("\\", "/"));
         return new URI(sb.toString()).toURL();
     }
 
@@ -106,7 +106,7 @@ public class LocalBucket implements StorageBucket {
             uploadMetadata.put(uploadId, new ArrayList<>());
 
             // 创建临时上传目录
-            Path tempDir = Paths.get(basePath, "temp_uploads", uploadId);
+            Path tempDir = Paths.get(getBasePath(), "temp_uploads", uploadId);
             Files.createDirectories(tempDir);
             return uploadId;
         } catch (Exception e) {
@@ -121,7 +121,7 @@ public class LocalBucket implements StorageBucket {
         if (!uploadMetadata.containsKey(uploadId)) {
             throw new ServiceException("无效的 uploadId: " + uploadId);
         }
-        Path tempDir = Paths.get(basePath, "temp_uploads", uploadId);
+        Path tempDir = Paths.get(getBasePath(), "temp_uploads", uploadId);
         Path partPath = tempDir.resolve("part_" + partNumber);
         try (OutputStream fos = Files.newOutputStream(partPath)) {
             byte[] buffer = new byte[8192];
@@ -177,7 +177,7 @@ public class LocalBucket implements StorageBucket {
                 throw new ServiceException("分片验证失败: 序号=" + actual.getPartNumber());
             }
         }
-        Path destPath = Paths.get(basePath, filePath);
+        Path destPath = Paths.get(getBasePath(), filePath);
         Files.createDirectories(destPath.getParent());
         try (WritableByteChannel outChannel = Files.newByteChannel(
                 destPath,
@@ -192,7 +192,7 @@ public class LocalBucket implements StorageBucket {
             }
         }
         // 清理临时文件和元数据
-        Path tempDir = Paths.get(basePath, "temp_uploads", uploadId);
+        Path tempDir = Paths.get(getBasePath(), "temp_uploads", uploadId);
         Files.walk(tempDir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
         uploadMetadata.remove(uploadId);
         log.info("分片合并完成: 文件={}, uploadId={}, 分片数={}", filePath, uploadId, storedParts.size());
@@ -204,6 +204,9 @@ public class LocalBucket implements StorageBucket {
     }
 
     public String getBasePath() {
+        if (basePath != null && !basePath.endsWith("/")) {
+            basePath = basePath + "/";
+        }
         return basePath;
     }
 
