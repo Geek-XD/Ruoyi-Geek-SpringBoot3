@@ -24,6 +24,13 @@ public class StorageUtils {
 
     private static Map<String, StorageManagement> storageManagementMap;
 
+    /**
+     * 获取指定存储类型和客户端名称的存储桶
+     * 
+     * @param storageType 存储类型
+     * @param clientName  客户端名称
+     * @return 存储桶
+     */
     public static StorageBucket getStorageBucket(String storageType, String clientName) {
         StorageManagement storageManagement = storageManagementMap.get(storageType);
         if (storageManagement == null) {
@@ -37,6 +44,11 @@ public class StorageUtils {
         return storageBucket;
     }
 
+    /**
+     * 获取所有可用存储渠道及其client列表
+     * 
+     * @return
+     */
     public static Map<String, List<String>> getClientList() {
         Map<String, List<String>> result = new HashMap<>();
         for (String storageType : storageManagementMap.keySet()) {
