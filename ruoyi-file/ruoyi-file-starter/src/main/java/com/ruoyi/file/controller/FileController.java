@@ -193,7 +193,9 @@ public class FileController {
             String timestamp = String.valueOf(System.currentTimeMillis());
             String objectName = String.format("%s/%s/%s_%s", "/upload", currentDate, timestamp, fileName);
             String uploadId = FileOperateUtils.initMultipartUpload(objectName);
-            return AjaxResult.success(Map.of("uploadId", uploadId, "filePath", objectName,
+            return AjaxResult.success(Map.of(
+                    "uploadId", uploadId,
+                    "filePath", objectName,
                     "fileName", fileName));
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
@@ -216,8 +218,10 @@ public class FileController {
                     chunk.getInputStream());
             if (etag == null || etag.isEmpty())
                 throw new ServiceException("上传分片失败：未获取到ETag");
-            return AjaxResult.success(Map.of("etag", etag, "chunkIndex",
-                    chunkIndex, "partNumber", chunkIndex + 1));
+            return AjaxResult.success(Map.of(
+                    "etag", etag,
+                    "chunkIndex", chunkIndex,
+                    "partNumber", chunkIndex + 1));
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
         }
@@ -255,16 +259,17 @@ public class FileController {
                 throw new ServiceException("合并分片失败：未获取到最终文件路径");
             }
             // 创建文件记录
+            int dotIndex = fileName.lastIndexOf('.');
+            String userName = SecurityUtils.getUsername();
             SysFileInfo fileInfo = new SysFileInfo();
             fileInfo.setFileName(fileName);
             fileInfo.setFilePath(finalPath);
             fileInfo.setFileSize(fileSize);
-            int dotIndex = fileName.lastIndexOf('.');
             fileInfo.setFileType(dotIndex >= 0 ? fileName.substring(dotIndex + 1) : "");
             fileInfo.setStorageType(RuoYiConfig.getFileServer());
-            fileInfo.setCreateBy(SecurityUtils.getUsername());
+            fileInfo.setCreateBy(userName);
             fileInfo.setCreateTime(new Date());
-            fileInfo.setUpdateBy(SecurityUtils.getUsername());
+            fileInfo.setUpdateBy(userName);
             fileInfo.setUpdateTime(new Date());
             fileInfo.setDelFlag("0");
             sysFileInfoService.insertSysFileInfo(fileInfo);
