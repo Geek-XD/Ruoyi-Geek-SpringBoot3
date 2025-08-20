@@ -1,5 +1,6 @@
 package com.ruoyi.file.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.utils.CacheUtils;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
@@ -45,6 +47,17 @@ public class FileOperateUtils {
     /**
      * 以默认配置进行文件上传
      *
+     * @param file 上传的文件
+     * @return 文件路径
+     * @throws Exception
+     */
+    public static final String upload(MultipartFile file, String fileName) throws Exception {
+        return upload(DateUtils.datePath() + File.separator + fileName, file);
+    }
+
+    /**
+     * 以默认配置进行文件上传
+     *
      * @param file             上传的文件
      * @param allowedExtension 允许的扩展名
      * @return 文件路径
@@ -52,19 +65,7 @@ public class FileOperateUtils {
      */
     public static final String upload(MultipartFile file, String[] allowedExtension)
             throws IOException {
-        try {
-            String md5 = Md5Utils.getMd5(file);
-            String pathForMd5 = getFilePathForMd5(md5);
-            if (StringUtils.isNotEmpty(pathForMd5)) {
-                return pathForMd5;
-            }
-            FileUtils.assertAllowed(file, allowedExtension);
-            String filePath = fileService.upload(file);
-            saveFilePathAndMd5(filePath, md5);
-            return filePath;
-        } catch (Exception e) {
-            throw new IOException(e.getMessage(), e);
-        }
+        return upload(FileUtils.fastFilePath(file), file, allowedExtension);
     }
 
     /**
@@ -244,8 +245,8 @@ public class FileOperateUtils {
     /**
      * 完成分片上传
      * 
-     * @param filePath 文件路径
-     * @param uploadId 上传ID
+     * @param filePath  文件路径
+     * @param uploadId  上传ID
      * @param partETags 分片的ETag列表
      * @return 文件的最终路径
      */

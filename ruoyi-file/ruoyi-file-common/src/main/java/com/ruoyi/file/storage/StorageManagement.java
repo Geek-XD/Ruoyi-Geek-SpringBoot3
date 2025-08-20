@@ -6,6 +6,14 @@ import org.springframework.beans.factory.InitializingBean;
 
 /** 存储管理器 */
 public interface StorageManagement extends InitializingBean {
+
+    /**
+     * 获取主存储桶
+     * 
+     * @return
+     */
+    StorageBucket getPrimaryBucket();
+
     /**
      * 获取存储桶
      *
