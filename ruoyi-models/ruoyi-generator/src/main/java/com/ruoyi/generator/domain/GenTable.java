@@ -80,14 +80,14 @@ public class GenTable extends BaseEntity {
     private String genPath;
 
     /** 主键信息 */
-    private GenTableColumn pkColumn;
+    private GenColumn pkColumn;
 
     /** 子表信息 */
     private GenTable subTable;
 
     /** 表列信息 */
     @Valid
-    private List<GenTableColumn> columns;
+    private List<GenColumn> columns;
 
     /** 其它生成选项 */
     private String options;

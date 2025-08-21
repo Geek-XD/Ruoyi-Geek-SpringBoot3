@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.ruoyi.common.core.domain.BaseEntity;
-import com.ruoyi.generator.domain.GenJoinTable;
+import com.ruoyi.generator.domain.GenColumn;
+import com.ruoyi.generator.domain.GenJoin;
 import com.ruoyi.generator.domain.GenTable;
-import com.ruoyi.generator.domain.GenTableColumn;
 
 import jakarta.validation.Valid;
 import lombok.Data;
@@ -33,18 +33,19 @@ public class GenTableVo extends BaseEntity {
 
     /** 业务表的列 */
     @Valid
-    private List<GenTableColumn> columns;
+    private List<GenColumn> columns;
 
     /** 关联信息 */
     @Valid
-    private List<GenJoinTable> joinTablesMate;
+    private List<GenJoin> joinTablesMate;
 
     /** 参与关联的表 */
     private Collection<GenTable> joinTables;
 
     /** 参与关联的列 */
-    private List<GenTableColumn> joinColumns;
+    private List<GenColumn> joinColumns;
 
+    /** 获取所有表 */
     public List<GenTable> getAllGenTables() {
         List<GenTable> allGenTables = new ArrayList<>();
         allGenTables.add(table);
@@ -52,8 +53,9 @@ public class GenTableVo extends BaseEntity {
         return allGenTables;
     }
 
-    public List<GenTableColumn> getAllGenTableColumns() {
-        List<GenTableColumn> allGenTableColumns = new ArrayList<>();
+    /** 获取所有列 */
+    public List<GenColumn> getAllGenTableColumns() {
+        List<GenColumn> allGenTableColumns = new ArrayList<>();
         if (columns != null) {
             allGenTableColumns.addAll(columns);
         }
@@ -63,6 +65,7 @@ public class GenTableVo extends BaseEntity {
         return allGenTableColumns;
     }
 
+    /** 获取表映射 */
     public Map<Long, GenTable> getTableMap() {
         Map<Long, GenTable> tableMap = new HashMap<>();
         if (table != null) {
@@ -78,13 +81,14 @@ public class GenTableVo extends BaseEntity {
         return tableMap;
     }
 
+    /** 获取关联时表别名映射 */
     public Map<Long, String> getTableAliasMap() {
         Map<Long, String> tableMap = new HashMap<>();
         if (table != null) {
             tableMap.put(table.getTableId(), table.getTableAlias());
         }
         if (joinTablesMate != null) {
-            for (GenJoinTable genTable : joinTablesMate) {
+            for (GenJoin genTable : joinTablesMate) {
                 if (genTable != null) {
                     tableMap.put(genTable.getLeftTableId(), genTable.getLeftTableAlias());
                     tableMap.put(genTable.getRightTableId(), genTable.getRightTableAlias());
@@ -94,11 +98,12 @@ public class GenTableVo extends BaseEntity {
         return tableMap;
     }
 
-    public Map<Long, GenTableColumn> getColumnMap() {
-        Map<Long, GenTableColumn> columnMap = new HashMap<>();
+    /** 获取列映射 */
+    public Map<Long, GenColumn> getColumnMap() {
+        Map<Long, GenColumn> columnMap = new HashMap<>();
         List<GenTable> genTables = getAllGenTables();
         for (GenTable genTable : genTables) {
-            for (GenTableColumn genTableColumn : genTable.getColumns()) {
+            for (GenColumn genTableColumn : genTable.getColumns()) {
                 columnMap.put(genTableColumn.getColumnId(), genTableColumn);
             }
         }

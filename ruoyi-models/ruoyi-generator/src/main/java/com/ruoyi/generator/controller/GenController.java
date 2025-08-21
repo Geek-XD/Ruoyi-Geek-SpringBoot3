@@ -33,12 +33,12 @@ import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.sql.SqlUtil;
-import com.ruoyi.generator.domain.GenJoinTable;
+import com.ruoyi.generator.domain.GenColumn;
+import com.ruoyi.generator.domain.GenJoin;
 import com.ruoyi.generator.domain.GenTable;
-import com.ruoyi.generator.domain.GenTableColumn;
 import com.ruoyi.generator.domain.vo.GenTableVo;
-import com.ruoyi.generator.service.IGenJoinTableService;
-import com.ruoyi.generator.service.IGenTableColumnService;
+import com.ruoyi.generator.service.IGenJoinService;
+import com.ruoyi.generator.service.IGenColumnService;
 import com.ruoyi.generator.service.IGenTableService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,10 +55,10 @@ public class GenController extends BaseController {
     private IGenTableService genTableService;
 
     @Autowired
-    private IGenTableColumnService genTableColumnService;
+    private IGenColumnService genTableColumnService;
 
     @Autowired
-    private IGenJoinTableService genJoinTableService;
+    private IGenJoinService genJoinTableService;
 
     /**
      * 查询代码生成列表
@@ -81,9 +81,9 @@ public class GenController extends BaseController {
         GenTableVo genTableVo = new GenTableVo();
         genTableVo.setTable(table);
         genTableVo.setColumns(table.getColumns());
-        GenJoinTable genJoinTable = new GenJoinTable();
+        GenJoin genJoinTable = new GenJoin();
         genJoinTable.setTableId(tableId);
-        List<GenJoinTable> selectGenJoinTableList = genJoinTableService.selectGenJoinTableList(genJoinTable);
+        List<GenJoin> selectGenJoinTableList = genJoinTableService.selectGenJoinTableList(genJoinTable);
         genTableVo.setJoinTablesMate(selectGenJoinTableList);
         Map<Long, GenTable> joinTableMap = new HashMap<Long, GenTable>();
         joinTableMap.put(tableId, table);
@@ -117,7 +117,7 @@ public class GenController extends BaseController {
     @GetMapping(value = "/column/{tableId}")
     public TableDataInfo columnList(@PathVariable(name = "tableId") Long tableId) {
         TableDataInfo dataInfo = new TableDataInfo();
-        List<GenTableColumn> list = genTableColumnService.selectGenTableColumnListByTableId(tableId);
+        List<GenColumn> list = genTableColumnService.selectGenTableColumnListByTableId(tableId);
         dataInfo.setRows(list);
         dataInfo.setTotal(list.size());
         return dataInfo;
