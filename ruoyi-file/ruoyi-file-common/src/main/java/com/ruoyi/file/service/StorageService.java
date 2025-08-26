@@ -1,8 +1,11 @@
 package com.ruoyi.file.service;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.constant.CacheConstants;
@@ -14,6 +17,8 @@ import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.storage.StorageBucket;
 import com.ruoyi.file.storage.StorageEntity;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 存储操作业务
@@ -74,6 +79,37 @@ public class StorageService {
      */
     public InputStream downLoad(String filePath) throws Exception {
         return this.storageBucket.get(filePath).getInputStream();
+    }
+
+    /**
+     * 根据文件路径下载
+     *
+     * @param fileUrl      下载文件路径
+     * @param outputStream 需要输出到的输出流
+     * @return 文件名称
+     * @throws IOException
+     */
+    public void downLoad(String filePath, OutputStream outputStream) throws Exception {
+        InputStream inputStream = downLoad(filePath);
+        FileUtils.writeBytes(inputStream, outputStream);
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param filePath 文件路径
+     * @return 返回文件输入流
+     * @throws Exception 比如读写文件出错时
+     *
+     */
+    public void downLoad(String filePath, HttpServletResponse response) throws Exception {
+        StorageEntity fileEntity = this.storageBucket.get(filePath);
+        InputStream inputStream = fileEntity.getInputStream();
+        OutputStream outputStream = response.getOutputStream();
+        FileUtils.setAttachmentResponseHeader(response, FileUtils.getName(fileEntity.getFilePath()));
+        response.setContentLengthLong(fileEntity.getByteCount());
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        FileUtils.writeBytes(inputStream, outputStream);
     }
 
     /**

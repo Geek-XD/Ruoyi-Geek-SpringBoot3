@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
@@ -31,7 +30,6 @@ import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.file.domain.SysFileInfo;
 import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.service.ISysFileInfoService;
@@ -69,26 +67,17 @@ public class FileController {
             @PathVariable("clientName") String clientName,
             @RequestParam("file") MultipartFile file) {
         try {
-            String md5 = Md5Utils.getMd5(file);
-            String fileType = null;
-            if (file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")) {
-                fileType = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
-            }
             String filePath = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             StorageService storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
             String url = storageService.upload(filePath, file);
-            SysFileInfo info = new SysFileInfo();
-            info.setFileName(file.getOriginalFilename());
-            info.setFilePath(filePath);
-            info.setStorageType(storageType);
-            info.setFileType(fileType);
-            info.setFileSize(file.getSize());
-            info.setMd5(md5);
-            sysFileInfoService.insertSysFileInfo(info);
+            SysFileInfo sysFileInfo = sysFileInfoService.buildSysFileInfo(file);
+            sysFileInfo.setFilePath(filePath);
+            sysFileInfo.setStorageType(storageType);
+            sysFileInfoService.insertSysFileInfo(sysFileInfo);
             AjaxResult ajax = AjaxResult.success();
             ajax.put("url", url);
-            ajax.put("info", info);
-            ajax.put("fileName", info.getFileName());
+            ajax.put("info", sysFileInfo);
+            ajax.put("fileName", sysFileInfo.getFileName());
             return ajax;
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
@@ -106,11 +95,8 @@ public class FileController {
             HttpServletResponse response) throws Exception {
         try {
             StorageService storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
-            InputStream inputStream = storageService.downLoad(filePath);
             response.setContentType("application/octet-stream");
-            response.setHeader("Content-Disposition",
-                    "attachment; filename=" + URLEncoder.encode(filePath, "UTF-8"));
-            IOUtils.copy(inputStream, response.getOutputStream());
+            storageService.downLoad(filePath, response);
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("下载失败: " + e.getMessage());
