@@ -23,7 +23,7 @@ import com.github.pagehelper.autoconfigure.PageHelperStandardProperties;
 import com.ruoyi.common.service.mybatis.CreateSqlSessionFactory;
 import com.ruoyi.common.utils.MybatisUtils;
 import com.ruoyi.common.utils.StringUtils;
-
+import com.ruoyi.mybatisinterceptor.interceptor.mybatis.DataScopeInterceptor;
 /**
  * Mybatis Plus 配置
  *
@@ -90,7 +90,7 @@ public class MybatisPlusConfig {
                 sessionFactory.setConfigLocation(new DefaultResourceLoader().getResource(configLocation));
                 PageInterceptor interceptor = new PageInterceptor();
                 interceptor.setProperties(packageHelperStandardProperties.getProperties());
-                sessionFactory.addPlugins(interceptor);
+                sessionFactory.addPlugins(interceptor,new DataScopeInterceptor());
                 return sessionFactory.getObject();
             }
         };

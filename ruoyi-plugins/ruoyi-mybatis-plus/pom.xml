@@ -27,6 +27,11 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.ruoyi.geekxd</groupId>
+            <artifactId>ruoyi-mybatis-interceptor</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

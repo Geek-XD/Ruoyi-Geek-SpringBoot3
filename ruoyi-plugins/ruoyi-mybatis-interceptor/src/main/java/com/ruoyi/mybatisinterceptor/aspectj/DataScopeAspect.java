@@ -43,7 +43,7 @@ import net.sf.jsqlparser.statement.select.SelectItem;
  * @author ruoyi
  */
 @Aspect
-@Component
+@Component("mybatisInterceptorDataScopeAspect")
 public class DataScopeAspect {
     /**
      * 全部数据权限
