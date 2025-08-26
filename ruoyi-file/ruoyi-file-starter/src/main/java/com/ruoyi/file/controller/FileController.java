@@ -1,5 +1,6 @@
 package com.ruoyi.file.controller;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -34,8 +35,7 @@ import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.file.domain.SysFileInfo;
 import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.service.ISysFileInfoService;
-import com.ruoyi.file.storage.StorageBucket;
-import com.ruoyi.file.storage.StorageEntity;
+import com.ruoyi.file.service.StorageService;
 import com.ruoyi.file.utils.FileOperateUtils;
 import com.ruoyi.file.utils.StorageUtils;
 
@@ -75,9 +75,8 @@ public class FileController {
                 fileType = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
             }
             String filePath = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            StorageBucket storageBucket = StorageUtils.getStorageBucket(storageType, clientName);
-            storageBucket.put(filePath, file);
-            String url = storageBucket.getUrl(filePath).toString();
+            StorageService storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+            String url = storageService.upload(filePath, file);
             SysFileInfo info = new SysFileInfo();
             info.setFileName(file.getOriginalFilename());
             info.setFilePath(filePath);
@@ -106,12 +105,12 @@ public class FileController {
             @RequestParam("filePath") String filePath,
             HttpServletResponse response) throws Exception {
         try {
-            StorageBucket storageBucket = StorageUtils.getStorageBucket(storageType, clientName);
-            StorageEntity fileEntity = storageBucket.get(filePath);
+            StorageService storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+            InputStream inputStream = storageService.downLoad(filePath);
             response.setContentType("application/octet-stream");
             response.setHeader("Content-Disposition",
                     "attachment; filename=" + URLEncoder.encode(filePath, "UTF-8"));
-            IOUtils.copy(fileEntity.getInputStream(), response.getOutputStream());
+            IOUtils.copy(inputStream, response.getOutputStream());
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("下载失败: " + e.getMessage());
@@ -130,14 +129,14 @@ public class FileController {
             HttpServletResponse response) throws Exception {
         try {
             filePath = URLDecoder.decode(filePath, "UTF-8");
-            StorageBucket storageBucket = StorageUtils.getStorageBucket(storageType, clientName);
-            StorageEntity fileEntity = storageBucket.get(filePath);
+            StorageService storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+            InputStream inputStream = storageService.downLoad(filePath);
             String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(filePath));
             if (contentType == null) {
                 contentType = "application/octet-stream";
             }
             response.setContentType(contentType);
-            IOUtils.copy(fileEntity.getInputStream(), response.getOutputStream());
+            IOUtils.copy(inputStream, response.getOutputStream());
             response.flushBuffer();
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
@@ -174,8 +173,6 @@ public class FileController {
         }
     }
 
-    private static final long MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
-
     /**
      * 初始化分片上传
      */
@@ -187,12 +184,11 @@ public class FileController {
             if (fileName == null || fileName.isEmpty() || fileSize == null || fileSize <= 0) {
                 throw new ServiceException("文件名或文件大小不能为空");
             }
-            if (fileSize > MAX_FILE_SIZE)
-                throw new ServiceException("文件不能超过500MB");
             String currentDate = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
             String timestamp = String.valueOf(System.currentTimeMillis());
             String objectName = String.format("%s/%s/%s_%s", "/upload", currentDate, timestamp, fileName);
-            String uploadId = FileOperateUtils.initMultipartUpload(objectName);
+            StorageService fileService = new StorageService(StorageUtils.getPrimary());
+            String uploadId = fileService.initMultipartUpload(objectName, fileSize);
             return AjaxResult.success(Map.of(
                     "uploadId", uploadId,
                     "filePath", objectName,
@@ -214,7 +210,8 @@ public class FileController {
         try {
             if (chunk == null || chunk.isEmpty())
                 throw new ServiceException("分片数据不能为空");
-            String etag = FileOperateUtils.uploadPart(filePath, uploadId, chunkIndex + 1, chunk.getSize(),
+            StorageService fileService = new StorageService(StorageUtils.getPrimary());
+            String etag = fileService.uploadPart(filePath, uploadId, chunkIndex + 1, chunk.getSize(),
                     chunk.getInputStream());
             if (etag == null || etag.isEmpty())
                 throw new ServiceException("上传分片失败：未获取到ETag");
@@ -254,7 +251,8 @@ public class FileController {
             }
             validParts.sort(Comparator.comparingInt(p -> p.getPartNumber()));
             // 完成分片上传并合并文件
-            String finalPath = FileOperateUtils.completeMultipartUpload(filePath, uploadId, validParts);
+            StorageService fileService = new StorageService(StorageUtils.getPrimary());
+            String finalPath = fileService.completeMultipartUpload(filePath, uploadId, validParts);
             if (finalPath == null || finalPath.isEmpty()) {
                 throw new ServiceException("合并分片失败：未获取到最终文件路径");
             }
