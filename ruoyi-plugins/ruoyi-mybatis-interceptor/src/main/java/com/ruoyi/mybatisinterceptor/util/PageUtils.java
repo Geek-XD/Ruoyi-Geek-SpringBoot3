@@ -2,23 +2,17 @@ package com.ruoyi.mybatisinterceptor.util;
 
 import java.util.List;
 
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.mybatisinterceptor.context.page.PageContextHolder;
-import com.ruoyi.mybatisinterceptor.context.page.model.RuoyiTableData;
 import com.ruoyi.mybatisinterceptor.context.page.model.TableInfo;
 
 public class PageUtils {
-    public static <E> RuoyiTableData toTableInfo(List<E> list) {
+    public static <E> TableDataInfo toTableInfo(List<E> list) {
         if (list instanceof TableInfo) {
             TableInfo<E> tableInfo = (TableInfo<E>) list;
-            RuoyiTableData ruoyiTableData = new RuoyiTableData();
-            ruoyiTableData.setData(list);
-            ruoyiTableData.setTotal(tableInfo.getTotal());
-            return ruoyiTableData;
+            return new TableDataInfo(list, tableInfo.getTotal().intValue());
         }
-        RuoyiTableData ruoyiTableData = new RuoyiTableData();
-        ruoyiTableData.setData(list);
-        ruoyiTableData.setTotal(-1L);
-        return ruoyiTableData;
+        return new TableDataInfo(list, -1);
 
     }
 
