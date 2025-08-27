@@ -119,11 +119,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="htmlType != null">html_type = #{htmlType},</if>
             <if test="dictType != null">dict_type = #{dictType},</if>
             <if test="sort != null">sort = #{sort},</if>
-            <if test="subColumnTableName != null and subColumnTableName != ''">sub_column_table_name = #{subColumnTableName},</if>
-            <if test="subColumnFkName != null and subColumnFkName != ''">sub_column_fk_name = #{subColumnFkName},</if>
-            <if test="subColumnName != null and subColumnName != ''">sub_column_name = #{subColumnName},</if>
-            <if test="subColumnJavaField != null and subColumnJavaField != ''">sub_column_java_field = #{subColumnJavaField},</if>
-            <if test="subColumnJavaType != null and subColumnJavaType != ''">sub_column_java_type = #{subColumnJavaType},</if>
+            sub_column_table_name = #{subColumnTableName},
+            sub_column_java_type = #{subColumnJavaType},
+            sub_column_fk_name = #{subColumnFkName},
+            sub_column_name = #{subColumnName},
+            sub_column_java_field = #{subColumnJavaField},
+            sub_column_java_type = #{subColumnJavaType},
             <if test="updateBy != null">update_by = #{updateBy},</if>
             update_time = sysdate()
         </set>
