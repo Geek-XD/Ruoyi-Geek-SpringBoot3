@@ -6,7 +6,7 @@ import java.util.List;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import com.ruoyi.common.annotation.DataScope;
@@ -27,7 +27,7 @@ import com.ruoyi.framework.security.context.PermissionContextHolder;
  */
 @Aspect
 @Component
-@ConditionalOnMissingBean(name = "mybatisInterceptorDataScopeAspect")
+@ConditionalOnProperty(prefix = "datascope", name = "type", havingValue = "default", matchIfMissing = true)
 public class DataScopeAspect {
     /**
      * 全部数据权限

@@ -8,6 +8,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import com.ruoyi.common.annotation.DataScope;
@@ -43,7 +44,8 @@ import net.sf.jsqlparser.statement.select.SelectItem;
  * @author ruoyi
  */
 @Aspect
-@Component("mybatisInterceptorDataScopeAspect")
+@Component
+@ConditionalOnProperty(prefix = "datascope", name = "type", havingValue = "plus", matchIfMissing = false)
 public class DataScopeAspect {
     /**
      * 全部数据权限
@@ -174,14 +176,15 @@ public class DataScopeAspect {
                     if (SqlContextHolder.getData(ContextKey.DATA_SCOPE, "userAlias", String.class) == null) {
                         SqlContextHolder.addData(ContextKey.DATA_SCOPE, "userAlias", userAlias);
                     }
-                    orExpressions.add(new EqualsTo(new Column(userAlias + ".user_id"), new LongValue(user.getUserId())));
+                    orExpressions
+                            .add(new EqualsTo(new Column(userAlias + ".user_id"), new LongValue(user.getUserId())));
                 } else {
                     if (SqlContextHolder.getData(ContextKey.DATA_SCOPE, "deptAlias", String.class) == null) {
                         SqlContextHolder.addData(ContextKey.DATA_SCOPE, "deptAlias", deptAlias);
                     }
-                    Expression expression=new AndExpression(
-                        new EqualsTo(new Column(deptAlias + ".dept_id"), new LongValue(user.getDeptId())),
-                        new NotEqualsTo(new Column(deptAlias + ".dept_id"), new LongValue(user.getDeptId())));
+                    Expression expression = new AndExpression(
+                            new EqualsTo(new Column(deptAlias + ".dept_id"), new LongValue(user.getDeptId())),
+                            new NotEqualsTo(new Column(deptAlias + ".dept_id"), new LongValue(user.getDeptId())));
                     orExpressions.add(expression);
                 }
             }
@@ -191,7 +194,8 @@ public class DataScopeAspect {
         if (!orExpressions.isEmpty()) {
             Expression finalExpression = orExpressions.stream().reduce(OrExpression::new).orElse(null);
             if (finalExpression != null) {
-                SqlContextHolder.addData(ContextKey.DATA_SCOPE, "expression",new ParenthesedExpressionList<>(finalExpression));
+                SqlContextHolder.addData(ContextKey.DATA_SCOPE, "expression",
+                        new ParenthesedExpressionList<>(finalExpression));
             }
         }
     }
