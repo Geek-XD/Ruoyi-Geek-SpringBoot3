@@ -74,9 +74,13 @@ public class PayController extends BaseController {
             @Parameter(name = "channel", description = "支付方式", required = true),
             @Parameter(name = "type", description = "通知类型", required = false)
     })
-    @RequestMapping({ "/{channel}/notify", "/{channel}/notify/{orderNumber}",
-            "/{channel}/notify/{orderNumber}/{type}" })
-    public String notify(@PathVariable String channel,
+    @RequestMapping({
+            "/{channel}/notify",
+            "/{channel}/notify/{orderNumber}",
+            "/{channel}/notify/{orderNumber}/{type}"
+    })
+    public String notify(
+            @PathVariable String channel,
             @PathVariable(name = "orderNumber", required = false) String orderNumber,
             @PathVariable(name = "type", required = false) String type,
             HttpServletRequest request,

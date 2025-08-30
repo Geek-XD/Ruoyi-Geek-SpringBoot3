@@ -136,9 +136,10 @@ public class FileController {
     @Operation(summary = "本地资源通用下载")
     @GetMapping("/resource")
     @Anonymous
-    public void resourceDownload(@RequestParam String filePath,
-            HttpServletRequest request, HttpServletResponse response)
-            throws Exception {
+    public void resourceDownload(
+            @RequestParam String filePath,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
         OutputStream outputStream = response.getOutputStream();
         try {
             if (!FileUtils.checkAllowDownload(filePath)) {
