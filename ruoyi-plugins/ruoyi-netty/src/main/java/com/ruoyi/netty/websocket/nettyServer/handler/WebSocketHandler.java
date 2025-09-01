@@ -1,12 +1,22 @@
 package com.ruoyi.netty.websocket.nettyServer.handler;
 
+import java.lang.reflect.Constructor;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.netty.websocket.annotations.NettyWebSocketEndpoint;
 import com.ruoyi.netty.websocket.nettyServer.NettyWebSocketEndpointHandler;
 import com.ruoyi.netty.websocket.utils.CommonUtil;
+
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
@@ -20,11 +30,6 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import jakarta.annotation.PostConstruct;
-
-import java.lang.reflect.Constructor;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
 
 @Component
 public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
@@ -46,7 +51,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
          if (annotation == null || StringUtils.isEmpty(annotation.path())) {
             throw new RuntimeException("未配置路径的 netty websocket endpoint ");
          }
-         // uriHandlerMap.put(uri.getPath(), handler);
          PathMatchModel pathMachModel = parseHandler(annotation.path(), handlerClass);
          uriHandlerMapper.put(pathMachModel.path, pathMachModel);
       }
@@ -69,7 +73,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
       if (handler != null) {
          handler.onClose(ctx);
       }
-
       channelHandlerMap.remove(ctx.channel().id());
       channelGroup.remove(ctx.channel());
    }
@@ -100,15 +103,14 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
             ctx.close().addListener(ChannelFutureListener.CLOSE);
             return;
          }
-         NettyWebSocketEndpointHandler newInstance = (NettyWebSocketEndpointHandler) mathPathMachModel.handlerConstructor
-               .newInstance();
+         Constructor<?> constructor = mathPathMachModel.handlerConstructor;
+         NettyWebSocketEndpointHandler newInstance = (NettyWebSocketEndpointHandler) constructor.newInstance();
          if (!(mathPathMachModel.pathParams == null || mathPathMachModel.pathParams.isEmpty())) {
             newInstance.setPathParam(
                   CommonUtil.parsePathParam(uri.getPath(), mathPathMachModel.pathParams, mathPathMachModel.path));
             super.channelRead(ctx, msg);
          }
          newInstance.setUrlParam(CommonUtil.parseQueryParameters(uri.getQuery()));
-
          channelHandlerMap.put(ctx.channel().id(), newInstance);
          newInstance.onOpen(ctx, fullHttpRequest);
       } else if (msg instanceof TextWebSocketFrame) {
