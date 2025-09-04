@@ -24,6 +24,7 @@ import com.ruoyi.common.service.mybatis.CreateSqlSessionFactory;
 import com.ruoyi.common.utils.MybatisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.mybatisinterceptor.interceptor.mybatis.DataScopeInterceptor;
+import com.ruoyi.framework.mybatis.CustomDatabaseIdProvider;
 /**
  * Mybatis Plus 配置
  *
@@ -84,6 +85,8 @@ public class MybatisPlusConfig {
                 final MybatisSqlSessionFactoryBean sessionFactory = new MybatisSqlSessionFactoryBean();
                 sessionFactory.setPlugins(new Interceptor[] { mybatisPlusInterceptor() });
                 sessionFactory.setDataSource(dataSource);
+                // 设置自定义 DatabaseIdProvider：区分 openGauss 与 PostgreSQL
+                sessionFactory.setDatabaseIdProvider(new CustomDatabaseIdProvider());
                 sessionFactory.setTypeAliasesPackage(typeAliasesPackage);
                 sessionFactory.setMapperLocations(
                         MybatisUtils.resolveMapperLocations(StringUtils.split(mapperLocations, ",")));

@@ -75,11 +75,39 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<select id="selectChildrenDeptById" parameterType="Long" resultMap="SysDeptResult">
-		select * from sys_dept where find_in_set(#{deptId}, ancestors)
+		select * from sys_dept where 
+		<choose>
+			<!-- PostgreSQL：使用 array_position 判断数组包含 -->
+			<when test="_databaseId == 'postgresql'">
+				array_position(string_to_array(ancestors, ','), CAST(#{deptId} AS TEXT)) IS NOT NULL
+			</when>
+			<!-- OpenGauss：使用 ANY 替代 array_position（兼容文本数组） -->
+			<when test="_databaseId == 'opengauss'">
+				CAST(#{deptId} AS TEXT) = ANY(string_to_array(ancestors, ','))
+			</when>
+			<!-- 其他数据库（如 MySQL）：使用 find_in_set 判断字符串包含 -->
+			<otherwise>
+				find_in_set(#{deptId}, ancestors)
+			</otherwise>
+		</choose>
 	</select>
 	
 	<select id="selectNormalChildrenDeptById" parameterType="Long" resultType="int">
-		select count(*) from sys_dept where status = 0 and del_flag = '0' and find_in_set(#{deptId}, ancestors)
+		select count(*) from sys_dept where status = 0 and del_flag = '0' and
+		<choose>
+			<!-- PostgreSQL：保留 array_position 逻辑 -->
+			<when test="_databaseId == 'postgresql'">
+				array_position(string_to_array(ancestors, ','), CAST(#{deptId} AS TEXT)) IS NOT NULL
+			</when>
+			<!-- OpenGauss：用 ANY 实现等效逻辑 -->
+			<when test="_databaseId == 'opengauss'">
+				CAST(#{deptId} AS TEXT) = ANY(string_to_array(ancestors, ','))
+			</when>
+			<!-- 其他数据库（如 MySQL）：用 find_in_set 匹配 -->
+			<otherwise>
+				find_in_set(#{deptId}, ancestors)
+			</otherwise>
+		</choose>
 	</select>
 	
 	<select id="checkDeptNameUnique" resultMap="SysDeptResult">
@@ -111,7 +139,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="email != null and email != ''">#{email},</if>
  			<if test="status != null">#{status},</if>
  			<if test="createBy != null and createBy != ''">#{createBy},</if>
- 			sysdate()
+ 			<choose>
+                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                    CURRENT_TIMESTAMP
+                </when>
+                <otherwise>
+                    sysdate()
+                </otherwise>
+            </choose>
  		)
 	</insert>
 	
@@ -127,7 +162,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="email != null">email = #{email},</if>
  			<if test="status != null and status != ''">status = #{status},</if>
  			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
- 			update_time = sysdate()
+ 			update_time = <choose>
+                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                    CURRENT_TIMESTAMP
+                </when>
+                <otherwise>
+                    sysdate()
+                </otherwise>
+            </choose>
  		</set>
  		where dept_id = #{deptId}
 	</update>

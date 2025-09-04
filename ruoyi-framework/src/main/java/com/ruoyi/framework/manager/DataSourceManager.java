@@ -1,13 +1,16 @@
 package com.ruoyi.framework.manager;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.CommonDataSource;
 import javax.sql.DataSource;
@@ -27,11 +30,14 @@ import com.ruoyi.common.service.datasource.AfterCreateDataSource;
 import com.ruoyi.framework.config.DruidConfig;
 import com.ruoyi.framework.config.properties.DynamicDataSourceProperties;
 import com.ruoyi.framework.datasource.DynamicDataSource;
+import com.ruoyi.framework.datasource.DynamicDataSourceContextHolder;
 
 @Configuration
 public class DataSourceManager implements InitializingBean {
     protected final Logger logger = LoggerFactory.getLogger(DataSourceManager.class);
     private Map<String, DataSource> targetDataSources = new HashMap<>();
+    private final Map<String, String> dsDatabaseId = new ConcurrentHashMap<>();
+    private final Map<DataSource, String> dataSourceKeyIndex = new ConcurrentHashMap<>();
 
     @Value("${spring.datasource.dynamic.xa}")
     private boolean xa;
@@ -56,17 +62,74 @@ public class DataSourceManager implements InitializingBean {
         return new DynamicDataSource(targetDataSources.get(dataSourceProperties.getPrimary()), objectMap);
     }
 
-    public void validateDataSource(DataSource dataSource) {
+    // 仅启动期调用：基于 JDBC 元数据判定 mybatis databaseId（含 openGauss 区分），与 MyBatis 机制兼容
+    private String detectDatabaseId(DataSource dataSource) {
         try (Connection conn = dataSource.getConnection()) {
-            String validationQuery = "SELECT 1";
-            try (Statement stmt = conn.createStatement();
-                    ResultSet rs = stmt.executeQuery(validationQuery)) {
-                if (!(rs.next() && rs.getInt(1) == 1)) {
-                    throw new RuntimeException("数据源连接验证失败：查询结果不正确");
-                }
+            DatabaseMetaData md = conn.getMetaData();
+            String productName = safeLower(md.getDatabaseProductName());
+            String driverName = safeLower(md.getDriverName());
+            String url = safeLower(null);
+            try {
+                url = safeLower(md.getURL());
+            } catch (Exception ignore) {
             }
+
+            // 优先尝试：通过 select version() 识别并顺带验证数据源
+            try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery("select version()")) {
+                if (rs.next()) {
+                    String v = safeLower(rs.getString(1));
+                    if (v != null) {
+                        if (v.contains("opengauss") || v.contains("gauss")) {
+                            return "opengauss";
+                        }
+                        if (v.contains("postgresql") || v.contains("postgres")) {
+                            return "postgresql";
+                        }
+                        if (v.contains("mysql") || v.contains("mariadb")) {
+                            return "mysql";
+                        }
+                        if (v.contains("oracle")) {
+                            return "oracle";
+                        }
+                        if (v.contains("sql server") || v.contains("microsoft")) {
+                            return "sqlserver";
+                        }
+                        if (v.contains("h2")) {
+                            return "h2";
+                        }
+                    }
+                }
+            } catch (Exception ignore) {
+            }
+            // 先看 URL/驱动是否明确标识 openGauss/Gauss
+            if ((url != null && url.startsWith("jdbc:opengauss:"))
+                    || (driverName != null && (driverName.contains("opengauss") || driverName.contains("gauss")))
+                    || (productName != null && (productName.contains("opengauss") || productName.contains("gauss")))) {
+                return "opengauss";
+            }
+
+            if (productName != null && productName.contains("postgres")) {
+                // 区分 openGauss 与 PostgreSQL
+                String ver = safeLower(md.getDatabaseProductVersion());
+                if ((ver != null && (ver.contains("opengauss") || ver.contains("gauss")))) {
+                    return "opengauss";
+                }
+                return "postgresql";
+            }
+            if (productName != null) {
+                if (productName.contains("mysql"))
+                    return "mysql";
+                if (productName.contains("oracle"))
+                    return "oracle";
+                if (productName.contains("sql server") || productName.contains("microsoft sql"))
+                    return "sqlserver";
+                if (productName.contains("h2"))
+                    return "h2";
+            }
+            return productName != null ? productName : null;
         } catch (SQLException e) {
-            throw new RuntimeException("数据源连接验证失败", e);
+            logger.warn("databaseId 判定失败，返回 null", e);
+            return null;
         }
     }
 
@@ -80,10 +143,13 @@ public class DataSourceManager implements InitializingBean {
             }
             DataSource dataSource = (DataSource) commonDataSource;
             logger.info("数据源：{} 校验中.......", name);
-            // 计时
             long start = System.currentTimeMillis();
-            validateDataSource(dataSource);
-            logger.info("数据源：{} 链接成功，耗时：{}ms", name, System.currentTimeMillis() - start);
+            String databaseId = detectDatabaseId(dataSource);
+            if (databaseId != null) {
+                dsDatabaseId.put(name, databaseId);
+            }
+            logger.info("数据源：{} 链接成功，耗时：{}ms，databaseId：{}", name, System.currentTimeMillis() - start, databaseId);
+
             putDataSource(name, dataSource);
         });
     }
@@ -119,5 +185,46 @@ public class DataSourceManager implements InitializingBean {
 
     public void putDataSource(String name, DataSource dataSource) {
         targetDataSources.put(name, dataSource);
+        dataSourceKeyIndex.put(dataSource, name);
+        dsDatabaseId.computeIfAbsent(name, k -> detectDatabaseId(dataSource));
     }
+
+    // 提供给 Provider/业务：根据 key 或当前线程获取已缓存的 databaseId
+    public String getDatabaseId(String dsKey) {
+        String key = (dsKey == null || dsKey.isEmpty()) ? dataSourceProperties.getPrimary() : dsKey;
+        return dsDatabaseId.get(key);
+    }
+
+    public String getCurrentDatabaseId() {
+        return getDatabaseId(DynamicDataSourceContextHolder.getDataSourceType());
+    }
+
+    // 提供 DataSource -> key 的反查，供 Provider 复用缓存
+    public String findKeyByDataSource(DataSource dataSource) {
+        return dataSourceKeyIndex.get(dataSource);
+    }
+
+    // 提供复用：按 DataSource 计算并（在可确定 key 时）写入缓存
+    public String computeDatabaseIdForDataSource(DataSource dataSource) {
+        String key = findKeyByDataSource(dataSource);
+        String id = detectDatabaseId(dataSource);
+        if (key != null && id != null) {
+            dsDatabaseId.putIfAbsent(key, id);
+        }
+        return id;
+    }
+
+    // 提供复用：按指定 key 计算并写入缓存
+    public String computeAndCacheDatabaseId(String dsKey, DataSource dataSource) {
+        String id = detectDatabaseId(dataSource);
+        if (dsKey != null && id != null) {
+            dsDatabaseId.putIfAbsent(dsKey, id);
+        }
+        return id;
+    }
+
+    private static String safeLower(String s) {
+        return s == null ? null : s.toLowerCase(Locale.ROOT);
+    }
+
 }

@@ -5,12 +5,30 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.online.mapper.OnlineDbMapper">
     <select id="selectDbTableList" resultType="java.util.Map">
         select * from information_schema.tables
-		where table_schema = (select database())
+		where table_schema = (
+            <choose>
+                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                    select current_catalog FROM information_schema.information_schema_catalog_name
+                </when>
+                <otherwise>
+                    select database()
+                </otherwise>
+            </choose>
+        )
 	</select>
    
     <select id="selectDbColumnsListByTableName" parameterType="String" resultType="java.util.Map">
         select * from information_schema.columns 
-        where  table_schema = (select database())
+        where  table_schema = (
+            <choose>
+                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                    select current_catalog FROM information_schema.information_schema_catalog_name
+                </when>
+                <otherwise>
+                    select database()
+                </otherwise>
+            </choose>
+        )
         and table_name = #{tableName};
 	</select>
 </mapper>

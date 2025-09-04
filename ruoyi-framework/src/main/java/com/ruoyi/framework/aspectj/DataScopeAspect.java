@@ -6,6 +6,7 @@ import java.util.List;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.manager.DataSourceManager;
 import com.ruoyi.framework.security.context.PermissionContextHolder;
 
 /**
@@ -29,6 +31,9 @@ import com.ruoyi.framework.security.context.PermissionContextHolder;
 @Component
 @ConditionalOnProperty(prefix = "datascope", name = "type", havingValue = "default", matchIfMissing = true)
 public class DataScopeAspect {
+
+    @Autowired
+    DataSourceManager dataSourceManager;
     /**
      * 全部数据权限
      */
@@ -89,7 +94,7 @@ public class DataScopeAspect {
      * @param userAlias  用户别名
      * @param permission 权限字符
      */
-    public static void dataScopeFilter(JoinPoint joinPoint, SysUser user, String deptAlias, String userAlias,
+    public void dataScopeFilter(JoinPoint joinPoint, SysUser user, String deptAlias, String userAlias,
             String permission) {
         StringBuilder sqlString = new StringBuilder();
         List<String> conditions = new ArrayList<String>();
@@ -129,9 +134,20 @@ public class DataScopeAspect {
             } else if (DATA_SCOPE_DEPT.equals(dataScope)) {
                 sqlString.append(StringUtils.format(" OR {}.dept_id = {} ", deptAlias, user.getDeptId()));
             } else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope)) {
-                sqlString.append(StringUtils.format(
-                        " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
-                        deptAlias, user.getDeptId(), user.getDeptId()));
+                String databaseId = dataSourceManager.getCurrentDatabaseId();
+                if (databaseId.equals("postgresql")) {
+                    sqlString.append(StringUtils.format(
+                            " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or array_position(string_to_array(ancestors , ','), CAST( {}  AS TEXT)) IS NOT NULL )",
+                            deptAlias, user.getDeptId(), user.getDeptId()));
+                } else if (databaseId.equals("opengauss")) {
+                    sqlString.append(StringUtils.format(
+                            " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or CAST( {}  AS TEXT) = ANY(string_to_array(ancestors , ',')) )",
+                            deptAlias, user.getDeptId(), user.getDeptId()));
+                } else {
+                    sqlString.append(StringUtils.format(
+                            " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
+                            deptAlias, user.getDeptId(), user.getDeptId()));
+                }
             } else if (DATA_SCOPE_SELF.equals(dataScope)) {
                 if (StringUtils.isNotBlank(userAlias)) {
                     sqlString.append(StringUtils.format(" OR {}.user_id = {} ", userAlias, user.getUserId()));

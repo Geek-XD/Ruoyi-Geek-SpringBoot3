@@ -4,7 +4,7 @@
 DROP TABLE IF EXISTS oauth_user CASCADE;
 
 CREATE TABLE oauth_user (
-    id SERIAL NOT NULL PRIMARY KEY,
+    id bigserial NOT NULL PRIMARY KEY,
     uuid VARCHAR(255) NOT NULL,
     user_id BIGINT NOT NULL,
     source VARCHAR(255) NOT NULL,

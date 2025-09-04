@@ -19,6 +19,7 @@ import com.github.pagehelper.autoconfigure.PageHelperStandardProperties;
 import com.ruoyi.common.service.mybatis.CreateSqlSessionFactory;
 import com.ruoyi.common.utils.MybatisUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.mybatis.CustomDatabaseIdProvider;
 
 /**
  * Mybatis支持*匹配扫描包
@@ -43,6 +44,7 @@ public class MyBatisConfig {
                 
                 final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
                 sessionFactory.setDataSource(dataSource);
+                sessionFactory.setDatabaseIdProvider(new CustomDatabaseIdProvider());
                 sessionFactory.setTypeAliasesPackage(typeAliasesPackage);
                 sessionFactory.setMapperLocations(
                         MybatisUtils.resolveMapperLocations(StringUtils.split(mapperLocations, ",")));

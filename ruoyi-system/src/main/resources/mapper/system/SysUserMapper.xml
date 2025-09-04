@@ -80,7 +80,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			AND date_format(u.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
 		</if>
 		<if test="deptId != null and deptId != 0">
-			AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))
+			AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE <choose>
+				<!-- PostgreSQL使用array_position判断数组包含 -->
+				<when test="_databaseId == 'postgresql'">
+					array_position(string_to_array(ancestors, ','), CAST(#{deptId} AS TEXT)) IS NOT NULL
+				</when>
+				<!-- OpenGauss使用ANY替代array_position -->
+				<when test="_databaseId == 'opengauss'">
+					CAST(#{deptId} AS TEXT) = ANY(string_to_array(ancestors, ','))
+				</when>
+				<!-- MySQL等其他数据库使用find_in_set -->
+				<otherwise>
+					find_in_set(#{deptId}, ancestors)
+				</otherwise>
+			</choose>))
 		</if>
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
@@ -181,7 +194,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="status != null and status != ''">#{status},</if>
 		<if test="createBy != null and createBy != ''">#{createBy},</if>
 		<if test="remark != null and remark != ''">#{remark},</if>
- 			sysdate()
+		<choose>
+			<when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+				CURRENT_TIMESTAMP
+			</when>
+			<otherwise>
+				sysdate()
+			</otherwise>
+		</choose>
  		)
 	</insert>
 
@@ -201,7 +221,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="loginDate != null">login_date = #{loginDate},</if>
 			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
 			<if test="remark != null">remark = #{remark},</if>
- 			update_time = sysdate()
+ 			update_time = <choose>
+                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                    CURRENT_TIMESTAMP
+                </when>
+                <otherwise>
+                    sysdate()
+                </otherwise>
+            </choose>
 		</set>
  		where user_id = #{userId}
 	</update>
@@ -215,7 +242,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</update>
 
 	<update id="resetUserPwd" parameterType="SysUser">
- 		update sys_user set pwd_update_date = sysdate(), password = #{password} where user_name = #{userName}
+ 		update sys_user set pwd_update_date = <choose>
+                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                    CURRENT_TIMESTAMP
+                </when>
+                <otherwise>
+                    sysdate()
+                </otherwise>
+            </choose>, password = #{password} where user_name = #{userName}
 	</update>
 
 	<delete id="deleteUserById" parameterType="Long">

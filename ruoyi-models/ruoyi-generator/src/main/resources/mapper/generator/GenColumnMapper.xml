@@ -46,7 +46,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectDbTableColumnsByName" parameterType="String" resultMap="GenTableColumnResult">
 		select column_name, (case when (is_nullable = 'no' <![CDATA[ && ]]> column_key != 'PRI') then '1' else '0' end) as is_required, (case when column_key = 'PRI' then '1' else '0' end) as is_pk, ordinal_position as sort, column_comment, (case when extra = 'auto_increment' then '1' else '0' end) as is_increment, column_type
-		from information_schema.columns where table_schema = (select database()) and table_name = (#{tableName})
+		from information_schema.columns where table_schema = (
+            <choose>
+                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                    SELECT current_catalog FROM information_schema.information_schema_catalog_name
+                </when>
+                <otherwise>
+                    select database()
+                </otherwise>
+            </choose>
+        ) and table_name = (#{tableName})
 		order by ordinal_position
 	</select>
     
@@ -100,7 +109,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="subColumnJavaField != null and subColumnJavaField != ''">#{subColumnJavaField},</if>
             <if test="subColumnJavaType != null and subColumnJavaType != ''">#{subColumnJavaType},</if>
 			<if test="createBy != null and createBy != ''">#{createBy},</if>
-			sysdate()
+			<choose>
+                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                    CURRENT_TIMESTAMP
+                </when>
+                <otherwise>
+                    sysdate()
+                </otherwise>
+            </choose>
          )
     </insert>
 	 
@@ -125,7 +141,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             sub_column_name = #{subColumnName},
             sub_column_java_field = #{subColumnJavaField},
             <if test="updateBy != null">update_by = #{updateBy},</if>
-            update_time = sysdate()
+            update_time = <choose>
+                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                    CURRENT_TIMESTAMP
+                </when>
+                <otherwise>
+                    sysdate()
+                </otherwise>
+            </choose>
         </set>
         where column_id = #{columnId}
     </update>

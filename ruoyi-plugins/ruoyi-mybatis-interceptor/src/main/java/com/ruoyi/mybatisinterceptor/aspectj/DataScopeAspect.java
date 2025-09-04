@@ -156,7 +156,7 @@ public class DataScopeAspect {
                 orExpressions.add(new EqualsTo(new Column(deptAlias + ".dept_id"), new LongValue(user.getDeptId())));
             } else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope)) {
                 // 部门及以下权限: d.dept_id IN (SELECT dept_id FROM sys_dept WHERE dept_id = ? OR
-                // find_in_set(?, ancestors))
+                // array_position(string_to_array(ancestors, ','), CAST(? AS TEXT)) IS NOT NULL)
                 if (SqlContextHolder.getData(ContextKey.DATA_SCOPE, "deptAlias", String.class) == null) {
                     SqlContextHolder.addData(ContextKey.DATA_SCOPE, "deptAlias", deptAlias);
                 }

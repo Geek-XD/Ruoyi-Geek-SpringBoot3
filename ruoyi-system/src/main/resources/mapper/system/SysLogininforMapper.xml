@@ -18,7 +18,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<insert id="insertLogininfor" parameterType="SysLogininfor">
 		insert into sys_logininfor (user_name, status, ipaddr, login_location, browser, os, msg, login_time)
-		values (#{userName}, #{status}, #{ipaddr}, #{loginLocation}, #{browser}, #{os}, #{msg}, sysdate())
+		values (#{userName}, #{status}, #{ipaddr}, #{loginLocation}, #{browser}, #{os}, #{msg}, <choose>
+                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                    CURRENT_TIMESTAMP
+                </when>
+                <otherwise>
+                    sysdate()
+                </otherwise>
+            </choose>)
 	</insert>
 	
 	<select id="selectLogininforList" parameterType="SysLogininfor" resultMap="SysLogininforResult">
