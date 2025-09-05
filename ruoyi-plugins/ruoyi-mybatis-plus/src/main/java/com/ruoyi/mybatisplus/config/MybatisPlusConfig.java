@@ -26,7 +26,7 @@ import com.ruoyi.common.utils.MybatisUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.manager.DataSourceManager;
 import com.ruoyi.framework.mybatis.CustomDatabaseIdProvider;
-import com.ruoyi.mybatisinterceptor.interceptor.mybatis.DataScopeInterceptor;
+import com.ruoyi.mybatisinterceptor.interceptor.DataScopeInterceptor;
 /**
  * Mybatis Plus 配置
  *

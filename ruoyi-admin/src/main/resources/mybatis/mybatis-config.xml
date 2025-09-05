@@ -20,10 +20,10 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	</settings>
 
     <!-- <plugins>
-        <plugin interceptor="com.ruoyi.mybatisinterceptor.interceptor.mybatis.MybatisInterceptor"></plugin>
+        <plugin interceptor="com.ruoyi.mybatisinterceptor.interceptor.PageInercetor"></plugin>
     </plugins> -->
     <!-- <plugins>
-        <plugin interceptor="com.ruoyi.mybatisinterceptor.interceptor.mybatis.DataScopeInterceptor"></plugin>
+        <plugin interceptor="com.ruoyi.mybatisinterceptor.interceptor.DataScopeInterceptor"></plugin>
     </plugins> -->
 
 </configuration>

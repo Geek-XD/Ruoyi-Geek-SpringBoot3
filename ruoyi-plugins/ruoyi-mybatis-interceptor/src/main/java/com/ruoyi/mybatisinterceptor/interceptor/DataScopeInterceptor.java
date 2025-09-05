@@ -1,4 +1,4 @@
-package com.ruoyi.mybatisinterceptor.interceptor.mybatis;
+package com.ruoyi.mybatisinterceptor.interceptor;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -21,7 +21,6 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.springframework.stereotype.Component;
 
 import com.ruoyi.mybatisinterceptor.context.sqlContext.SqlContextHolder;
 import com.ruoyi.mybatisinterceptor.enums.ContextKey;
@@ -40,7 +39,6 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
 @Slf4j
-@Component
 @Intercepts({
         @Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class }),
         @Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class,
