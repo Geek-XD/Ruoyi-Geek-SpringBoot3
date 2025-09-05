@@ -44,8 +44,7 @@ public abstract class MybatisInterceptor implements Interceptor {
    }
 
    public abstract Object runPreHandlers(Executor executor, MappedStatement ms, Object parameterObject,
-         RowBounds rowBounds,
-         ResultHandler<?> resultHandler, CacheKey cacheKey, BoundSql boundSql) throws Throwable;
+         RowBounds rowBounds, ResultHandler<?> resultHandler, CacheKey cacheKey, BoundSql boundSql) throws Throwable;
 
    public abstract Object applyAfterHandlers(Object result) throws Throwable;
 

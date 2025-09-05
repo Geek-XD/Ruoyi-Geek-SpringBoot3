@@ -41,10 +41,8 @@ import net.sf.jsqlparser.statement.select.Select;
 @Intercepts({
         @Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class,
                 RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class }),
-        @Signature(type = Executor.class, method = "query", args = {
-                MappedStatement.class, Object.class, RowBounds.class,
-                ResultHandler.class })
-
+        @Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class,
+                RowBounds.class, ResultHandler.class })
 })
 public class PageInercetor extends MybatisInterceptor {
 
@@ -84,8 +82,7 @@ public class PageInercetor extends MybatisInterceptor {
                 if (doCount) {
                     String base = analysis.noOrderSql != null ? analysis.noOrderSql : originSql; // 优化：去掉 order by
                     String countSql = dialect.buildCountSql(base, analysis.complex);
-                    total = getCount(executor, mappedStatement, params, boundSql, rowBounds, resultHandler,
-                            countSql);
+                    total = getCount(executor, mappedStatement, params, boundSql, rowBounds, resultHandler, countSql);
                     PageContextHolder.setTotal(total);
                     // 若 total=0，标记跳过主查询，由拦截器统一执行短路
                     if (total != null && total.longValue() == 0L) {
@@ -174,8 +171,7 @@ public class PageInercetor extends MybatisInterceptor {
     }
 
     private static MappedStatement createCountMappedStatement(MappedStatement ms, String newMsId) {
-        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), newMsId,
-                ms.getSqlSource(),
+        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), newMsId, ms.getSqlSource(),
                 ms.getSqlCommandType());
         builder.resource(ms.getResource());
         builder.fetchSize(ms.getFetchSize());
@@ -193,8 +189,7 @@ public class PageInercetor extends MybatisInterceptor {
         builder.parameterMap(ms.getParameterMap());
         // count查询返回值int
         List<ResultMap> resultMaps = new ArrayList<ResultMap>();
-        ResultMap resultMap = new ResultMap.Builder(ms.getConfiguration(), ms.getId(), Long.class,
-                EMPTY_RESULTMAPPING)
+        ResultMap resultMap = new ResultMap.Builder(ms.getConfiguration(), ms.getId(), Long.class, EMPTY_RESULTMAPPING)
                 .build();
         resultMaps.add(resultMap);
         builder.resultMaps(resultMaps);
@@ -208,20 +203,16 @@ public class PageInercetor extends MybatisInterceptor {
     public static Long getCount(Executor executor, MappedStatement mappedStatement, Object parameter,
             BoundSql boundSql, RowBounds rowBounds, ResultHandler<?> resultHandler, String countSql)
             throws SQLException {
-
         Map<String, Object> additionalParameters = boundSql.getAdditionalParameters();
-
         BoundSql countBoundSql = new BoundSql(mappedStatement.getConfiguration(), countSql,
                 boundSql.getParameterMappings(), parameter);
         for (String key : additionalParameters.keySet()) {
             countBoundSql.setAdditionalParameter(key, additionalParameters.get(key));
         }
         CacheKey countKey = executor.createCacheKey(mappedStatement, parameter, RowBounds.DEFAULT, countBoundSql);
-
         List<Object> query = executor.query(
                 createCountMappedStatement(mappedStatement, getCountMSId(mappedStatement)),
-                parameter, RowBounds.DEFAULT, resultHandler, countKey,
-                countBoundSql);
+                parameter, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
         return (Long) query.get(0);
     }
 
@@ -230,7 +221,6 @@ public class PageInercetor extends MybatisInterceptor {
     }
 
     // 已简化：count 直接通过 dialect.buildCountSql(originSql, analysis.complex)
-
     private String applyPagination(Select select, String originSql, PageInfo pageInfo, Dialect dialect,
             SqlAnalysisCache.Analysis analysis) {
         long limitSize = pageInfo.getPageSize();
@@ -270,8 +260,9 @@ public class PageInercetor extends MybatisInterceptor {
                 list.add(e);
             }
         }
-        if (!list.isEmpty())
+        if (!list.isEmpty()) {
             plain.setOrderByElements(list);
+        }
     }
 
 }
