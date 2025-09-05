@@ -3,6 +3,7 @@ package com.ruoyi.mybatisinterceptor.handler.page;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
@@ -21,17 +23,24 @@ import com.ruoyi.common.utils.sql.SqlUtil;
 import com.ruoyi.mybatisinterceptor.annotation.MybatisHandlerOrder;
 import com.ruoyi.mybatisinterceptor.context.page.PageContextHolder;
 import com.ruoyi.mybatisinterceptor.context.page.model.PageInfo;
+import com.ruoyi.mybatisinterceptor.dialect.Dialect;
+import com.ruoyi.mybatisinterceptor.dialect.DialectRouter;
+import com.ruoyi.mybatisinterceptor.dialect.OracleDialect;
+import com.ruoyi.mybatisinterceptor.dialect.SqlServerDialect;
 import com.ruoyi.mybatisinterceptor.handler.MybatisPreHandler;
+import com.ruoyi.mybatisinterceptor.util.OrderByUtil;
+import com.ruoyi.mybatisinterceptor.util.SqlAnalysisCache;
 
+import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Limit;
+import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectItem;
 
 @Component
-@MybatisHandlerOrder(2)
+@MybatisHandlerOrder(10)
 public class PagePreHandler implements MybatisPreHandler {
 
       private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
@@ -42,24 +51,82 @@ public class PagePreHandler implements MybatisPreHandler {
             sqlFiled.setAccessible(true);
       }
 
+      @Autowired
+      private DialectRouter dialectRouter;
+
       @Override
-      public void preHandle(Executor executor, MappedStatement mappedStatement, Object params, RowBounds rowBounds,
+      public Object preHandle(Executor executor, MappedStatement mappedStatement, Object params, RowBounds rowBounds,
                   ResultHandler<?> resultHandler, CacheKey cacheKey, BoundSql boundSql) throws Throwable {
+            // 避免对内部 count 查询再次分页/递归
+            if (mappedStatement.getId() != null && mappedStatement.getId().endsWith(SELECT_COUNT_SUFIX)) {
+                  return null;
+            }
             if (PageContextHolder.isPage()) {
                   String originSql = boundSql.getSql();
+                  SqlAnalysisCache.Analysis analysis = SqlAnalysisCache.analyze(originSql);
                   Statement sql = SqlUtil.parseSql(originSql);
                   if (sql instanceof Select) {
                         PageInfo pageInfo = PageContextHolder.getPageInfo();
-                        Statement handleLimit = handleLimit((Select) sql, pageInfo);
-                        Statement countSql = getCountSql((Select) sql);
-                        Long count = getCount(executor, mappedStatement, params, boundSql, rowBounds, resultHandler,
-                                    countSql.toString());
-                        PageContextHolder.setTotal(count);
-                        sqlFiled.set(boundSql, handleLimit.toString());
-                        cacheKey = executor.createCacheKey(mappedStatement, params, rowBounds, boundSql);
+                        // 安全 order by 注入（可选）
+                        applyOrderByIfPresent((Select) sql, pageInfo);
+
+                        // 路由方言
+                        Dialect dialect = dialectRouter.routeByCurrent();
+
+                        // 生成 count（可关闭）
+                        Long total = null;
+                        boolean doCount = pageInfo.getSearchCount() == null || pageInfo.getSearchCount().booleanValue();
+                        if (doCount) {
+                              String base = ((Select) sql).toString();
+                              if (analysis.noOrderSql != null)
+                                    base = analysis.noOrderSql; // 优化：去掉 order by
+                              String countSql = buildCountSql((Select) sql, base, dialect);
+                              total = getCount(executor, mappedStatement, params, boundSql, rowBounds, resultHandler,
+                                          countSql);
+                              PageContextHolder.setTotal(total);
+                              // 若 total=0，标记跳过主查询，由拦截器统一执行短路
+                              if (total != null && total.longValue() == 0L) {
+                                    PageContextHolder.setSkipQuery(true);
+                              }
+                        }
+
+                        // PageHelper 合理化语义对齐：在拿到 total 后修正页码
+                        if (Boolean.TRUE.equals(pageInfo.getReasonable())) {
+                              // 仅在已执行 count 的情况下才能根据最大页修正
+                              if (doCount) {
+                                    long ps = pageInfo.getPageSize() == null ? 10L
+                                                : Math.max(1L, pageInfo.getPageSize());
+                                    long pages = (total == null || total <= 0L) ? 0L : ((total + ps - 1L) / ps);
+                                    long pn = pageInfo.getPageNumber() == null ? 1L : pageInfo.getPageNumber();
+                                    if (pn < 1L)
+                                          pn = 1L;
+                                    if (pages == 0L) {
+                                          // 无数据时，PageHelper 将页码校正为 1
+                                          pn = 1L;
+                                    } else if (pn > pages) {
+                                          pn = pages;
+                                    }
+                                    pageInfo.setPageNumber(pn);
+                              } else {
+                                    // 未进行 count 时，仅做下限校正
+                                    long pn = pageInfo.getPageNumber() == null ? 1L : pageInfo.getPageNumber();
+                                    if (pn < 1L)
+                                          pageInfo.setPageNumber(1L);
+                              }
+                        }
+
+                        // 注入分页
+                        String pagedSqlStr = applyPagination((Select) sql, ((Select) sql).toString(), pageInfo, dialect,
+                                    analysis);
+                        sqlFiled.set(boundSql, pagedSqlStr);
+                        cacheKey.update(pagedSqlStr);
                   }
             }
-
+            if (PageContextHolder.shouldSkipQuery()) {
+                  return Collections.emptyList();
+            } else {
+                  return null;
+            }
       }
 
       private static MappedStatement createCountMappedStatement(MappedStatement ms, String newMsId) {
@@ -118,27 +185,63 @@ public class PagePreHandler implements MybatisPreHandler {
             return mappedStatement.getId() + SELECT_COUNT_SUFIX;
       }
 
-      public static Statement getCountSql(Select select) {
+      private String buildCountSql(Select select, String originSql, Dialect dialect) {
             PlainSelect plain = select.getPlainSelect();
-            PlainSelect countPlain = new PlainSelect();
-            countPlain.setSelectItems(List.of(new SelectItem<>(new Column("COUNT(0)"))));
-            countPlain.setJoins(plain.getJoins());
-            countPlain.setWhere(plain.getWhere());
-            countPlain.setFromItem(plain.getFromItem());
-            countPlain.setDistinct(plain.getDistinct());
-            countPlain.setHaving(plain.getHaving());
-            countPlain.setIntoTables(plain.getIntoTables());
-            // countPlain.setOrderByElements(plain.getOrderByElements());
-            return plain;
+            boolean complex = plain.getDistinct() != null || plain.getGroupBy() != null || plain.getIntoTables() != null
+                        || plain.getHaving() != null || plain.getJoins() != null && !plain.getJoins().isEmpty()
+                        || plain.getOrderByElements() != null && !plain.getOrderByElements().isEmpty();
+            return dialect.buildCountSql(originSql, complex);
       }
 
-      private static Statement handleLimit(Select select, PageInfo pageInfo) {
+      private String applyPagination(Select select, String originSql, PageInfo pageInfo, Dialect dialect,
+                  SqlAnalysisCache.Analysis analysis) {
+            long limitSize = pageInfo.getPageSize();
+            long offset = pageInfo.getOffset();
+            if (dialect instanceof OracleDialect) {
+                  return ((OracleDialect) dialect).wrapPaginationSql(originSql, offset, limitSize);
+            }
+            if (dialect instanceof SqlServerDialect) {
+                  return ((SqlServerDialect) dialect).wrapPaginationSql(originSql, offset, limitSize);
+            }
+            // MySQL/PG/H2：对于非复杂并且无现有 LIMIT 的 SQL，走字符串快路径避免 AST 重写
+            if (!analysis.complex && !analysis.hasLimit) {
+                  StringBuilder sb = new StringBuilder(originSql.length() + 32);
+                  sb.append(originSql).append(" LIMIT ").append(limitSize).append(" OFFSET ").append(offset);
+                  return sb.toString();
+            }
+            // 其余情况使用 AST 添加 LIMIT
+            PlainSelect plain = select.getPlainSelect();
             Limit limit = new Limit();
-            limit.setRowCount(new Column(pageInfo.getPageSize().toString()));
-            limit.setOffset(new Column(pageInfo.getOffeset().toString()));
-            PlainSelect plain = select.getPlainSelect();
+            limit.setRowCount(new LongValue(limitSize));
+            limit.setOffset(new LongValue(offset));
             plain.setLimit(limit);
-            return select;
+            return select.toString();
       }
 
+      private void applyOrderByIfPresent(Select select, PageInfo pageInfo) {
+            String orderExpr = OrderByUtil.build(pageInfo.getOrderByColumn(), pageInfo.getIsAsc());
+            if (orderExpr == null || orderExpr.isEmpty())
+                  return;
+            PlainSelect plain = select.getPlainSelect();
+            if (plain.getOrderByElements() != null && !plain.getOrderByElements().isEmpty()) {
+                  return; // 已有排序，按原 SQL 为准
+            }
+            String[] items = orderExpr.split(",");
+            List<OrderByElement> list = new ArrayList<>();
+            for (String item : items) {
+                  String[] parts = item.trim().split("\\s+");
+                  if (parts.length >= 1) {
+                        OrderByElement e = new OrderByElement();
+                        e.setExpression(new Column(parts[0]));
+                        if (parts.length >= 2) {
+                              e.setAsc("asc".equalsIgnoreCase(parts[1]));
+                        } else {
+                              e.setAsc(true);
+                        }
+                        list.add(e);
+                  }
+            }
+            if (!list.isEmpty())
+                  plain.setOrderByElements(list);
+      }
 }

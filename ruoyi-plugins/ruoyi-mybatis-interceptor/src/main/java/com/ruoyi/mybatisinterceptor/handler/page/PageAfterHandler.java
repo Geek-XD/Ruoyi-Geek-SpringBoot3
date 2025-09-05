@@ -9,8 +9,8 @@ import com.ruoyi.mybatisinterceptor.context.page.PageContextHolder;
 import com.ruoyi.mybatisinterceptor.context.page.model.TableInfo;
 import com.ruoyi.mybatisinterceptor.handler.MybatisAfterHandler;
 
-@MybatisHandlerOrder(1)
 @Component
+@MybatisHandlerOrder(10)
 public class PageAfterHandler implements MybatisAfterHandler {
 
    @Override
@@ -19,7 +19,6 @@ public class PageAfterHandler implements MybatisAfterHandler {
          if (object instanceof List) {
             TableInfo<Object> tableInfo = new TableInfo<Object>((List<?>) object);
             tableInfo.setTotal(PageContextHolder.getTotal());
-            PageContextHolder.clear();
             return tableInfo;
          }
          return object;

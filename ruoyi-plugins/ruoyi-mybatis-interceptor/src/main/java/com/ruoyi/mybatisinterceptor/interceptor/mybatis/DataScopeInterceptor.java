@@ -110,7 +110,6 @@ public class DataScopeInterceptor implements Interceptor {
 
                 }
             }
-
         } catch (Exception e) {
             log.error("数据权限拦截器处理异常", e);
         } finally {
@@ -218,7 +217,7 @@ public class DataScopeInterceptor implements Interceptor {
                     expressions.add(new ParenthesedExpressionList<>(newOn));
                     targetJoin.setOnExpressions(expressions);
                     log.debug("数据权限拦截器：数据权限条件已应用到 INNER JOIN ON 子句（表别名：{}）", targetAlias);
-                } 
+                }
             }
             Expression currentWhere = plainSelect.getWhere();
             Expression newWhere = currentWhere == null ? expression : new AndExpression(currentWhere, expression);

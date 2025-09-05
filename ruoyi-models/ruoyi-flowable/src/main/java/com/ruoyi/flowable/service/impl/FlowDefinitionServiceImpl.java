@@ -20,9 +20,9 @@ import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.task.api.Task;
 import org.springframework.stereotype.Service;
 
-import com.github.pagehelper.PageHelper;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.flowable.common.constant.ProcessConstants;
 import com.ruoyi.flowable.common.enums.FlowComment;
@@ -108,7 +108,7 @@ public class FlowDefinitionServiceImpl extends FlowServiceFactory implements IFl
         // reProcDef.setDeploymentTime(deployment.getDeploymentTime());
         // dataList.add(reProcDef);
         // }
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         final List<FlowProcDefDto> dataList = flowDeployMapper.selectDeployList(name);
         // 加载挂表单
         for (FlowProcDefDto procDef : dataList) {

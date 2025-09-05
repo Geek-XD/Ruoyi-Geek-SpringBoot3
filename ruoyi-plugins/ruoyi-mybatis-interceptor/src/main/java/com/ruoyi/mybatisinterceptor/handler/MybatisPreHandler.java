@@ -9,7 +9,7 @@ import org.apache.ibatis.session.RowBounds;
 
 public interface MybatisPreHandler {
 
-      void preHandle(Executor executor, MappedStatement mappedStatement, Object params,
+      Object preHandle(Executor executor, MappedStatement mappedStatement, Object params,
                   RowBounds rowBounds, ResultHandler<?> resultHandler, CacheKey cacheKey, BoundSql boundSql)
                   throws Throwable;
 }

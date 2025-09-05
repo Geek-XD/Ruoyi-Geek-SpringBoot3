@@ -7,6 +7,10 @@ public class TableInfo<E> extends ArrayList<E> {
 
    private Long total;
 
+   public TableInfo() {
+      super();
+   }
+
    public TableInfo(List<? extends E> list) {
       super(list);
    }

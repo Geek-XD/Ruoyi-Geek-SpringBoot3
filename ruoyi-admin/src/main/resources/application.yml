@@ -123,6 +123,14 @@ createSqlSessionFactory:
   # 选择MyBatis配置方式，mybatis / mybatis-plus
   use: mybatis-plus
 
+datascope:
+  # default 原生数据范围注解   plus 增强数据范围注解
+  type: default
+
+pageutils:
+  # default 使用PageHelper分页插件   custom 自研分页插件
+  type: default
+
 # PageHelper分页插件
 pagehelper:
   helperDialect: mysql
