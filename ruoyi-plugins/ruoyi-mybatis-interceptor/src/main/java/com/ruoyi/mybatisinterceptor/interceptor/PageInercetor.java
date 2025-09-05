@@ -26,15 +26,14 @@ import com.ruoyi.mybatisinterceptor.context.page.model.PageInfo;
 import com.ruoyi.mybatisinterceptor.context.page.model.TableInfo;
 import com.ruoyi.mybatisinterceptor.dialect.Dialect;
 import com.ruoyi.mybatisinterceptor.dialect.DialectRouter;
-import com.ruoyi.mybatisinterceptor.dialect.OracleDialect;
-import com.ruoyi.mybatisinterceptor.dialect.SqlServerDialect;
+// no dialect-specific imports needed; rely on Dialect API
 import com.ruoyi.mybatisinterceptor.util.OrderByUtil;
 import com.ruoyi.mybatisinterceptor.util.SqlAnalysisCache;
 
-import net.sf.jsqlparser.expression.LongValue;
+//
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.Limit;
+//
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
@@ -69,11 +68,12 @@ public class PageInercetor extends MybatisInterceptor {
         if (PageContextHolder.isPage()) {
             String originSql = boundSql.getSql();
             SqlAnalysisCache.Analysis analysis = SqlAnalysisCache.analyze(originSql);
-            Statement sql = SqlUtil.parseSql(originSql);
-            if (sql instanceof Select) {
+            // 惰性解析：仅在确需 AST（注入排序或复杂分页）时再 parse
+            Statement sql = null;
+            Select selectAst = null;
+            {
                 PageInfo pageInfo = PageContextHolder.getPageInfo();
-                // 安全 order by 注入（可选）
-                applyOrderByIfPresent((Select) sql, pageInfo);
+                String orderExpr = OrderByUtil.build(pageInfo.getOrderByColumn(), pageInfo.getIsAsc());
 
                 // 路由方言
                 Dialect dialect = dialectRouter.routeByCurrent();
@@ -82,10 +82,8 @@ public class PageInercetor extends MybatisInterceptor {
                 Long total = null;
                 boolean doCount = pageInfo.getSearchCount() == null || pageInfo.getSearchCount().booleanValue();
                 if (doCount) {
-                    String base = ((Select) sql).toString();
-                    if (analysis.noOrderSql != null)
-                        base = analysis.noOrderSql; // 优化：去掉 order by
-                    String countSql = buildCountSql((Select) sql, base, dialect);
+                    String base = analysis.noOrderSql != null ? analysis.noOrderSql : originSql; // 优化：去掉 order by
+                    String countSql = dialect.buildCountSql(base, analysis.complex);
                     total = getCount(executor, mappedStatement, params, boundSql, rowBounds, resultHandler,
                             countSql);
                     PageContextHolder.setTotal(total);
@@ -120,9 +118,32 @@ public class PageInercetor extends MybatisInterceptor {
                     }
                 }
 
+                // 注入排序（仅当需要注入且原 SQL 无排序时，才解析 AST 注入）
+                boolean needInjectOrder = (orderExpr != null && !orderExpr.isEmpty() && analysis.noOrderSql == null);
+                if (needInjectOrder || analysis.hasLimit || (!dialect.preferWrap() && analysis.complex)) {
+                    // 需要 AST：解析一次
+                    if (sql == null)
+                        sql = SqlUtil.parseSql(originSql);
+                    if (sql instanceof Select) {
+                        selectAst = (Select) sql;
+                        if (needInjectOrder) {
+                            applyOrderByIfPresent(selectAst, pageInfo);
+                        }
+                    }
+                }
+
                 // 注入分页
-                String pagedSqlStr = applyPagination((Select) sql, ((Select) sql).toString(), pageInfo, dialect,
-                        analysis);
+                String baseSqlForPage = (selectAst != null) ? selectAst.toString() : originSql;
+                String pagedSqlStr;
+                if (selectAst != null) {
+                    // 用 AST 注入分页
+                    pagedSqlStr = applyPagination(selectAst, baseSqlForPage, pageInfo, dialect, analysis);
+                } else {
+                    // 不解析，走包装
+                    long limitSize = pageInfo.getPageSize();
+                    long offset = pageInfo.getOffset();
+                    pagedSqlStr = dialect.wrapPaginationSql(baseSqlForPage, offset, limitSize);
+                }
                 sqlFiled.set(boundSql, pagedSqlStr);
                 cacheKey.update(pagedSqlStr);
             }
@@ -208,36 +229,21 @@ public class PageInercetor extends MybatisInterceptor {
         return mappedStatement.getId() + SELECT_COUNT_SUFIX;
     }
 
-    private String buildCountSql(Select select, String originSql, Dialect dialect) {
-        PlainSelect plain = select.getPlainSelect();
-        boolean complex = plain.getDistinct() != null || plain.getGroupBy() != null || plain.getIntoTables() != null
-                || plain.getHaving() != null || plain.getJoins() != null && !plain.getJoins().isEmpty()
-                || plain.getOrderByElements() != null && !plain.getOrderByElements().isEmpty();
-        return dialect.buildCountSql(originSql, complex);
-    }
+    // 已简化：count 直接通过 dialect.buildCountSql(originSql, analysis.complex)
 
     private String applyPagination(Select select, String originSql, PageInfo pageInfo, Dialect dialect,
             SqlAnalysisCache.Analysis analysis) {
         long limitSize = pageInfo.getPageSize();
         long offset = pageInfo.getOffset();
-        if (dialect instanceof OracleDialect) {
-            return ((OracleDialect) dialect).wrapPaginationSql(originSql, offset, limitSize);
+        if (dialect.preferWrap()) {
+            return dialect.wrapPaginationSql(originSql, offset, limitSize);
         }
-        if (dialect instanceof SqlServerDialect) {
-            return ((SqlServerDialect) dialect).wrapPaginationSql(originSql, offset, limitSize);
-        }
-        // MySQL/PG/H2：对于非复杂并且无现有 LIMIT 的 SQL，走字符串快路径避免 AST 重写
+        // 支持 LIMIT 的方言：对于非复杂并且无现有 LIMIT 的 SQL，走字符串快路径（委托方言包装）
         if (!analysis.complex && !analysis.hasLimit) {
-            StringBuilder sb = new StringBuilder(originSql.length() + 32);
-            sb.append(originSql).append(" LIMIT ").append(limitSize).append(" OFFSET ").append(offset);
-            return sb.toString();
+            return dialect.wrapPaginationSql(originSql, offset, limitSize);
         }
-        // 其余情况使用 AST 添加 LIMIT
-        PlainSelect plain = select.getPlainSelect();
-        Limit limit = new Limit();
-        limit.setRowCount(new LongValue(limitSize));
-        limit.setOffset(new LongValue(offset));
-        plain.setLimit(limit);
+        // 其余情况使用 AST 添加 LIMIT（委托方言以保持一致性）
+        dialect.applyPagination(select.getPlainSelect(), offset, limitSize);
         return select.toString();
     }
 

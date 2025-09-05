@@ -9,10 +9,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
  * 但该方式对没有稳定 order by 的结果不确定性较大，生产中建议在 SQL 层显式 order by。
  */
 public class SqlServerDialect implements Dialect {
-    @Override
-    public boolean supportsLimit() {
-        return true;
-    }
+    // supportsLimit 已移除
 
     @Override
     public void applyPagination(PlainSelect select, long offset, long limit) {
@@ -20,12 +17,7 @@ public class SqlServerDialect implements Dialect {
         // 这里不做操作。
     }
 
-    @Override
-    public String buildCountSql(String originalSql, boolean hasDistinctOrGroupOrUnion) {
-        String wrapped = originalSql;
-        if (wrapped.endsWith(";")) wrapped = wrapped.substring(0, wrapped.length() - 1);
-        return "SELECT COUNT(1) FROM (" + wrapped + ") TMP_COUNT";
-    }
+    // 使用 Dialect 默认的 buildCountSql
 
     /**
      * 生成 SQL Server 的分页包装 SQL。
@@ -39,4 +31,7 @@ public class SqlServerDialect implements Dialect {
         return "SELECT * FROM (SELECT ROW_NUMBER() OVER(ORDER BY 1) AS RN, T.* FROM (" + body + ") T) X WHERE X.RN BETWEEN "
                 + start + " AND " + end;
     }
+
+    @Override
+    public boolean preferWrap() { return true; }
 }

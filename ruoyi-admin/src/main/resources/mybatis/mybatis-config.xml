@@ -19,11 +19,9 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <setting name="logImpl" value="STDOUT_LOGGING" />
 	</settings>
 
-    <!-- <plugins>
-        <plugin interceptor="com.ruoyi.mybatisinterceptor.interceptor.PageInercetor"></plugin>
-    </plugins> -->
-    <!-- <plugins>
-        <plugin interceptor="com.ruoyi.mybatisinterceptor.interceptor.DataScopeInterceptor"></plugin>
-    </plugins> -->
+    <!-- <plugins> -->
+        <!-- <plugin interceptor="com.ruoyi.mybatisinterceptor.interceptor.PageInercetor" /> -->
+        <!-- <plugin interceptor="com.ruoyi.mybatisinterceptor.interceptor.DataScopeInterceptor" /> -->
+    <!-- </plugins> -->
 
 </configuration>

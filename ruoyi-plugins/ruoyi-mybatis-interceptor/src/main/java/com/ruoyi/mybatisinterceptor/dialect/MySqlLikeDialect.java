@@ -8,10 +8,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
  * 适用于 MySQL/MariaDB/PostgreSQL/openGauss 的方言（均支持 limit offset）。
  */
 public class MySqlLikeDialect implements Dialect {
-    @Override
-    public boolean supportsLimit() {
-        return true;
-    }
+    // supportsLimit 已移除
 
     @Override
     public void applyPagination(PlainSelect select, long offset, long limit) {
