@@ -86,7 +86,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createBy != null and createBy != ''">#{createBy},</if>
 			<if test="remark != null and remark != ''">#{remark},</if>
  			<choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
                     CURRENT_TIMESTAMP
                 </when>
                 <otherwise>
@@ -106,7 +106,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
             <if test="remark != null">remark = #{remark},</if>
  			update_time = <choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
                     CURRENT_TIMESTAMP
                 </when>
                 <otherwise>

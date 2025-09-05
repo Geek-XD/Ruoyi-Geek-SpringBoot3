@@ -84,11 +84,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 
 	<select id="selectDbTableList" parameterType="GenTable" resultMap="GenTableResult">
-		select table_name, table_comment, create_time, update_time from information_schema.tables
+		select table_name,
+		<choose>
+			<when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
+				description as table_comment,
+				CURRENT_TIMESTAMP as create_time,
+				CURRENT_TIMESTAMP as update_time
+				from information_schema.tables t
+				left join pg_catalog.pg_class c on c.relname = t.table_name
+				left join pg_catalog.pg_description pd on c.oid = pd.objoid and pd.objsubid = 0
+			</when>
+			<otherwise>
+				table_comment,create_time, update_time 
+				from information_schema.tables
+			</otherwise>
+		</choose>
 		where table_schema = (
 			<choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
-                    select current_catalog FROM information_schema.information_schema_catalog_name
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
+                    'public'
                 </when>
                 <otherwise>
                     select database()
@@ -113,11 +127,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 
 	<select id="selectDbTableListByNames" resultMap="GenTableResult">
-		select table_name, table_comment, create_time, update_time from information_schema.tables
+		select table_name, 
+		<choose>
+			<when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
+				description as table_comment,
+				CURRENT_TIMESTAMP as create_time,
+				CURRENT_TIMESTAMP as update_time
+				from information_schema.tables t
+				left join pg_catalog.pg_class c on c.relname = t.table_name
+				left join pg_catalog.pg_description pd on c.oid = pd.objoid and pd.objsubid = 0
+			</when>
+			<otherwise>
+				table_comment,create_time, update_time 
+				from information_schema.tables
+			</otherwise>
+		</choose>
 		where table_name NOT LIKE 'qrtz\_%' AND table_name NOT LIKE 'gen\_%' and table_schema = (
 			<choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
-                    select current_catalog FROM information_schema.information_schema_catalog_name
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
+                    'public'
                 </when>
                 <otherwise>
                     select database()
@@ -131,11 +159,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 
 	<select id="selectTableByName" parameterType="String" resultMap="GenTableResult">
-		select table_name, table_comment, create_time, update_time from information_schema.tables
+		select table_name, 
+		<choose>
+			<when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
+				description as table_comment,
+				CURRENT_TIMESTAMP as create_time,
+				CURRENT_TIMESTAMP as update_time
+				from information_schema.tables t
+				left join pg_catalog.pg_class c on c.relname = t.table_name
+				left join pg_catalog.pg_description pd on c.oid = pd.objoid and pd.objsubid = 0
+			</when>
+			<otherwise>
+				table_comment,create_time, update_time 
+				from information_schema.tables
+			</otherwise>
+		</choose>
 		where table_comment 		<![CDATA[ <> ]]> '' and table_schema = (
 			<choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
-                    select current_catalog FROM information_schema.information_schema_catalog_name
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
+                    'public'
                 </when>
                 <otherwise>
                     select database()
@@ -206,7 +248,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="haveSubColumn != null and haveSubColumn != ''">#{haveSubColumn},</if>
 		<if test="createBy != null and createBy != ''">#{createBy},</if>
 		<choose>
-            <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+            <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
                 CURRENT_TIMESTAMP
             </when>
 			<otherwise>
@@ -243,7 +285,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="remark != null">remark = #{remark},</if>
 			<if test="haveSubColumn != null and haveSubColumn != ''">have_sub_column = #{haveSubColumn},</if>
             update_time = <choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
                     CURRENT_TIMESTAMP
                 </when>
                 <otherwise>

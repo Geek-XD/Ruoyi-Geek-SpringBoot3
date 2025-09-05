@@ -85,8 +85,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				<when test="_databaseId == 'postgresql'">
 					array_position(string_to_array(ancestors, ','), CAST(#{deptId} AS TEXT)) IS NOT NULL
 				</when>
-				<!-- OpenGauss使用ANY替代array_position -->
-				<when test="_databaseId == 'opengauss'">
+				<!-- openGauss使用ANY替代array_position -->
+				<when test="_databaseId == 'openGauss'">
 					CAST(#{deptId} AS TEXT) = ANY(string_to_array(ancestors, ','))
 				</when>
 				<!-- MySQL等其他数据库使用find_in_set -->
@@ -195,7 +195,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="createBy != null and createBy != ''">#{createBy},</if>
 		<if test="remark != null and remark != ''">#{remark},</if>
 		<choose>
-			<when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+			<when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
 				CURRENT_TIMESTAMP
 			</when>
 			<otherwise>
@@ -222,7 +222,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
 			<if test="remark != null">remark = #{remark},</if>
  			update_time = <choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
                     CURRENT_TIMESTAMP
                 </when>
                 <otherwise>
@@ -243,7 +243,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<update id="resetUserPwd" parameterType="SysUser">
  		update sys_user set pwd_update_date = <choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
                     CURRENT_TIMESTAMP
                 </when>
                 <otherwise>

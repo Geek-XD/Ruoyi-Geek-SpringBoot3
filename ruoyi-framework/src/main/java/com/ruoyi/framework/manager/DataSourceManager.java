@@ -79,8 +79,8 @@ public class DataSourceManager implements InitializingBean {
                 if (rs.next()) {
                     String v = safeLower(rs.getString(1));
                     if (v != null) {
-                        if (v.contains("opengauss") || v.contains("gauss")) {
-                            return "opengauss";
+                        if (v.contains("openGauss") || v.contains("gauss")) {
+                            return "openGauss";
                         }
                         if (v.contains("postgresql") || v.contains("postgres")) {
                             return "postgresql";
@@ -102,17 +102,17 @@ public class DataSourceManager implements InitializingBean {
             } catch (Exception ignore) {
             }
             // 先看 URL/驱动是否明确标识 openGauss/Gauss
-            if ((url != null && url.startsWith("jdbc:opengauss:"))
-                    || (driverName != null && (driverName.contains("opengauss") || driverName.contains("gauss")))
-                    || (productName != null && (productName.contains("opengauss") || productName.contains("gauss")))) {
-                return "opengauss";
+            if ((url != null && url.startsWith("jdbc:openGauss:"))
+                    || (driverName != null && (driverName.contains("openGauss") || driverName.contains("gauss")))
+                    || (productName != null && (productName.contains("openGauss") || productName.contains("gauss")))) {
+                return "openGauss";
             }
 
             if (productName != null && productName.contains("postgres")) {
                 // 区分 openGauss 与 PostgreSQL
                 String ver = safeLower(md.getDatabaseProductVersion());
-                if ((ver != null && (ver.contains("opengauss") || ver.contains("gauss")))) {
-                    return "opengauss";
+                if ((ver != null && (ver.contains("openGauss") || ver.contains("gauss")))) {
+                    return "openGauss";
                 }
                 return "postgresql";
             }

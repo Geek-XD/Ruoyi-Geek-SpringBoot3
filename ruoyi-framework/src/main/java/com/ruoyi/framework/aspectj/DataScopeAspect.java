@@ -139,7 +139,7 @@ public class DataScopeAspect {
                     sqlString.append(StringUtils.format(
                             " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or array_position(string_to_array(ancestors , ','), CAST( {}  AS TEXT)) IS NOT NULL )",
                             deptAlias, user.getDeptId(), user.getDeptId()));
-                } else if (databaseId.equals("opengauss")) {
+                } else if (databaseId.equals("openGauss")) {
                     sqlString.append(StringUtils.format(
                             " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or CAST( {}  AS TEXT) = ANY(string_to_array(ancestors , ',')) )",
                             deptAlias, user.getDeptId(), user.getDeptId()));

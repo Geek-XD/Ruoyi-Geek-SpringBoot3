@@ -7,8 +7,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select * from information_schema.tables
 		where table_schema = (
             <choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
-                    select current_catalog FROM information_schema.information_schema_catalog_name
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
+                    'public'
                 </when>
                 <otherwise>
                     select database()
@@ -21,8 +21,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select * from information_schema.columns 
         where  table_schema = (
             <choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
-                    select current_catalog FROM information_schema.information_schema_catalog_name
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
+                    'public'
                 </when>
                 <otherwise>
                     select database()

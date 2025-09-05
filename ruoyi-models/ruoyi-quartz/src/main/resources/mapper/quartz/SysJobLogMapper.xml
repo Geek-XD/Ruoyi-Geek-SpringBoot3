@@ -88,7 +88,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="status != null and status != ''">#{status},</if>
  			<if test="exceptionInfo != null and exceptionInfo != ''">#{exceptionInfo},</if>
  			<choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
                     CURRENT_TIMESTAMP
                 </when>
                 <otherwise>

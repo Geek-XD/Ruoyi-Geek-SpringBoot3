@@ -153,7 +153,7 @@
 			<if test="remark != null and remark != ''">remark = #{remark},</if>
 			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
 			update_time = <choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
                     CURRENT_TIMESTAMP
                 </when>
                 <otherwise>
@@ -203,7 +203,7 @@
 		<if test="remark != null and remark != ''">#{remark},</if>
 		<if test="createBy != null and createBy != ''">#{createBy},</if>
 		<choose>
-                <when test="_databaseId == 'postgresql' or _databaseId == 'opengauss'">
+                <when test="_databaseId == 'postgresql' or _databaseId == 'openGauss'">
                     CURRENT_TIMESTAMP
                 </when>
                 <otherwise>

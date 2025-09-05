@@ -5,6 +5,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +24,9 @@ import com.github.pagehelper.autoconfigure.PageHelperStandardProperties;
 import com.ruoyi.common.service.mybatis.CreateSqlSessionFactory;
 import com.ruoyi.common.utils.MybatisUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.mybatisinterceptor.interceptor.mybatis.DataScopeInterceptor;
+import com.ruoyi.framework.manager.DataSourceManager;
 import com.ruoyi.framework.mybatis.CustomDatabaseIdProvider;
+import com.ruoyi.mybatisinterceptor.interceptor.mybatis.DataScopeInterceptor;
 /**
  * Mybatis Plus 配置
  *
@@ -32,6 +34,10 @@ import com.ruoyi.framework.mybatis.CustomDatabaseIdProvider;
  */
 @Configuration
 public class MybatisPlusConfig {
+
+    @Autowired
+    private DataSourceManager dataSourceManager;
+
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
@@ -50,7 +56,8 @@ public class MybatisPlusConfig {
     public PaginationInnerInterceptor paginationInnerInterceptor() {
         PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
         // 设置数据库类型为mysql
-        paginationInnerInterceptor.setDbType(DbType.MYSQL);
+        String databaseId = dataSourceManager.getCurrentDatabaseId();
+        paginationInnerInterceptor.setDbType(DbType.getDbType(databaseId));
         // 设置最大单页限制数量，默认 500 条，-1 不受限制
         paginationInnerInterceptor.setMaxLimit(-1L);
         return paginationInnerInterceptor;
