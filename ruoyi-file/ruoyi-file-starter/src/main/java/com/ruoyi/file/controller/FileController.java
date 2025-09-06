@@ -192,20 +192,19 @@ public class FileController {
     public AjaxResult uploadFileChunk(
             @RequestParam("uploadId") String uploadId,
             @RequestParam("filePath") String filePath,
-            @RequestParam("chunkIndex") int chunkIndex,
+            @RequestParam("partNumber") int partNumber,
             @RequestParam("chunk") MultipartFile chunk) {
         try {
             if (chunk == null || chunk.isEmpty())
                 throw new ServiceException("分片数据不能为空");
             StorageService fileService = new StorageService(StorageUtils.getPrimary());
-            String etag = fileService.uploadPart(filePath, uploadId, chunkIndex + 1, chunk.getSize(),
+            String etag = fileService.uploadPart(filePath, uploadId, partNumber, chunk.getSize(),
                     chunk.getInputStream());
             if (etag == null || etag.isEmpty())
                 throw new ServiceException("上传分片失败：未获取到ETag");
             return AjaxResult.success(Map.of(
                     "etag", etag,
-                    "chunkIndex", chunkIndex,
-                    "partNumber", chunkIndex + 1));
+                    "partNumber", partNumber));
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
         }
