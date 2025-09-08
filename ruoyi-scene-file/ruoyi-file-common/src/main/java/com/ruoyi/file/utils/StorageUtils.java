@@ -22,7 +22,11 @@ public class StorageUtils {
 
     private static Map<String, StorageManagement> storageManagementMap;
 
-    public static StorageBucket getPrimary() {
+    public static String getPrimaryStorageType() {
+        return RuoYiConfig.getFileServer();
+    }
+
+    public static StorageBucket getPrimaryStorageBucket() {
         return storageManagementMap.get(RuoYiConfig.getFileServer()).getPrimaryBucket();
     }
 

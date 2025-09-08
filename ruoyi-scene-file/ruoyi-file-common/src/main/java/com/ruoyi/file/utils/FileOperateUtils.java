@@ -82,7 +82,7 @@ public class FileOperateUtils {
     public static final String upload(String filePath, MultipartFile file, String[] allowedExtension)
             throws IOException {
         try {
-            StorageService fileService = new StorageService(StorageUtils.getPrimary());
+            StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
             fileService.setAllowedExtension(allowedExtension);
             return fileService.upload(filePath, file);
         } catch (Exception e) {
@@ -99,7 +99,7 @@ public class FileOperateUtils {
      * @throws IOException
      */
     public static final void downLoad(String filePath, OutputStream outputStream) throws Exception {
-        StorageService fileService = new StorageService(StorageUtils.getPrimary());
+        StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
         InputStream inputStream = fileService.downLoad(filePath);
         FileUtils.writeBytes(inputStream, outputStream);
     }
@@ -113,7 +113,7 @@ public class FileOperateUtils {
      * @throws IOException
      */
     public static final void downLoad(String filePath, HttpServletResponse response) throws Exception {
-        StorageService fileService = new StorageService(StorageUtils.getPrimary());
+        StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
         StorageEntity fileEntity = fileService.getFile(filePath);
         InputStream inputStream = fileEntity.getInputStream();
         OutputStream outputStream = response.getOutputStream();
@@ -131,7 +131,7 @@ public class FileOperateUtils {
      * @throws IOException
      */
     public static final boolean deleteFile(String filePath) throws Exception {
-        StorageService fileService = new StorageService(StorageUtils.getPrimary());
+        StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
         return fileService.deleteFile(filePath);
     }
 
@@ -143,7 +143,7 @@ public class FileOperateUtils {
      * @throws Exception
      */
     public static String getURL(String filePath) throws Exception {
-        StorageService fileService = new StorageService(StorageUtils.getPrimary());
+        StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
         return fileService.generateUrl(filePath);
     }
 }

@@ -107,7 +107,7 @@ public class MinioManagement implements StorageManagement {
         this.client = client;
     }
 
-    public String getPrimary() {
+    public String getPrimaryStorageBucket() {
         return primary;
     }
 

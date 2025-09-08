@@ -61,18 +61,24 @@ public class FileController {
     /**
      * 统一上传接口：/file/{storageType}/{clientName}/upload
      */
-    @PostMapping("/{storageType}/{clientName}/upload")
+    @PostMapping({ "/upload", "/{storageType}/{clientName}/upload" })
     public AjaxResult uploadUnified(
-            @PathVariable("storageType") String storageType,
-            @PathVariable("clientName") String clientName,
+            @PathVariable(name = "storageType", required = false) String storageType,
+            @PathVariable(name = "clientName", required = false) String clientName,
             @RequestParam("file") MultipartFile file) {
         try {
             String filePath = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            StorageService storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+            StorageService storageService = null;
+            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(clientName)) {
+                storageService = new StorageService(StorageUtils.getPrimaryStorageBucket());
+            } else {
+                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+            }
             String url = storageService.upload(filePath, file);
             SysFileInfo sysFileInfo = sysFileInfoService.buildSysFileInfo(file);
             sysFileInfo.setFilePath(filePath);
-            sysFileInfo.setStorageType(storageType);
+            sysFileInfo.setStorageType(
+                    StringUtils.isNotEmpty(storageType) ? storageType : StorageUtils.getPrimaryStorageType());
             sysFileInfoService.insertSysFileInfo(sysFileInfo);
             AjaxResult ajax = AjaxResult.success();
             ajax.put("url", url);
@@ -87,14 +93,19 @@ public class FileController {
     /**
      * 统一下载接口：/file/{storageType}/{clientName}/download?filePath=xxx
      */
-    @GetMapping("/{storageType}/{clientName}/download")
+    @GetMapping({ "/download", "/{storageType}/{clientName}/download" })
     public void downloadUnified(
-            @PathVariable("storageType") String storageType,
-            @PathVariable("clientName") String clientName,
+            @PathVariable(name = "storageType", required = false) String storageType,
+            @PathVariable(name = "clientName", required = false) String clientName,
             @RequestParam("filePath") String filePath,
             HttpServletResponse response) throws Exception {
         try {
-            StorageService storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+            StorageService storageService = null;
+            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(clientName)) {
+                storageService = new StorageService(StorageUtils.getPrimaryStorageBucket());
+            } else {
+                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+            }
             response.setContentType("application/octet-stream");
             storageService.downLoad(filePath, response);
         } catch (Exception e) {
@@ -107,15 +118,20 @@ public class FileController {
      * 统一预览接口：/file/{storageType}/{clientName}/preview?filePath=xxx
      */
     @Anonymous
-    @GetMapping("/{storageType}/{clientName}/preview")
+    @GetMapping({ "/preview", "/{storageType}/{clientName}/preview" })
     public void preview(
-            @PathVariable("storageType") String storageType,
-            @PathVariable("clientName") String clientName,
+            @PathVariable(name = "storageType", required = false) String storageType,
+            @PathVariable(name = "clientName", required = false) String clientName,
             @RequestParam("filePath") String filePath,
             HttpServletResponse response) throws Exception {
         try {
+            StorageService storageService = null;
+            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(clientName)) {
+                storageService = new StorageService(StorageUtils.getPrimaryStorageBucket());
+            } else {
+                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+            }
             filePath = URLDecoder.decode(filePath, "UTF-8");
-            StorageService storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
             InputStream inputStream = storageService.downLoad(filePath);
             String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(filePath));
             if (contentType == null) {
@@ -174,7 +190,7 @@ public class FileController {
             String currentDate = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
             String timestamp = String.valueOf(System.currentTimeMillis());
             String objectName = String.format("%s/%s/%s_%s", "/upload", currentDate, timestamp, fileName);
-            StorageService fileService = new StorageService(StorageUtils.getPrimary());
+            StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
             String uploadId = fileService.initMultipartUpload(objectName, fileSize);
             return AjaxResult.success(Map.of(
                     "uploadId", uploadId,
@@ -197,7 +213,7 @@ public class FileController {
         try {
             if (chunk == null || chunk.isEmpty())
                 throw new ServiceException("分片数据不能为空");
-            StorageService fileService = new StorageService(StorageUtils.getPrimary());
+            StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
             String etag = fileService.uploadPart(filePath, uploadId, partNumber, chunk.getSize(),
                     chunk.getInputStream());
             if (etag == null || etag.isEmpty())
@@ -237,7 +253,7 @@ public class FileController {
             }
             validParts.sort(Comparator.comparingInt(p -> p.getPartNumber()));
             // 完成分片上传并合并文件
-            StorageService fileService = new StorageService(StorageUtils.getPrimary());
+            StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
             String finalPath = fileService.completeMultipartUpload(filePath, uploadId, validParts);
             if (finalPath == null || finalPath.isEmpty()) {
                 throw new ServiceException("合并分片失败：未获取到最终文件路径");

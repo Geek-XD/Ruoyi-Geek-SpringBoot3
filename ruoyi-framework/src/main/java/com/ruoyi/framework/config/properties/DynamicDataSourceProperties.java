@@ -66,7 +66,7 @@ public class DynamicDataSourceProperties {
         this.datasource = datasource;
     }
 
-    public String getPrimary() {
+    public String getPrimaryStorageBucket() {
         return primary;
     }
 

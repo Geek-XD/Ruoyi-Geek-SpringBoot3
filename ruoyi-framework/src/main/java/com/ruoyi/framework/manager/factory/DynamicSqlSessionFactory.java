@@ -36,9 +36,9 @@ public class DynamicSqlSessionFactory {
             SqlSessionFactory sessionFactory = createSqlSessionFactory.createSqlSessionFactory(env, entry.getValue());
             sqlSessionFactoryMap.put(entry.getKey(), sessionFactory);
         }
-        SqlSessionFactory factoryMaster = sqlSessionFactoryMap.get(dataSourceProperties.getPrimary());
+        SqlSessionFactory factoryMaster = sqlSessionFactoryMap.get(dataSourceProperties.getPrimaryStorageBucket());
         if (factoryMaster == null) {
-            throw new RuntimeException("找不到主库配置" + dataSourceProperties.getPrimary());
+            throw new RuntimeException("找不到主库配置" + dataSourceProperties.getPrimaryStorageBucket());
         }
         DynamicSqlSessionTemplate customSqlSessionTemplate = new DynamicSqlSessionTemplate(factoryMaster);
         customSqlSessionTemplate.setTargetSqlSessionFactorys(sqlSessionFactoryMap);

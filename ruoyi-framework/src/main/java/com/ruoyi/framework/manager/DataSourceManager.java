@@ -59,7 +59,7 @@ public class DataSourceManager implements InitializingBean {
         for (Map.Entry<String, DataSource> entry : targetDataSources.entrySet()) {
             objectMap.put(entry.getKey(), entry.getValue());
         }
-        return new DynamicDataSource(targetDataSources.get(dataSourceProperties.getPrimary()), objectMap);
+        return new DynamicDataSource(targetDataSources.get(dataSourceProperties.getPrimaryStorageBucket()), objectMap);
     }
 
     // 仅启动期调用：基于 JDBC 元数据判定 mybatis databaseId（含 openGauss 区分），与 MyBatis 机制兼容
@@ -168,7 +168,7 @@ public class DataSourceManager implements InitializingBean {
     }
 
     public DataSource getPrimaryDataSource() {
-        return targetDataSources.get(dataSourceProperties.getPrimary());
+        return targetDataSources.get(dataSourceProperties.getPrimaryStorageBucket());
     }
 
     public DataSource getDataSource(String name) {
@@ -191,7 +191,7 @@ public class DataSourceManager implements InitializingBean {
 
     // 提供给 Provider/业务：根据 key 或当前线程获取已缓存的 databaseId
     public String getDatabaseId(String dsKey) {
-        String key = (dsKey == null || dsKey.isEmpty()) ? dataSourceProperties.getPrimary() : dsKey;
+        String key = (dsKey == null || dsKey.isEmpty()) ? dataSourceProperties.getPrimaryStorageBucket() : dsKey;
         return dsDatabaseId.get(key);
     }
 

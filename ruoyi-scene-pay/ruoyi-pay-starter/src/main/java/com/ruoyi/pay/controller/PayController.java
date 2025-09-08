@@ -57,7 +57,6 @@ public class PayController extends BaseController {
 
     @Operation(summary = "获取支付链接", description = "也不一定是链接，比如支付宝是一串表单代码")
     @Parameters({
-
             @Parameter(name = "channel", description = "支付方式", required = true),
             @Parameter(name = "orderNumber", description = "订单号", required = true)
     })

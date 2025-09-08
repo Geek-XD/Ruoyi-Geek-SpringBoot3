@@ -71,7 +71,7 @@ public class LocalManagement implements StorageManagement, WebMvcConfigurer {
         this.client = client;
     }
 
-    public String getPrimary() {
+    public String getPrimaryStorageBucket() {
         return primary;
     }
 
