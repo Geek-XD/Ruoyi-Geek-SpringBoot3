@@ -15,17 +15,16 @@
     </description>
 
     <dependencies>
-
-        <!-- 通用工具-->
-        <dependency>
-            <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-common</artifactId>
-        </dependency>
-
         <!-- ehcache-->
         <dependency>
             <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-ehcache</artifactId>
+            <artifactId>ruoyi-cache-ehcache</artifactId>
+        </dependency>
+
+        <!-- redis-->
+        <dependency>
+            <groupId>com.ruoyi.geekxd</groupId>
+            <artifactId>ruoyi-cache-redis</artifactId>
         </dependency>
 
         <!-- websocket -->
@@ -54,11 +53,6 @@
         <dependency>
             <groupId>com.ruoyi.geekxd</groupId>
             <artifactId>ruoyi-netty</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-redis</artifactId>
         </dependency>
 
         <dependency>

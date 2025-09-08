@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ruoyi-scene-auth</artifactId>
+        <groupId>com.ruoyi.geekxd</groupId>
+        <version>3.9.0-G</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ruoyi-auth-starter</artifactId>
+
+    <description>
+        第三方认证模块
+    </description>
+
+    <dependencies>
+            <!-- 第三方认证通用工具-->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-auth-common</artifactId>
+            </dependency>
+
+            <!-- justauth通用认证 -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-oauth-justauth</artifactId>
+            </dependency>
+
+            <!-- 微信小程序和公众号认证 -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-oauth-wx</artifactId>
+            </dependency>
+
+            <!-- 手机号认证 -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-tfa-phone</artifactId>
+            </dependency>
+
+            <!-- 邮箱认证 -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-tfa-email</artifactId>
+            </dependency>
+    </dependencies>
+
+</project>

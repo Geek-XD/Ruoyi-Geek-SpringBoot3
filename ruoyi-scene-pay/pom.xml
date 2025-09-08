@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ruoyi</artifactId>
+        <groupId>com.ruoyi.geekxd</groupId>
+        <version>3.9.0-G</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ruoyi-scene-pay</artifactId>
+
+    <properties>
+        <wechatpay.version>0.2.12</wechatpay.version>
+        <alipay.version>2.2.0</alipay.version>
+    </properties>
+
+    <description>
+        支付模块
+    </description>
+    <dependencyManagement>
+        <dependencies>
+            <!-- 微信支付的api -->
+            <dependency>
+                <groupId>com.github.wechatpay-apiv3</groupId>
+                <artifactId>wechatpay-java</artifactId>
+                <version>${wechatpay.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alipay.sdk</groupId>
+                <artifactId>alipay-easysdk</artifactId>
+                <version>${alipay.version}</version>
+            </dependency>
+
+            <!-- 支付基础模块 -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-pay-common</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- 收钱吧支付 -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-pay-sqb</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- 支付宝支付 -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-pay-alipay</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- 微信支付 -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-pay-wx</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+    <modules>
+        <module>ruoyi-pay-sqb</module>
+        <module>ruoyi-pay-alipay</module>
+        <module>ruoyi-pay-wx</module>
+        <module>ruoyi-pay-common</module>
+        <module>ruoyi-pay-starter</module>
+    </modules>
+    <packaging>pom</packaging>
+</project>

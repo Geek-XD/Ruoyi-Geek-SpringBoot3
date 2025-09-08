@@ -53,7 +53,14 @@
             <!-- ruoyi-ehcache-->
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-ehcache</artifactId>
+                <artifactId>ruoyi-cache-ehcache</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- ruoyi-redis-->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-cache-redis</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
@@ -98,12 +105,6 @@
 
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-redis</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-rabbitmq</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
@@ -118,7 +119,7 @@
 
 
     <modules>
-        <module>ruoyi-ehcache</module>
+        <module>ruoyi-cache-ehcache</module>
         <module>ruoyi-mybatis-jpa</module>
         <module>ruoyi-mybatis-plus</module>
         <module>ruoyi-websocket</module>
@@ -127,7 +128,7 @@
         <module>ruoyi-netty</module>
         <module>ruoyi-atomikos</module>
         <module>ruoyi-rabbitmq</module>
-        <module>ruoyi-redis</module>
+        <module>ruoyi-cache-redis</module>
     </modules>
     <packaging>pom</packaging>
 </project>

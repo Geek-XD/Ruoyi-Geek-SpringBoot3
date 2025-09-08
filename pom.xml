@@ -303,9 +303,9 @@
         <module>ruoyi-framework</module>
         <module>ruoyi-system</module>
         <module>ruoyi-common</module>
-        <module>ruoyi-auth</module>
-        <module>ruoyi-pay</module>
-        <module>ruoyi-file</module>
+        <module>ruoyi-scene-auth</module>
+        <module>ruoyi-scene-pay</module>
+        <module>ruoyi-scene-file</module>
         <module>ruoyi-plugins</module>
         <module>ruoyi-models</module>
     </modules>
