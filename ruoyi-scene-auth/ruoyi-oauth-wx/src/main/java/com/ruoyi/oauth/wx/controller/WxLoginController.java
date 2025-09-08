@@ -35,9 +35,9 @@ public class WxLoginController extends BaseController {
         String token = null;
         AjaxResult ajax = AjaxResult.success();
         if ("miniapp".equals(source)) {
-            token = wxMiniAppLoginServiceImpl.doLogin(code);
+            token = wxMiniAppLoginServiceImpl.doLogin(code, false);
         } else if ("pub".equals(source)) {
-            token = wxPubLoginServiceImpl.doLogin(code);
+            token = wxPubLoginServiceImpl.doLogin(code, false);
         } else {
             return error("错误的登录方式");
         }

@@ -8,7 +8,7 @@ import com.ruoyi.common.utils.http.HttpClientUtil;
 
 public interface WxLoginService {
 
-    public String doLogin(String code);
+    public String doLogin(String code, boolean autoRegister);
 
     public String doRegister(OauthUser oauthUser);
 

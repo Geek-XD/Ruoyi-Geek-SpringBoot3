@@ -35,7 +35,7 @@ public class WxPubLoginServiceImpl implements WxLoginService {
     private IOauthUserService oauthUserService;
 
     @Override
-    public String doLogin(String code) {
+    public String doLogin(String code,boolean autoRegister) {
         String openid = doAuth(
                 wxH5Constant.getUrl(),
                 wxH5Constant.getAppId(),
