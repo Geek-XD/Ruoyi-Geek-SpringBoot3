@@ -35,7 +35,7 @@ public class WxLoginController extends BaseController {
         String token = null;
         AjaxResult ajax = AjaxResult.success();
         if ("miniapp".equals(source)) {
-            token = wxMiniAppLoginServiceImpl.doLogin(code, false);
+            token = wxMiniAppLoginServiceImpl.doLogin(code, true);
         } else if ("pub".equals(source)) {
             token = wxPubLoginServiceImpl.doLogin(code, false);
         } else {

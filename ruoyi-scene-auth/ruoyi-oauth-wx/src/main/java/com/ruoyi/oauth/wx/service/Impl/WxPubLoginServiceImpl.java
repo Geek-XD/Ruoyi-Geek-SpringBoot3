@@ -6,10 +6,16 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.auth.common.domain.OauthUser;
 import com.ruoyi.auth.common.service.IOauthUserService;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.MessageUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.manager.AsyncManager;
+import com.ruoyi.framework.manager.factory.AsyncFactory;
+import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.framework.web.service.UserDetailsServiceImpl;
 import com.ruoyi.oauth.wx.constant.WxPubConstant;
@@ -34,22 +40,44 @@ public class WxPubLoginServiceImpl implements WxLoginService {
     @Autowired
     private IOauthUserService oauthUserService;
 
+    @Autowired
+    private SysLoginService sysLoginService;
+
     @Override
-    public String doLogin(String code,boolean autoRegister) {
-        String openid = doAuth(
+    public String doLogin(String code, boolean autoRegister) {
+        JSONObject doAuth = doAuth(
                 wxH5Constant.getUrl(),
                 wxH5Constant.getAppId(),
                 wxH5Constant.getAppSecret(),
-                code).getString("openid");
+                code);
+        String openid = doAuth.getString("openid");
         OauthUser selectOauthUser = oauthUserService.selectOauthUserByUUID(openid);
+        SysUser sysUser = null;
         if (selectOauthUser == null) {
-            return null;
+            if (autoRegister) {
+                sysUser = new SysUser();
+                sysUser.setUserName(openid);
+                sysUser.setNickName(openid);
+                sysUser.setPassword(SecurityUtils.encryptPassword(code));
+                userService.registerUser(sysUser);
+                OauthUser oauthUser = new OauthUser();
+                oauthUser.setUserId(sysUser.getUserId());
+                oauthUser.setOpenId(doAuth.getString("openid"));
+                oauthUser.setUuid(doAuth.getString("openid"));
+                oauthUser.setSource("WXMiniApp");
+                oauthUser.setAccessToken(doAuth.getString("session_key"));
+                oauthUserService.insertOauthUser(oauthUser);
+            }
+        } else {
+            sysUser = userService.selectUserById(selectOauthUser.getUserId());
         }
-        SysUser sysUser = userService.selectUserById(selectOauthUser.getUserId());
         if (sysUser == null) {
             throw new ServiceException("该微信未绑定用户");
         }
+        AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getUserName(), Constants.LOGIN_SUCCESS,
+                MessageUtils.message("user.login.success")));
         LoginUser loginUser = (LoginUser) userDetailsServiceImpl.createLoginUser(sysUser);
+        sysLoginService.recordLoginInfo(loginUser.getUserId());
         return tokenService.createToken(loginUser);
     }
 
@@ -69,7 +97,7 @@ public class WxPubLoginServiceImpl implements WxLoginService {
         oauthUser.setOpenId(doAuth.getString("openid"));
         oauthUser.setUuid(doAuth.getString("openid"));
         oauthUser.setSource("WXPub");
-        oauthUser.setAccessToken(doAuth.getString("sessionKey"));
+        oauthUser.setAccessToken(doAuth.getString("session_key"));
         oauthUserService.insertOauthUser(oauthUser);
         return "";
     }

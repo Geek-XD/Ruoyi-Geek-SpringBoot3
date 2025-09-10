@@ -60,10 +60,11 @@ public class WxMiniAppLoginServiceImpl implements WxLoginService {
                 sysUser.setPassword(SecurityUtils.encryptPassword(code));
                 userService.registerUser(sysUser);
                 OauthUser oauthUser = new OauthUser();
+                oauthUser.setUserId(sysUser.getUserId());
                 oauthUser.setOpenId(doAuth.getString("openid"));
                 oauthUser.setUuid(doAuth.getString("openid"));
                 oauthUser.setSource("WXMiniApp");
-                oauthUser.setAccessToken(doAuth.getString("sessionKey"));
+                oauthUser.setAccessToken(doAuth.getString("session_key"));
                 oauthUserService.insertOauthUser(oauthUser);
             }
         } else {
@@ -95,7 +96,7 @@ public class WxMiniAppLoginServiceImpl implements WxLoginService {
         oauthUser.setOpenId(doAuth.getString("openid"));
         oauthUser.setUuid(doAuth.getString("openid"));
         oauthUser.setSource("WXMiniApp");
-        oauthUser.setAccessToken(doAuth.getString("sessionKey"));
+        oauthUser.setAccessToken(doAuth.getString("session_key"));
         oauthUserService.insertOauthUser(oauthUser);
         return "";
     }
