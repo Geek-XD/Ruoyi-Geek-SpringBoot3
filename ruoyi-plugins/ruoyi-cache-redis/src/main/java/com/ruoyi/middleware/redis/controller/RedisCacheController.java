@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.StringUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 
 /**
  * 缓存监控
@@ -34,6 +36,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class RedisCacheController {
     @Autowired
     private RedisTemplate redisTemplate;
+    
 
     @Operation(summary = "获取缓存信息")
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
@@ -60,5 +63,13 @@ public class RedisCacheController {
         result.put("commandStats", pieList);
         return AjaxResult.success(result);
     }
+
+    @Anonymous
+    @GetMapping("/test")
+    public String getMethodName() {
+        redisTemplate.convertAndSend("order.channel", "messageTest");
+        return new String("ok");
+    }
+    
 
 }
