@@ -32,7 +32,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @Tag(name = "支付业务")
 @RequestMapping("/pay")
 @RestController
-@Anonymous
 public class PayController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(PayController.class);
