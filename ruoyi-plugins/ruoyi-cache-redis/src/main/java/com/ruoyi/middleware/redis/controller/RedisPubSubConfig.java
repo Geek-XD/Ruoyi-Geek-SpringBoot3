@@ -1,9 +1,10 @@
 package com.ruoyi.middleware.redis.controller;
 
-import com.ruoyi.middleware.redis.annotation.RedisListener;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
@@ -11,15 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.listener.KeyExpirationEventMessageListener;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
+import com.ruoyi.middleware.redis.annotation.RedisListener;
 
 @Configuration
 public class RedisPubSubConfig implements ApplicationListener<ContextRefreshedEvent> {

@@ -135,40 +135,6 @@ public class HttpUtils {
         }
     }
 
-    // ============== 兼容旧方法（Deprecated）==============
-    @Deprecated
-    public static String sendGet(String url) {
-        return get(url);
-    }
-
-    @Deprecated
-    public static String sendGet(String url, String param) {
-        return sendGet(url, param, Constants.UTF8);
-    }
-
-    @Deprecated
-    public static String sendGet(String url, String param, String contentType) {
-        String real = StringUtils.isNotBlank(param) ? url + "?" + param : url;
-        return get(real);
-    }
-
-    @Deprecated
-    public static String sendPost(String url, String param) {
-        try {
-            return postCall(url, "application/x-www-form-urlencoded", param);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @Deprecated
-    public static String sendSSLPost(String url, String param) {
-        log.warn("sendSSLPost 已废弃，使用 sendPost/ postJson 等安全方法");
-        return sendPost(url, param);
-    }
-
-    // 已废弃不安全 HostnameVerifier，保留 TrustAnyTrustManager 仅用于兼容场景（未再使用）
-
     /**
      * 获取httpClient
      * 
