@@ -1,9 +1,9 @@
 package com.ruoyi.file.minio.config;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.impl.io.EmptyInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -54,9 +54,11 @@ public class MinioManagement implements StorageManagement {
         boolean b = false;
         try {
             b = minioBucket.getClient().bucketExists(bucketExistArgs);
-            PutObjectArgs putObjectArgs = PutObjectArgs.builder()
-                    .object(FileUtils.getRelativePath(RuoYiConfig.getProfile()) + "/")
-                    .stream(EmptyInputStream.nullInputStream(), 0, -1).bucket(minioBucket.getBucketName()).build();
+        // 使用空输入流兼容 httpclient5 移除旧 EmptyInputStream
+        InputStream empty = InputStream.nullInputStream();
+        PutObjectArgs putObjectArgs = PutObjectArgs.builder()
+            .object(FileUtils.getRelativePath(RuoYiConfig.getProfile()) + "/")
+            .stream(empty, 0, -1).bucket(minioBucket.getBucketName()).build();
             minioBucket.getClient().putObject(putObjectArgs);
         } catch (Exception e) {
             logger.error("数据桶：{}  - 链接失败", minioBucket.getName());

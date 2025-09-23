@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.auth.common.domain.OauthUser;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.http.HttpClientUtil;
+import com.ruoyi.common.utils.http.HttpUtils;
 
 public interface WxLoginService {
 
@@ -19,7 +19,7 @@ public interface WxLoginService {
                 .append("&js_code=").append(code)
                 .append("&grant_type=").append("authorization_code");
         String getMessageUrl = builder.toString();
-        String result = HttpClientUtil.sendHttpGet(getMessageUrl);
+    String result = HttpUtils.get(getMessageUrl);
         JSONObject jsonObject = JSON.parseObject(result);
         if (jsonObject.containsKey("openid")) {
             String openid = jsonObject.getString("openid");

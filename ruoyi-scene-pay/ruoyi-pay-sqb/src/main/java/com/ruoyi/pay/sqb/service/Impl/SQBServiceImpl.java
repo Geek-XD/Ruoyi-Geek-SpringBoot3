@@ -25,7 +25,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.http.HttpClientUtil;
+import com.ruoyi.common.utils.http.HttpUtils;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.pay.domain.PayOrder;
 import com.ruoyi.pay.service.IPayOrderService;
@@ -61,7 +61,8 @@ public class SQBServiceImpl implements ISqbPayService {
         try {
             Map<String, String> header = new HashMap<>();
             header.put("Authorization", sn + " " + sign);
-            xmlRes = HttpClientUtil.sendHttpPost(url, body, header);
+            // 使用新的 HttpUtils.postJson 支持 headers
+            xmlRes = HttpUtils.postJson(url, body, header);
         } catch (Exception e) {
         }
         return xmlRes;

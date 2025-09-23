@@ -17,7 +17,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
-        <spring-boot.version>3.5.5</spring-boot.version>
+        <spring-boot.version>3.5.6</spring-boot.version>
         <druid.version>1.2.27</druid.version>
         <jta.version>1.1</jta.version>
         <!-- bitwalker目前处于准废弃状态:最近一次更新2018.1.24 -->
@@ -31,8 +31,7 @@
         <commons-io.version>2.20.0</commons-io.version>
         <commons.collections.version>4.5.0</commons.collections.version>
         <poi.version>5.4.1</poi.version>
-        <!-- TODO原仓库已迁移httpclient5 -->
-        <httpclient.version>4.5.14</httpclient.version>
+        <httpclient5.version>5.5</httpclient5.version>
         <velocity.version>2.4.1</velocity.version>
         <jwt.version>0.12.6</jwt.version>
         <knife4j.version>4.5.0</knife4j.version>
@@ -136,17 +135,10 @@
                 <version>${velocity.version}</version>
             </dependency>
 
-            <!--httpclient-->
             <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${httpclient.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                </exclusions>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${httpclient5.version}</version>
             </dependency>
 
             <!-- collections工具类 -->
