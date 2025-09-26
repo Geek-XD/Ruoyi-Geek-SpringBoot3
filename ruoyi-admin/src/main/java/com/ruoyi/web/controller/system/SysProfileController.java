@@ -73,23 +73,17 @@ public class SysProfileController extends BaseController {
     public AjaxResult updateProfile(@RequestBody SysUser user) {
         LoginUser loginUser = getLoginUser();
         SysUser sysUser = loginUser.getUser();
-        user.setUserName(sysUser.getUserName());
+        sysUser.setNickName(user.getNickName());
+        sysUser.setEmail(user.getEmail());
+        sysUser.setPhonenumber(user.getPhonenumber());
+        sysUser.setSex(user.getSex());
         if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
             return error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
         if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
             return error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-        user.setUserId(sysUser.getUserId());
-        user.setPassword(null);
-        user.setAvatar(null);
-        user.setDeptId(null);
         if (userService.updateUserProfile(user) > 0) {
-            // 更新缓存用户信息
-            sysUser.setNickName(user.getNickName());
-            sysUser.setPhonenumber(user.getPhonenumber());
-            sysUser.setEmail(user.getEmail());
-            sysUser.setSex(user.getSex());
             tokenService.setLoginUser(loginUser);
             return success();
         }
