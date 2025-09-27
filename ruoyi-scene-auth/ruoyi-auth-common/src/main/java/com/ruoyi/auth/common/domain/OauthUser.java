@@ -114,6 +114,32 @@ public class OauthUser extends BaseEntity {
     @Excel(name = "Twitter平台用户的附带属性，部分平台可能没有")
     private String oauthTokenSecret;
 
+    /** 用户名称 */
+    @Schema(title = "用户名称")
+    @Excel(name = "用户名称")
+    private String userName;
+
+    /** 部门名称 */
+    @Schema(title = "部门名称")
+    @Excel(name = "部门名称")
+    private String deptName;
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

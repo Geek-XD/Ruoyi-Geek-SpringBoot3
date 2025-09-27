@@ -24,10 +24,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="code" column="code" />
         <result property="oauthToken" column="oauth_token" />
         <result property="oauthTokenSecret" column="oauth_token_secret" />
+        <result property="userName" column="user_name" />
+        <result property="deptName" column="dept_name" />
     </resultMap>
 
     <sql id="selectOauthUserVo">
-        select id, uuid, user_id, source, access_token, expire_in, refresh_token, open_id, uid, access_code, union_id, scope, token_type, id_token, mac_algorithm, mac_key, code, oauth_token, oauth_token_secret from oauth_user
+        select id, uuid, source, access_token, expire_in, refresh_token, open_id, uid, access_code, union_id, scope, token_type, id_token, mac_algorithm, mac_key, code, oauth_token, oauth_token_secret, sys_user.user_name, sys_dept.dept_name from oauth_user
+        left join sys_user on oauth_user.user_id = sys_user.user_id
+        left join sys_dept on sys_user.dept_id = sys_dept.dept_id
     </sql>
 
     <select id="checkUserNameUnique" parameterType="String" resultType="int">
