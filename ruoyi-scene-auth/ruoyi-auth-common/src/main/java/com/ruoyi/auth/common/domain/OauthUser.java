@@ -32,11 +32,9 @@ public class OauthUser extends BaseEntity {
     @Excel(name = "用户ID")
     private Long userId;
 
-    /**
-     * 第三方用户来源，可选值：GITHUB、GITEE、QQ，更多请参考：AuthDefaultSource.java(opens new window)
-     */
-    @Schema(title = "第三方用户来源，可选值：GITHUB、GITEE、QQ，更多请参考：AuthDefaultSource.java(opens new window)")
-    @Excel(name = "第三方用户来源，可选值：GITHUB、GITEE、QQ，更多请参考：AuthDefaultSource.java(opens new window)")
+    /** 第三方用户来源 */
+    @Schema(title = "第三方用户来源")
+    @Excel(name = "第三方用户来源")
     private String source;
 
     /** 用户的授权令牌 */

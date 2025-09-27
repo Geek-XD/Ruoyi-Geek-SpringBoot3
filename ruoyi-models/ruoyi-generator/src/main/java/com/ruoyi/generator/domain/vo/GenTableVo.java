@@ -45,7 +45,7 @@ public class GenTableVo extends BaseEntity {
     /** 参与关联的列 */
     private List<GenColumn> joinColumns;
 
-    /** 获取所有表 */
+    /** 获取所有与本业务相关的表 */
     public List<GenTable> getAllGenTables() {
         List<GenTable> allGenTables = new ArrayList<>();
         allGenTables.add(table);
@@ -53,7 +53,7 @@ public class GenTableVo extends BaseEntity {
         return allGenTables;
     }
 
-    /** 获取所有列 */
+    /** 获取所有与本业务相关的列 */
     public List<GenColumn> getAllGenTableColumns() {
         List<GenColumn> allGenTableColumns = new ArrayList<>();
         if (columns != null) {
@@ -65,7 +65,7 @@ public class GenTableVo extends BaseEntity {
         return allGenTableColumns;
     }
 
-    /** 获取表映射 */
+    /** 获取所有与本业务相关表的表ID与表对象映射 */
     public Map<Long, GenTable> getTableMap() {
         Map<Long, GenTable> tableMap = new HashMap<>();
         if (table != null) {
@@ -81,7 +81,7 @@ public class GenTableVo extends BaseEntity {
         return tableMap;
     }
 
-    /** 获取关联时表别名映射 */
+    /** 获取所有与本业务相关表的表ID与表别名映射 */
     public Map<Long, String> getTableAliasMap() {
         Map<Long, String> tableMap = new HashMap<>();
         if (table != null) {
@@ -98,7 +98,7 @@ public class GenTableVo extends BaseEntity {
         return tableMap;
     }
 
-    /** 获取列映射 */
+    /** 获取所有与本业务相关列的列ID与列对象映射 */
     public Map<Long, GenColumn> getColumnMap() {
         Map<Long, GenColumn> columnMap = new HashMap<>();
         List<GenTable> genTables = getAllGenTables();
