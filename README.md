@@ -164,6 +164,10 @@ com.ruoyi
 
 <table>
     <tr>
+        <td><img src="./doc/image/message.png"/></td>
+        <td><img src="./doc/image/flowable.png"/></td>
+    </tr>
+    <tr>
         <td><img src="./doc/image/online-mb-list.png"/></td>
         <td><img src="./doc/image/online-mb-edit.png"/></td>
     </tr>

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,6 +46,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Tag(name = "默认文件存储")
 @RestController
 @RequestMapping("/file")
+@PreAuthorize("@ss.hasPermi('system:file:add')")
 public class FileController {
 
     @Autowired
