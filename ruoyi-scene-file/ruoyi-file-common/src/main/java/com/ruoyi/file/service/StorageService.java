@@ -66,7 +66,7 @@ public class StorageService {
         } else {
             this.storageBucket.put(filePath, file);
         }
-        return generateUrl(filePath);
+        return filePath;
     }
 
     /**
