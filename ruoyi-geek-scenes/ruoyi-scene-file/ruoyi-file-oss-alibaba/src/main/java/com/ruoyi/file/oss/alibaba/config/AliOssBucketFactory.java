@@ -14,7 +14,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.ruoyi.file.oss.alibaba.domain.AliOssBucket;
-import com.ruoyi.file.storage.StorageManagement;
+import com.ruoyi.file.storage.StorageFactory;
 
 /**
  * 配置类用于管理阿里云OSS客户端实例及其相关属性。
@@ -22,8 +22,8 @@ import com.ruoyi.file.storage.StorageManagement;
 @Configuration("oss")
 @ConditionalOnProperty(prefix = "oss", name = "enable", havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties(prefix = "oss")
-public class AliOssManagement implements StorageManagement {
-    private static final Logger logger = LoggerFactory.getLogger(AliOssManagement.class);
+public class AliOssBucketFactory implements StorageFactory {
+    private static final Logger logger = LoggerFactory.getLogger(AliOssBucketFactory.class);
     private Map<String, AliOssBucketProperties> client;
     private String primary;
     private Map<String, AliOssBucket> targetAliOssBucket = new HashMap<>();
@@ -51,7 +51,7 @@ public class AliOssManagement implements StorageManagement {
     }
 
     private void validateOssBucket(AliOssBucket aliOssBucket) {
-        OSS ossClient = aliOssBucket.getOssClient();
+        OSS ossClient = aliOssBucket.getClient();
         String bucketName = aliOssBucket.getBucketName();
         try {
             if (!ossClient.doesBucketExist(bucketName)) {
@@ -78,7 +78,7 @@ public class AliOssManagement implements StorageManagement {
         OSS client = new OSSClientBuilder().build(props.getEndpoint(), props.getAccessKeyId(),
                 props.getAccessKeySecret());
         AliOssBucket ossBucket = AliOssBucket.builder()
-                .ossClient(client)
+                .client(client)
                 .bucketName(props.getBucketName())
                 .endpoint(props.getEndpoint())
                 .build();
@@ -87,6 +87,7 @@ public class AliOssManagement implements StorageManagement {
         return ossBucket;
     }
 
+    @Override
     public AliOssBucket getPrimaryBucket() {
         return this.primaryBucket;
     }

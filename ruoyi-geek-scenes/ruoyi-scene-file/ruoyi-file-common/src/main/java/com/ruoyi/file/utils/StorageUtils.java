@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.file.storage.StorageBucket;
-import com.ruoyi.file.storage.StorageManagement;
+import com.ruoyi.file.storage.StorageFactory;
 
 import jakarta.annotation.PostConstruct;
 
@@ -20,7 +20,7 @@ import jakarta.annotation.PostConstruct;
 public class StorageUtils {
     private static final Logger logger = LoggerFactory.getLogger(StorageUtils.class);
 
-    private static Map<String, StorageManagement> storageManagementMap;
+    private static Map<String, StorageFactory> storageManagementMap;
 
     public static String getPrimaryStorageType() {
         return RuoYiConfig.getFileServer();
@@ -38,7 +38,7 @@ public class StorageUtils {
      * @return 存储桶
      */
     public static StorageBucket getStorageBucket(String storageType, String clientName) {
-        StorageManagement storageManagement = storageManagementMap.get(storageType);
+        StorageFactory storageManagement = storageManagementMap.get(storageType);
         if (storageManagement == null) {
             throw new IllegalArgumentException("Storage management for type " + storageType + " not found");
         }
@@ -58,14 +58,14 @@ public class StorageUtils {
     public static Map<String, List<String>> getClientList() {
         Map<String, List<String>> result = new HashMap<>();
         for (String storageType : storageManagementMap.keySet()) {
-            StorageManagement config = storageManagementMap.get(storageType);
+            StorageFactory config = storageManagementMap.get(storageType);
             result.put(storageType, new ArrayList<>(config.getClient().keySet()));
         }
         return result;
     }
 
     @Autowired(required = false)
-    private void setStorageManagementMap(Map<String, StorageManagement> storageManagementMap) {
+    private void setStorageManagementMap(Map<String, StorageFactory> storageManagementMap) {
         StorageUtils.storageManagementMap = storageManagementMap;
     }
 

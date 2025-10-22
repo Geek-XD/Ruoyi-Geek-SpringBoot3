@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.file.domain.SysFilePartETag;
 import com.ruoyi.file.minio.exception.MinioClientErrorException;
 import com.ruoyi.file.storage.StorageBucket;
@@ -21,7 +20,6 @@ import com.ruoyi.file.storage.StorageBucket;
 import io.minio.ComposeObjectArgs;
 import io.minio.ComposeSource;
 import io.minio.GetObjectArgs;
-import io.minio.GetObjectResponse;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -71,16 +69,7 @@ public class MinioBucket implements StorageBucket {
                 .object(filePath)
                 .bucket(bucketName)
                 .build();
-        GetObjectResponse response = client.getObject(getObjectArgs);
-        MinioEntityVO minioFileVO = new MinioEntityVO();
-        minioFileVO.setInputStream(response);
-        minioFileVO.setByteCount(Convert.toLong(response.headers().get("Content-Length"), null));
-        minioFileVO.setFilePath(filePath);
-        minioFileVO.setObject(response.object());
-        minioFileVO.setRegion(response.region());
-        minioFileVO.setBuket(response.bucket());
-        minioFileVO.setHeaders(response.headers());
-        return minioFileVO;
+        return new MinioEntityVO(client.getObject(getObjectArgs), filePath);
     }
 
     @Override

@@ -69,17 +69,17 @@ public class FileController {
         try {
             String filePath = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             StorageService storageService = null;
+            SysFileInfo sysFileInfo = sysFileInfoService.buildSysFileInfo(file);
             if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(clientName)) {
+                sysFileInfo.setStorageType(StorageUtils.getPrimaryStorageType());
                 storageService = new StorageService(StorageUtils.getPrimaryStorageBucket());
             } else {
+                sysFileInfo.setStorageType(storageType);
                 storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
             }
-            filePath  = storageService.upload(filePath, file);
+            filePath = storageService.upload(filePath, file);
             String url = storageService.generateUrl(filePath);
-            SysFileInfo sysFileInfo = sysFileInfoService.buildSysFileInfo(file);
             sysFileInfo.setFilePath(filePath);
-            sysFileInfo.setStorageType(
-                    StringUtils.isNotEmpty(storageType) ? storageType : StorageUtils.getPrimaryStorageType());
             sysFileInfoService.insertSysFileInfo(sysFileInfo);
             AjaxResult ajax = AjaxResult.success();
             ajax.put("url", url);

@@ -12,13 +12,13 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.ruoyi.file.local.domain.LocalBucket;
-import com.ruoyi.file.storage.StorageManagement;
+import com.ruoyi.file.storage.StorageFactory;
 
 @Configuration("local")
 @ConditionalOnProperty(prefix = "local", name = { "enable" }, havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties("local")
-public class LocalManagement implements StorageManagement, WebMvcConfigurer {
-    private static final Logger logger = LoggerFactory.getLogger(LocalManagement.class);
+public class LocalBucketFactory implements StorageFactory, WebMvcConfigurer {
+    private static final Logger logger = LoggerFactory.getLogger(LocalBucketFactory.class);
     private Map<String, LocalBucketProperties> client;
     private String primary;
     private Map<String, LocalBucket> targetLocalBucket = new HashMap<>();
@@ -59,6 +59,7 @@ public class LocalManagement implements StorageManagement, WebMvcConfigurer {
         });
     }
 
+    @Override
     public LocalBucket getPrimaryBucket() {
         return this.primaryBucket;
     }

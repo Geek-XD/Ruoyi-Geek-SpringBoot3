@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AliOssBucket implements StorageBucket {
 
     private String bucketName;
-    private OSS ossClient;
+    private OSS client;
     private String permission;
     private String endpoint;
 
@@ -46,7 +46,7 @@ public class AliOssBucket implements StorageBucket {
             metadata.setContentType(file.getContentType());
             metadata.setContentLength(inputStream.available());
             PutObjectRequest putRequest = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
-            this.ossClient.putObject(putRequest);
+            this.client.putObject(putRequest);
         } catch (Exception e) {
             log.error("Error uploading file to OSS: {}", e.getMessage(), e);
             throw new AliOssClientErrorException("Error uploading file to OSS: " + e.getMessage(), e);
@@ -55,23 +55,17 @@ public class AliOssBucket implements StorageBucket {
 
     @Override
     public void remove(String filePath) throws Exception {
-        ossClient.deleteObject(bucketName, filePath);
+        client.deleteObject(bucketName, filePath);
     }
 
     @Override
     public AliOssEntityVO get(String filePath) throws Exception {
         GetObjectRequest request = new GetObjectRequest(this.bucketName, filePath);
-        OSSObject ossObject = this.ossClient.getObject(request);
+        OSSObject ossObject = this.client.getObject(request);
         if (ossObject == null) {
             throw new Exception("Failed to retrieve object from OSS.");
         }
-        AliOssEntityVO fileVO = new AliOssEntityVO();
-        fileVO.setInputStream(ossObject.getObjectContent());
-        fileVO.setKey(ossObject.getKey());
-        fileVO.setBucketName(ossObject.getBucketName());
-        fileVO.setByteCount(ossObject.getObjectMetadata().getContentLength());
-        fileVO.setFilePath(filePath);
-        return fileVO;
+        return new AliOssEntityVO(ossObject, filePath);
     }
 
     @Override
@@ -79,7 +73,7 @@ public class AliOssBucket implements StorageBucket {
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, filePath);
         Date expiration = new Date(System.currentTimeMillis() + expireTime * 1000); // 设置过期时间为1小时
         request.setExpiration(expiration);
-        return ossClient.generatePresignedUrl(request);
+        return client.generatePresignedUrl(request);
     }
 
     @Override
@@ -96,7 +90,7 @@ public class AliOssBucket implements StorageBucket {
      */
     public String initMultipartUpload(String filePath) throws Exception {
         InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, filePath);
-        String uploadId = ossClient.initiateMultipartUpload(initRequest).getUploadId();
+        String uploadId = client.initiateMultipartUpload(initRequest).getUploadId();
         return uploadId;
     }
 
@@ -113,7 +107,7 @@ public class AliOssBucket implements StorageBucket {
         uploadPartRequest.setInputStream(inputStream);
         uploadPartRequest.setPartSize(partSize);
         uploadPartRequest.setPartNumber(partNumber);
-        PartETag partETag = ossClient.uploadPart(uploadPartRequest).getPartETag();
+        PartETag partETag = client.uploadPart(uploadPartRequest).getPartETag();
         return new SysFilePartETag(partETag.getPartNumber(), partETag.getETag(), partETag.getPartSize(),
                 partETag.getPartCRC());
     }
@@ -134,7 +128,7 @@ public class AliOssBucket implements StorageBucket {
         try {
             CompleteMultipartUploadRequest completeRequest = new CompleteMultipartUploadRequest(bucketName, filePath,
                     uploadId, partETags);
-            ossClient.completeMultipartUpload(completeRequest);
+            client.completeMultipartUpload(completeRequest);
             log.info("分片上传已完成并合并: 文件={}, uploadId={}, 分片数={}",
                     filePath, uploadId, partETags.size());
             return filePath;
@@ -142,7 +136,7 @@ public class AliOssBucket implements StorageBucket {
             log.error("合并分片失败: 文件={}, uploadId={}, 错误={}",
                     filePath, uploadId, e.getMessage());
             try {
-                ossClient.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName, filePath, uploadId));
+                client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName, filePath, uploadId));
             } catch (Exception abortEx) {
                 log.error("取消分片上传失败: {}", abortEx.getMessage());
             }
@@ -150,12 +144,12 @@ public class AliOssBucket implements StorageBucket {
         }
     }
 
-    public OSS getOssClient() {
-        return ossClient;
+    public OSS getClient() {
+        return client;
     }
 
-    public void setOssClient(OSS ossClient) {
-        this.ossClient = ossClient;
+    public void setClient(OSS client) {
+        this.client = client;
     }
 
     public String getBucketName() {

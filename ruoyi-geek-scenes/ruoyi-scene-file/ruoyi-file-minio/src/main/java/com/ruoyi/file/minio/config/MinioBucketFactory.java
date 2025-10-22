@@ -14,7 +14,7 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.file.minio.domain.MinioBucket;
-import com.ruoyi.file.storage.StorageManagement;
+import com.ruoyi.file.storage.StorageFactory;
 
 import io.minio.BucketExistsArgs;
 import io.minio.MinioClient;
@@ -23,8 +23,8 @@ import io.minio.PutObjectArgs;
 @Configuration("minio")
 @ConditionalOnProperty(prefix = "minio", name = { "enable" }, havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties("minio")
-public class MinioManagement implements StorageManagement {
-    private static final Logger logger = LoggerFactory.getLogger(MinioManagement.class);
+public class MinioBucketFactory implements StorageFactory {
+    private static final Logger logger = LoggerFactory.getLogger(MinioBucketFactory.class);
     private Map<String, MinioBucketProperties> client;
     private String primary;
     private Map<String, MinioBucket> targetMinioBucket = new HashMap<>();
@@ -97,6 +97,7 @@ public class MinioManagement implements StorageManagement {
         return targetMinioBucket.get(clent);
     }
 
+    @Override
     public MinioBucket getPrimaryBucket() {
         return this.primaryBucket;
     }
