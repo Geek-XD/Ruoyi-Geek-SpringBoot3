@@ -112,7 +112,7 @@ com.ruoyi
 │       └── minio                          // minio分布式文件服务
 │       └── oss-alibaba                    // alibaba的oss云储存服务
 │       └── starter                        // 第三方认证启动器
-├── ruoyi-models   	// 业务场景
+├── ruoyi-geek-models   	// 业务场景
 │       └── online			   // 在线开发模块（可移除）
 │       └── quartz			   // 定时任务（可移除）
 │       └── generator			   // 代码生成（可移除）
@@ -120,7 +120,7 @@ com.ruoyi
 │       └── flowable			   // 流程管理（可移除）（依赖于form模块）
 │       └── message			   // 消息模块（可移除）（可以与phone、email模块协同）
 │       └── starter  		 	   // 业务场景启动器
-├── ruoyi-plugins   	// 插件
+├── ruoyi-geek-plugins   	// 插件
 │       └── ehcache			   // ehcache缓存插件（与redis模块同类，两者二选一） 
 │       └── mybatis-jpa			   // mybatis-jpa插件（可移除）（简化CRUD，以数据模型为基础开发）
 │       └── mybatis-plus		   // mybatis-plus插件（可移除）（简化CRUD）

@@ -253,27 +253,6 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
-            <!-- 第三方登录启动器 -->
-            <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-auth-starter</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <!-- 支付管理启动器 -->
-            <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-pay-starter</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <!-- 文件管理启动器 -->
-            <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-file-starter</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
             <!-- 插件启动器 -->
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
@@ -287,6 +266,13 @@
                 <artifactId>ruoyi-models-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
+
+            <!-- 场景启动器 -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-scene-starter</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -295,11 +281,9 @@
         <module>ruoyi-framework</module>
         <module>ruoyi-system</module>
         <module>ruoyi-common</module>
-        <module>ruoyi-scene-auth</module>
-        <module>ruoyi-scene-pay</module>
-        <module>ruoyi-scene-file</module>
-        <module>ruoyi-plugins</module>
-        <module>ruoyi-models</module>
+        <module>ruoyi-geek-scenes</module>
+        <module>ruoyi-geek-plugins</module>
+        <module>ruoyi-geek-models</module>
     </modules>
     <packaging>pom</packaging>
 

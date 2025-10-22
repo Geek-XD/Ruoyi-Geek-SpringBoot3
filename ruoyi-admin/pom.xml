@@ -53,22 +53,10 @@
             <artifactId>ruoyi-framework</artifactId>
         </dependency>
 
-        <!-- 集成第三方认证场景 -->
+        <!-- 模块启动器 -->
         <dependency>
             <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-auth-starter</artifactId>
-        </dependency>
-
-        <!-- 集成第三方支付场景 -->
-        <dependency>
-            <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-pay-starter</artifactId>
-        </dependency>
-
-        <!-- 集成文件管理场景 -->
-        <dependency>
-            <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-file-starter</artifactId>
+            <artifactId>ruoyi-scene-starter</artifactId>
         </dependency>
 
         <!-- 集成插件启动器 -->
