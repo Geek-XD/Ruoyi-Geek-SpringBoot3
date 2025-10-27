@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.constant.CacheConstants;
@@ -108,7 +107,6 @@ public class StorageService {
         OutputStream outputStream = response.getOutputStream();
         FileUtils.setAttachmentResponseHeader(response, FileUtils.getName(fileEntity.getFilePath()));
         response.setContentLengthLong(fileEntity.getByteCount());
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         FileUtils.writeBytes(inputStream, outputStream);
     }
 

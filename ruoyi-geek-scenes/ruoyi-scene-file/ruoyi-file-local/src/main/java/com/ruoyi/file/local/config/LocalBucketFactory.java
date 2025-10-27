@@ -2,6 +2,7 @@ package com.ruoyi.file.local.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,19 +20,19 @@ import com.ruoyi.file.storage.StorageFactory;
 @ConfigurationProperties("local")
 public class LocalBucketFactory implements StorageFactory, WebMvcConfigurer {
     private static final Logger logger = LoggerFactory.getLogger(LocalBucketFactory.class);
-    private Map<String, LocalBucketProperties> client;
+    private Map<String, LocalBucketProperties> buckets;
     private String primary;
     private Map<String, LocalBucket> targetLocalBucket = new HashMap<>();
     private LocalBucket primaryBucket;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (client == null || client.isEmpty()) {
-            throw new RuntimeException("Local client properties cannot be null or empty");
+        if (buckets == null || buckets.isEmpty()) {
+            throw new RuntimeException("Local bucket properties cannot be null or empty");
         }
-        client.forEach((name, props) -> {
+        buckets.forEach((name, props) -> {
             targetLocalBucket.put(name, LocalBucket.builder()
-                    .clientName(name)
+                    .bucketName(name)
                     .basePath(props.getPath())
                     .permission(props.getPermission())
                     .api(props.getApi())
@@ -51,7 +52,7 @@ public class LocalBucketFactory implements StorageFactory, WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        client.forEach((name, props) -> {
+        buckets.forEach((name, props) -> {
             if ("public".equals(props.getPermission())) {
                 registry.addResourceHandler(props.getApi() + "/**")
                         .addResourceLocations("file:" + props.getPath() + "/");
@@ -64,12 +65,12 @@ public class LocalBucketFactory implements StorageFactory, WebMvcConfigurer {
         return this.primaryBucket;
     }
 
-    public Map<String, LocalBucketProperties> getClient() {
-        return client;
+    public Set<String> getBuckets() {
+        return buckets.keySet();
     }
 
-    public void setClient(Map<String, LocalBucketProperties> client) {
-        this.client = client;
+    public void setBuckets(Map<String, LocalBucketProperties> buckets) {
+        this.buckets = buckets;
     }
 
     public String getPrimaryStorageBucket() {

@@ -11,7 +11,7 @@
             "description": "默认存储名称"
         },
         {
-            "name": "minio.client",
+            "name": "minio.buckets",
             "type": "java.util.Map<java.lang.String, com.ruoyi.file.minio.config.MinioBucketProperties>",
             "description": "储存桶"
         }

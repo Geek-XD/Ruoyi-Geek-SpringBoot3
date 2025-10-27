@@ -1,6 +1,6 @@
 package com.ruoyi.file.storage;
 
-import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.InitializingBean;
 
@@ -23,10 +23,10 @@ public interface StorageFactory extends InitializingBean {
     StorageBucket getBucket(String clientName);
 
     /**
-     * 获取存储桶
+     * 获取所有储存桶的名称
      *
-     * @return 存储桶
+     * @return 存储桶名称集合
      */
-    public Map<String, ?> getClient();
+    public Set<String> getBuckets();
 
 }

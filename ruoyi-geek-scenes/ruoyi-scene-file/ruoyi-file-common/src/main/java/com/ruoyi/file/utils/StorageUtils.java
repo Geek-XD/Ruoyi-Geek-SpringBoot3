@@ -59,7 +59,7 @@ public class StorageUtils {
         Map<String, List<String>> result = new HashMap<>();
         for (String storageType : storageManagementMap.keySet()) {
             StorageFactory config = storageManagementMap.get(storageType);
-            result.put(storageType, new ArrayList<>(config.getClient().keySet()));
+            result.put(storageType, new ArrayList<>(config.getBuckets()));
         }
         return result;
     }

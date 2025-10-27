@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LocalBucket implements StorageBucket {
 
-    private String clientName;
+    private String bucketName;
     private String basePath;
     private String permission;
     private String api;
@@ -199,8 +199,8 @@ public class LocalBucket implements StorageBucket {
         return filePath;
     }
 
-    public String getClientName() {
-        return clientName;
+    public String getBucketName() {
+        return bucketName;
     }
 
     public String getBasePath() {

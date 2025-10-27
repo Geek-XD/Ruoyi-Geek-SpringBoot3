@@ -2,6 +2,7 @@ package com.ruoyi.file.oss.alibaba.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,18 +25,18 @@ import com.ruoyi.file.storage.StorageFactory;
 @ConfigurationProperties(prefix = "oss")
 public class AliOssBucketFactory implements StorageFactory {
     private static final Logger logger = LoggerFactory.getLogger(AliOssBucketFactory.class);
-    private Map<String, AliOssBucketProperties> client;
+    private Map<String, AliOssBucketProperties> buckets;
     private String primary;
     private Map<String, AliOssBucket> targetAliOssBucket = new HashMap<>();
     private AliOssBucket primaryBucket;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (client == null || client.isEmpty()) {
-            throw new RuntimeException("Client properties cannot be null or empty");
+        if (buckets == null || buckets.isEmpty()) {
+            throw new RuntimeException("Bucket properties cannot be null or empty");
         }
 
-        client.forEach((name, props) -> {
+        buckets.forEach((name, props) -> {
             try {
                 AliOssBucket aliOssBucket = createOssClient(name, props);
                 targetAliOssBucket.put(name, aliOssBucket);
@@ -97,12 +98,12 @@ public class AliOssBucketFactory implements StorageFactory {
         return targetAliOssBucket.get(client);
     }
 
-    public Map<String, AliOssBucketProperties> getClient() {
-        return client;
+    public Set<String> getBuckets() {
+        return buckets.keySet();
     }
 
-    public void setClient(Map<String, AliOssBucketProperties> client) {
-        this.client = client;
+    public void setBuckets(Map<String, AliOssBucketProperties> buckets) {
+        this.buckets = buckets;
     }
 
     public String getPrimaryStorageBucket() {

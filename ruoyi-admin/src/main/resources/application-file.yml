@@ -2,7 +2,7 @@
 local:
   enable: true
   primary: MASTER
-  client:
+  buckets:
     MASTER:
       permission: public 
       path: /data/files/master
@@ -18,7 +18,7 @@ local:
 minio:
   enable: false
   primary: MASTER
-  client:
+  buckets:
     MASTER:
       permission: public
       url: http://localhost:9000
@@ -36,7 +36,7 @@ minio:
 oss:
   enable: false
   primary: MASTER
-  client:
+  buckets:
     MASTER:
       permission: public
       accessKeyId: accessKeyId

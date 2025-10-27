@@ -3,6 +3,7 @@ package com.ruoyi.file.minio.config;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,17 +26,17 @@ import io.minio.PutObjectArgs;
 @ConfigurationProperties("minio")
 public class MinioBucketFactory implements StorageFactory {
     private static final Logger logger = LoggerFactory.getLogger(MinioBucketFactory.class);
-    private Map<String, MinioBucketProperties> client;
+    private Map<String, MinioBucketProperties> buckets;
     private String primary;
     private Map<String, MinioBucket> targetMinioBucket = new HashMap<>();
     private MinioBucket primaryBucket;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (client == null || client.isEmpty()) {
-            throw new RuntimeException("Client properties cannot be null or empty");
+        if (buckets == null || buckets.isEmpty()) {
+            throw new RuntimeException("Bucket properties cannot be null or empty");
         }
-        client.forEach((name, props) -> {
+        buckets.forEach((name, props) -> {
             try {
                 targetMinioBucket.put(name, createMinioClient(name, props));
             } catch (Exception e) {
@@ -102,12 +103,12 @@ public class MinioBucketFactory implements StorageFactory {
         return this.primaryBucket;
     }
 
-    public Map<String, MinioBucketProperties> getClient() {
-        return client;
+    public Set<String> getBuckets() {
+        return buckets.keySet();
     }
 
-    public void setClient(Map<String, MinioBucketProperties> client) {
-        this.client = client;
+    public void setBuckets(Map<String, MinioBucketProperties> buckets) {
+        this.buckets = buckets;
     }
 
     public String getPrimaryStorageBucket() {

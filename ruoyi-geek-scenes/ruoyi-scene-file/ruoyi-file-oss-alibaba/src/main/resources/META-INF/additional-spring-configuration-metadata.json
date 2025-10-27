@@ -11,7 +11,7 @@
             "description": "默认存储名称"
         },
         {
-            "name": "oss.client",
+            "name": "oss.buckets",
             "type": "java.util.Map<java.lang.String, com.ruoyi.file.oss.alibaba.config.AliOssBucketProperties>",
             "description": "储存桶"
         }

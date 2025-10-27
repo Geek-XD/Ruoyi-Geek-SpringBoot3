@@ -11,7 +11,7 @@
             "description": "默认存储名称"
         },
         {
-            "name": "local.client",
+            "name": "local.buckets",
             "type": "java.util.Map<java.lang.String, com.ruoyi.file.local.config.LocalBucketProperties>",
             "description": "储存桶"
         }
