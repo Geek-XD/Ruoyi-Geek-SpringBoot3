@@ -182,10 +182,6 @@ public class MinioBucket implements StorageBucket {
         return filePath;
     }
 
-    public String getName() {
-        return bucketName;
-    }
-
     public MinioClient getClient() {
         return client;
     }

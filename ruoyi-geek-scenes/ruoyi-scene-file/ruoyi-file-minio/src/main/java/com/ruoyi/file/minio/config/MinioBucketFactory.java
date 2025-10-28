@@ -1,9 +1,6 @@
 package com.ruoyi.file.minio.config;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,100 +19,44 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 
 @Configuration("minio")
-@ConditionalOnProperty(prefix = "minio", name = { "enable" }, havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties("minio")
-public class MinioBucketFactory implements StorageFactory {
+@ConditionalOnProperty(prefix = "minio", name = { "enable" }, havingValue = "true", matchIfMissing = false)
+public class MinioBucketFactory extends StorageFactory<MinioBucketProperties, MinioBucket> {
     private static final Logger logger = LoggerFactory.getLogger(MinioBucketFactory.class);
-    private Map<String, MinioBucketProperties> buckets;
-    private String primary;
-    private Map<String, MinioBucket> targetMinioBucket = new HashMap<>();
-    private MinioBucket primaryBucket;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        if (buckets == null || buckets.isEmpty()) {
-            throw new RuntimeException("Bucket properties cannot be null or empty");
+    public MinioBucket createBucket(String name, MinioBucketProperties props) {
+        MinioClient.Builder builder = MinioClient.builder();
+        builder.endpoint(props.getUrl());
+        if (!StringUtils.isEmpty(props.getAccessKey())) {
+            builder.credentials(props.getAccessKey(), props.getSecretKey());
         }
-        buckets.forEach((name, props) -> {
-            try {
-                targetMinioBucket.put(name, createMinioClient(name, props));
-            } catch (Exception e) {
-                logger.error("Failed to create MinIO client for {}: {}", name, e.getMessage(), e);
-            }
-        });
-
-        if (targetMinioBucket.get(primary) == null) {
-            throw new RuntimeException("Primary client " + primary + " does not exist");
-        }
-        primaryBucket = targetMinioBucket.get(primary);
-    }
-
-    private void validateMinioBucket(MinioBucket minioBucket) {
-        BucketExistsArgs bucketExistArgs = BucketExistsArgs.builder().bucket(minioBucket.getBucketName()).build();
-        boolean b = false;
-        try {
-            b = minioBucket.getClient().bucketExists(bucketExistArgs);
-        // 使用空输入流兼容 httpclient5 移除旧 EmptyInputStream
-        InputStream empty = InputStream.nullInputStream();
-        PutObjectArgs putObjectArgs = PutObjectArgs.builder()
-            .object(FileUtils.getRelativePath(RuoYiConfig.getProfile()) + "/")
-            .stream(empty, 0, -1).bucket(minioBucket.getBucketName()).build();
-            minioBucket.getClient().putObject(putObjectArgs);
-        } catch (Exception e) {
-            logger.error("数据桶：{}  - 链接失败", minioBucket.getName());
-            throw new RuntimeException(e.getMessage());
-        }
-        if (!b) {
-            throw new RuntimeException("Bucket " + minioBucket.getBucketName() + " does not exist");
-        }
-    }
-
-    private MinioBucket createMinioClient(String name, MinioBucketProperties props) {
-        MinioClient client;
-        if (StringUtils.isEmpty(props.getAccessKey())) {
-            client = MinioClient.builder()
-                    .endpoint(props.getUrl())
-                    .build();
-        } else {
-            client = MinioClient.builder()
-                    .endpoint(props.getUrl())
-                    .credentials(props.getAccessKey(), props.getSecretKey())
-                    .build();
-        }
+        MinioClient client = builder.build();
         MinioBucket minioBucket = MinioBucket.builder()
                 .client(client)
                 .bucketName(props.getBucketName())
                 .permission(props.getPermission())
                 .url(props.getUrl())
                 .build();
-        validateMinioBucket(minioBucket);
-        logger.info("数据桶：{}  - 链接成功", name);
+        logger.info("Minio 数据桶：{}  - 创建成功", name);
         return minioBucket;
     }
 
     @Override
-    public MinioBucket getBucket(String clent) {
-        return targetMinioBucket.get(clent);
+    public void validateBucket(MinioBucket minioBucket) {
+        BucketExistsArgs bucketExistArgs = BucketExistsArgs.builder().bucket(minioBucket.getBucketName()).build();
+        try {
+            if (!minioBucket.getClient().bucketExists(bucketExistArgs)) {
+                throw new RuntimeException("Bucket " + minioBucket.getBucketName() + " does not exist");
+            }
+            InputStream empty = InputStream.nullInputStream();
+            PutObjectArgs putObjectArgs = PutObjectArgs.builder()
+                    .object(FileUtils.getRelativePath(RuoYiConfig.getProfile()) + "/")
+                    .stream(empty, 0, -1).bucket(minioBucket.getBucketName()).build();
+            minioBucket.getClient().putObject(putObjectArgs);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
-    @Override
-    public MinioBucket getPrimaryBucket() {
-        return this.primaryBucket;
-    }
-
-    public Set<String> getBuckets() {
-        return buckets.keySet();
-    }
-
-    public void setBuckets(Map<String, MinioBucketProperties> buckets) {
-        this.buckets = buckets;
-    }
-
-    public String getPrimaryStorageBucket() {
-        return primary;
-    }
-
-    public void setPrimary(String primary) {
-        this.primary = primary;
-    }
 }

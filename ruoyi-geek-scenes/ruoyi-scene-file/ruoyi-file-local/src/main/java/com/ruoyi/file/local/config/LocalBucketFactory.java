@@ -1,9 +1,5 @@
 package com.ruoyi.file.local.config;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,68 +12,35 @@ import com.ruoyi.file.local.domain.LocalBucket;
 import com.ruoyi.file.storage.StorageFactory;
 
 @Configuration("local")
-@ConditionalOnProperty(prefix = "local", name = { "enable" }, havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties("local")
-public class LocalBucketFactory implements StorageFactory, WebMvcConfigurer {
+@ConditionalOnProperty(prefix = "local", name = { "enable" }, havingValue = "true", matchIfMissing = false)
+public class LocalBucketFactory extends StorageFactory<LocalBucketProperties, LocalBucket> implements WebMvcConfigurer {
     private static final Logger logger = LoggerFactory.getLogger(LocalBucketFactory.class);
-    private Map<String, LocalBucketProperties> buckets;
-    private String primary;
-    private Map<String, LocalBucket> targetLocalBucket = new HashMap<>();
-    private LocalBucket primaryBucket;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        if (buckets == null || buckets.isEmpty()) {
-            throw new RuntimeException("Local bucket properties cannot be null or empty");
-        }
-        buckets.forEach((name, props) -> {
-            targetLocalBucket.put(name, LocalBucket.builder()
-                    .bucketName(name)
-                    .basePath(props.getPath())
-                    .permission(props.getPermission())
-                    .api(props.getApi())
-                    .build());
-            logger.info("本地存储目录：{} - 配置成功，路径:{}", name, props.getPath());
-        });
-        if (targetLocalBucket.get(primary) == null) {
-            throw new RuntimeException("Primary local client " + primary + " does not exist");
-        }
-        primaryBucket = targetLocalBucket.get(primary);
+    public LocalBucket createBucket(String name, LocalBucketProperties props) {
+        LocalBucket bucket = LocalBucket.builder()
+                .bucketName(name)
+                .basePath(props.getPath())
+                .permission(props.getPermission())
+                .api(props.getApi())
+                .build();
+        logger.info("本地 数据桶：{}  - 创建成功", name);
+        return bucket;
     }
 
     @Override
-    public LocalBucket getBucket(String clientName) {
-        return targetLocalBucket.get(clientName);
+    public void validateBucket(LocalBucket localBucket) {
+        // 本地存储无需校验
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        buckets.forEach((name, props) -> {
+        getProperties().forEach((name, props) -> {
             if ("public".equals(props.getPermission())) {
                 registry.addResourceHandler(props.getApi() + "/**")
                         .addResourceLocations("file:" + props.getPath() + "/");
             }
         });
-    }
-
-    @Override
-    public LocalBucket getPrimaryBucket() {
-        return this.primaryBucket;
-    }
-
-    public Set<String> getBuckets() {
-        return buckets.keySet();
-    }
-
-    public void setBuckets(Map<String, LocalBucketProperties> buckets) {
-        this.buckets = buckets;
-    }
-
-    public String getPrimaryStorageBucket() {
-        return primary;
-    }
-
-    public void setPrimary(String primary) {
-        this.primary = primary;
     }
 }

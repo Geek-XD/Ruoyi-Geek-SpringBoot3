@@ -1,9 +1,5 @@
 package com.ruoyi.file.oss.alibaba.config;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,37 +17,31 @@ import com.ruoyi.file.storage.StorageFactory;
  * 配置类用于管理阿里云OSS客户端实例及其相关属性。
  */
 @Configuration("oss")
-@ConditionalOnProperty(prefix = "oss", name = "enable", havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties(prefix = "oss")
-public class AliOssBucketFactory implements StorageFactory {
+@ConditionalOnProperty(prefix = "oss", name = "enable", havingValue = "true", matchIfMissing = false)
+public class AliOssBucketFactory extends StorageFactory<AliOssBucketProperties, AliOssBucket> {
     private static final Logger logger = LoggerFactory.getLogger(AliOssBucketFactory.class);
-    private Map<String, AliOssBucketProperties> buckets;
-    private String primary;
-    private Map<String, AliOssBucket> targetAliOssBucket = new HashMap<>();
-    private AliOssBucket primaryBucket;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        if (buckets == null || buckets.isEmpty()) {
-            throw new RuntimeException("Bucket properties cannot be null or empty");
+    public AliOssBucket createBucket(String name, AliOssBucketProperties props) {
+        if (props == null || props.getEndpoint() == null || props.getAccessKeyId() == null ||
+                props.getAccessKeySecret() == null || props.getBucketName() == null) {
+            throw new IllegalArgumentException("AliOssProperties or its required fields cannot be null");
         }
 
-        buckets.forEach((name, props) -> {
-            try {
-                AliOssBucket aliOssBucket = createOssClient(name, props);
-                targetAliOssBucket.put(name, aliOssBucket);
-            } catch (Exception e) {
-                logger.error("Failed to create OSS client for {}: {}", name, e.getMessage(), e);
-            }
-        });
-
-        if (targetAliOssBucket.get(primary) == null) {
-            throw new RuntimeException("Primary client " + primary + " does not exist");
-        }
-        primaryBucket = targetAliOssBucket.get(primary);
+        OSS client = new OSSClientBuilder().build(props.getEndpoint(), props.getAccessKeyId(),
+                props.getAccessKeySecret());
+        AliOssBucket ossBucket = AliOssBucket.builder()
+                .client(client)
+                .bucketName(props.getBucketName())
+                .endpoint(props.getEndpoint())
+                .build();
+        logger.info("AliOSS 数据桶：{} - 创建成功", name);
+        return ossBucket;
     }
 
-    private void validateOssBucket(AliOssBucket aliOssBucket) {
+    @Override
+    public void validateBucket(AliOssBucket aliOssBucket) {
         OSS ossClient = aliOssBucket.getClient();
         String bucketName = aliOssBucket.getBucketName();
         try {
@@ -68,49 +58,5 @@ public class AliOssBucketFactory implements StorageFactory {
             logger.error("Exception: " + e.getMessage(), e);
             throw new RuntimeException("Error validating OSS bucket: " + e.getMessage());
         }
-    }
-
-    private AliOssBucket createOssClient(String name, AliOssBucketProperties props) {
-        if (props == null || props.getEndpoint() == null || props.getAccessKeyId() == null ||
-                props.getAccessKeySecret() == null || props.getBucketName() == null) {
-            throw new IllegalArgumentException("AliOssProperties or its required fields cannot be null");
-        }
-
-        OSS client = new OSSClientBuilder().build(props.getEndpoint(), props.getAccessKeyId(),
-                props.getAccessKeySecret());
-        AliOssBucket ossBucket = AliOssBucket.builder()
-                .client(client)
-                .bucketName(props.getBucketName())
-                .endpoint(props.getEndpoint())
-                .build();
-        validateOssBucket(ossBucket);
-        logger.info("数据桶：{} - 链接成功", name);
-        return ossBucket;
-    }
-
-    @Override
-    public AliOssBucket getPrimaryBucket() {
-        return this.primaryBucket;
-    }
-
-    @Override
-    public AliOssBucket getBucket(String client) {
-        return targetAliOssBucket.get(client);
-    }
-
-    public Set<String> getBuckets() {
-        return buckets.keySet();
-    }
-
-    public void setBuckets(Map<String, AliOssBucketProperties> buckets) {
-        this.buckets = buckets;
-    }
-
-    public String getPrimaryStorageBucket() {
-        return primary;
-    }
-
-    public void setPrimary(String primary) {
-        this.primary = primary;
     }
 }

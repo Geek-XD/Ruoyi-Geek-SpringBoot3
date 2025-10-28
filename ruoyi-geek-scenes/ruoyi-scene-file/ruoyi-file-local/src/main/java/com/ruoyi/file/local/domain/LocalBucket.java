@@ -146,15 +146,13 @@ public class LocalBucket implements StorageBucket {
                 "etag", etag,
                 "size", partSize,
                 "path", partPath.toString());
-        synchronized (uploadMetadata) {
-            List<Map<String, Object>> parts = uploadMetadata.get(uploadId);
-            int insertPos = 0;
-            while (insertPos < parts.size()
-                    && ((Number) parts.get(insertPos).get("partNumber")).intValue() < partNumber) {
-                insertPos++;
-            }
-            parts.add(insertPos, partInfo);
+        List<Map<String, Object>> parts = uploadMetadata.get(uploadId);
+        int insertPos = 0;
+        while (insertPos < parts.size()
+                && ((Number) parts.get(insertPos).get("partNumber")).intValue() < partNumber) {
+            insertPos++;
         }
+        parts.add(insertPos, partInfo);
         return new SysFilePartETag(partNumber, etag, partSize, null);
     }
 
