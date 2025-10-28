@@ -34,18 +34,18 @@ public class StorageUtils {
      * 获取指定存储类型和客户端名称的存储桶
      * 
      * @param storageType 存储类型
-     * @param clientName  客户端名称
+     * @param bucketName  存储桶名称
      * @return 存储桶
      */
-    public static StorageBucket getStorageBucket(String storageType, String clientName) {
+    public static StorageBucket getStorageBucket(String storageType, String bucketName) {
         StorageFactory<?, ?> storageManagement = storageManagementMap.get(storageType);
         if (storageManagement == null) {
             throw new IllegalArgumentException("Storage management for type " + storageType + " not found");
         }
-        StorageBucket storageBucket = storageManagement.getBucket(clientName);
+        StorageBucket storageBucket = storageManagement.getBucket(bucketName);
         if (storageBucket == null) {
             throw new IllegalArgumentException(
-                    "Storage bucket for client " + clientName + " not found in type " + storageType);
+                    "Storage bucket for client " + bucketName + " not found in type " + storageType);
         }
         return storageBucket;
     }

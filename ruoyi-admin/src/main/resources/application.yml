@@ -80,7 +80,7 @@ spring:
     # 国际化资源文件路径
     basename: i18n/messages
   profiles:
-    active: druid,file,auth,pay,plugins,model
+    active: druid,file,auth,pay,plugins,model,apidoc
   # 文件上传
   servlet:
     multipart:
@@ -102,13 +102,6 @@ token:
   secret: abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz
   # 令牌有效期（默认1天）
   expireTime: 1440
-
-# Swagger配置
-swagger:
-  # 是否开启swagger
-  enabled: true
-  # 请求前缀
-  pathMapping: /dev-api
 
 # 防盗链配置
 referer:

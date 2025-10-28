@@ -30,11 +30,11 @@ public abstract class StorageFactory<P, S extends StorageBucket> implements Init
     /**
      * 获取存储桶
      *
-     * @param clientName 客户端名称
+     * @param bucketName 存储桶名称
      * @return 存储桶
      */
-    public S getBucket(String clientName) {
-        return targetBucket.get(clientName);
+    public S getBucket(String bucketName) {
+        return targetBucket.get(bucketName);
     }
 
     /**

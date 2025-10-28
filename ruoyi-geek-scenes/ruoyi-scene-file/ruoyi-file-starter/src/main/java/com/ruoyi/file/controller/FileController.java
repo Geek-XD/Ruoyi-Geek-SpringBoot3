@@ -59,23 +59,23 @@ public class FileController {
     }
 
     /**
-     * 统一上传接口：/file/{storageType}/{clientName}/upload
+     * 统一上传接口：/file/{storageType}/{bucketName}/upload
      */
-    @PostMapping({ "/upload", "/{storageType}/{clientName}/upload" })
+    @PostMapping({ "/upload", "/{storageType}/{bucketName}/upload" })
     public AjaxResult uploadUnified(
             @PathVariable(name = "storageType", required = false) String storageType,
-            @PathVariable(name = "clientName", required = false) String clientName,
+            @PathVariable(name = "bucketName", required = false) String bucketName,
             @RequestParam("file") MultipartFile file) {
         try {
             String filePath = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             StorageService storageService = null;
             SysFileInfo sysFileInfo = sysFileInfoService.buildSysFileInfo(file);
-            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(clientName)) {
+            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(bucketName)) {
                 sysFileInfo.setStorageType(StorageUtils.getPrimaryStorageType());
                 storageService = new StorageService(StorageUtils.getPrimaryStorageBucket());
             } else {
                 sysFileInfo.setStorageType(storageType);
-                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, bucketName));
             }
             filePath = storageService.upload(filePath, file);
             String url = storageService.generateUrl(filePath);
@@ -92,20 +92,20 @@ public class FileController {
     }
 
     /**
-     * 统一下载接口：/file/{storageType}/{clientName}/download?filePath=xxx
+     * 统一下载接口：/file/{storageType}/{bucketName}/download?filePath=xxx
      */
-    @GetMapping({ "/download", "/{storageType}/{clientName}/download" })
+    @GetMapping({ "/download", "/{storageType}/{bucketName}/download" })
     public void downloadUnified(
             @PathVariable(name = "storageType", required = false) String storageType,
-            @PathVariable(name = "clientName", required = false) String clientName,
+            @PathVariable(name = "bucketName", required = false) String bucketName,
             @RequestParam("filePath") String filePath,
             HttpServletResponse response) throws Exception {
         try {
             StorageService storageService = null;
-            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(clientName)) {
+            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(bucketName)) {
                 storageService = new StorageService(StorageUtils.getPrimaryStorageBucket());
             } else {
-                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, bucketName));
             }
             response.setContentType("application/octet-stream");
             storageService.downLoad(filePath, response);
@@ -116,21 +116,21 @@ public class FileController {
     }
 
     /**
-     * 统一预览接口：/file/{storageType}/{clientName}/preview?filePath=xxx
+     * 统一预览接口：/file/{storageType}/{bucketName}/preview?filePath=xxx
      */
     @Anonymous
-    @GetMapping({ "/preview", "/{storageType}/{clientName}/preview" })
+    @GetMapping({ "/preview", "/{storageType}/{bucketName}/preview" })
     public void preview(
             @PathVariable(name = "storageType", required = false) String storageType,
-            @PathVariable(name = "clientName", required = false) String clientName,
+            @PathVariable(name = "bucketName", required = false) String bucketName,
             @RequestParam("filePath") String filePath,
             HttpServletResponse response) throws Exception {
         try {
             StorageService storageService = null;
-            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(clientName)) {
+            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(bucketName)) {
                 storageService = new StorageService(StorageUtils.getPrimaryStorageBucket());
             } else {
-                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, clientName));
+                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, bucketName));
             }
             filePath = URLDecoder.decode(filePath, "UTF-8");
             InputStream inputStream = storageService.downLoad(filePath);

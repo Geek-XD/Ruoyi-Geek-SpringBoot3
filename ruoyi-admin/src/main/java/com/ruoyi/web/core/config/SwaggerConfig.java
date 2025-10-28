@@ -1,6 +1,5 @@
 package com.ruoyi.web.core.config;
 
-import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -48,46 +47,6 @@ public class SwaggerConfig {
 				.externalDocs(new ExternalDocumentation()
 						.description("外部文档")
 						.url("/doc.html"));
-	}
-
-	@Bean
-	public GroupedOpenApi sysApi() {
-		return GroupedOpenApi.builder()
-				.group("sys系统模块")
-				.packagesToScan("com.ruoyi.web.controller.system")
-				.build();
-	}
-
-	@Bean
-	public GroupedOpenApi commonApi() {
-		return GroupedOpenApi.builder()
-				.group("基础模块")
-				.packagesToScan("com.ruoyi.web.controller.common")
-				.build();
-	}
-
-	@Bean
-	public GroupedOpenApi payApi() {
-		return GroupedOpenApi.builder()
-				.group("支付模块")
-				.pathsToMatch("/pay/**")
-				.build();
-	}
-
-	@Bean
-	public GroupedOpenApi fileApi() {
-		return GroupedOpenApi.builder()
-				.group("文件模块")
-				.packagesToScan("com.ruoyi.file.controller")
-				.build();
-	}
-
-	@Bean
-	public GroupedOpenApi authApi() {
-		return GroupedOpenApi.builder()
-				.group("认证模块")
-				.packagesToScan("com.ruoyi.auth.controller")
-				.build();
 	}
 
 }
