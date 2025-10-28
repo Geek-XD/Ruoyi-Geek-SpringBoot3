@@ -31,7 +31,7 @@ public class StorageUtils {
     }
 
     /**
-     * 获取指定存储类型和客户端名称的存储桶
+     * 获取指定存储类型和存储桶名称的存储桶
      * 
      * @param storageType 存储类型
      * @param bucketName  存储桶名称
@@ -44,14 +44,14 @@ public class StorageUtils {
         }
         StorageBucket storageBucket = storageManagement.getBucket(bucketName);
         if (storageBucket == null) {
-            throw new IllegalArgumentException(
-                    "Storage bucket for client " + bucketName + " not found in type " + storageType);
+            throw new IllegalArgumentException(String.format("StorageBucket %s not found in type %s",
+                    bucketName, storageType));
         }
         return storageBucket;
     }
 
     /**
-     * 获取所有可用存储渠道及其client列表
+     * 获取所有可用存储渠道及其存储桶列表
      * 
      * @return
      */

@@ -18,24 +18,24 @@ import com.ruoyi.file.storage.StorageBucket;
 import com.ruoyi.file.storage.StorageEntity;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 存储操作业务
  */
+@Getter
+@Setter
 public class StorageService {
 
     private StorageBucket storageBucket;
     private String[] allowedExtension = MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION;
     private Boolean fastUpload = true;
     private Integer expireTime = 3600;
-    private Long MAX_FILE_SIZE = 500 * 1024 * 1024L; // 500MB
+    private Long MAX_FILE_SIZE = 500 * 1024 * 1024L;
 
     public StorageService(StorageBucket storageBucket) {
         this.storageBucket = storageBucket;
-    }
-
-    public void setAllowedExtension(String[] allowedExtension) {
-        this.allowedExtension = allowedExtension;
     }
 
     /**
