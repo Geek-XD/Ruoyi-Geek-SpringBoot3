@@ -4,6 +4,11 @@ import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.ruoyi.file.storage.StorageEntity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class AliOssEntityVO extends StorageEntity {
     private String key;
     private String bucketName;
@@ -15,29 +20,5 @@ public class AliOssEntityVO extends StorageEntity {
         this.setBucketName(object.getBucketName());
         this.setByteCount(object.getObjectMetadata().getContentLength());
         this.setFilePath(filePath);
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getBucketName() {
-        return bucketName;
-    }
-
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
-    }
-
-    public ObjectMetadata getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(ObjectMetadata metadata) {
-        this.metadata = metadata;
     }
 }

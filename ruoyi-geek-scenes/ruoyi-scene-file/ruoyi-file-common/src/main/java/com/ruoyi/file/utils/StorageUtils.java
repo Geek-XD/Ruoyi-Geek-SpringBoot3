@@ -20,14 +20,14 @@ import jakarta.annotation.PostConstruct;
 public class StorageUtils {
     private static final Logger logger = LoggerFactory.getLogger(StorageUtils.class);
 
-    private static Map<String, StorageFactory<?, ?>> storageManagementMap;
+    private static Map<String, StorageFactory<?, ?>> storageFactoryMap;
 
     public static String getPrimaryStorageType() {
         return RuoYiConfig.getFileServer();
     }
 
     public static StorageBucket getPrimaryStorageBucket() {
-        return storageManagementMap.get(RuoYiConfig.getFileServer()).getPrimaryBucket();
+        return storageFactoryMap.get(RuoYiConfig.getFileServer()).getPrimaryBucket();
     }
 
     /**
@@ -38,11 +38,11 @@ public class StorageUtils {
      * @return 存储桶
      */
     public static StorageBucket getStorageBucket(String storageType, String bucketName) {
-        StorageFactory<?, ?> storageManagement = storageManagementMap.get(storageType);
-        if (storageManagement == null) {
+        StorageFactory<?, ?> storageFactory = storageFactoryMap.get(storageType);
+        if (storageFactory == null) {
             throw new IllegalArgumentException("Storage management for type " + storageType + " not found");
         }
-        StorageBucket storageBucket = storageManagement.getBucket(bucketName);
+        StorageBucket storageBucket = storageFactory.getBucket(bucketName);
         if (storageBucket == null) {
             throw new IllegalArgumentException(String.format("StorageBucket %s not found in type %s",
                     bucketName, storageType));
@@ -57,25 +57,25 @@ public class StorageUtils {
      */
     public static Map<String, List<String>> getClientList() {
         Map<String, List<String>> result = new HashMap<>();
-        for (String storageType : storageManagementMap.keySet()) {
-            StorageFactory<?, ?> config = storageManagementMap.get(storageType);
+        for (String storageType : storageFactoryMap.keySet()) {
+            StorageFactory<?, ?> config = storageFactoryMap.get(storageType);
             result.put(storageType, new ArrayList<>(config.getBuckets()));
         }
         return result;
     }
 
     @Autowired(required = false)
-    private void setStorageManagementMap(Map<String, StorageFactory<?, ?>> storageManagementMap) {
-        StorageUtils.storageManagementMap = storageManagementMap;
+    private void setStorageFactoryMap(Map<String, StorageFactory<?, ?>> storageFactoryMap) {
+        StorageUtils.storageFactoryMap = storageFactoryMap;
     }
 
     @PostConstruct
     private void init() {
-        if (StorageUtils.storageManagementMap == null) {
-            StorageUtils.storageManagementMap = new HashMap<>();
+        if (StorageUtils.storageFactoryMap == null) {
+            StorageUtils.storageFactoryMap = new HashMap<>();
             logger.warn("请注意，没有加载任何存储服务");
         } else {
-            StorageUtils.storageManagementMap.forEach((k, v) -> {
+            StorageUtils.storageFactoryMap.forEach((k, v) -> {
                 logger.info("已加载存储服务 {}", k);
             });
         }

@@ -30,7 +30,7 @@ public class FileOperateUtils {
      * @return 文件路径
      * @throws Exception
      */
-    public static final String upload(MultipartFile file) throws IOException {
+    public static String upload(MultipartFile file) throws IOException {
         return upload(file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION);
     }
 
@@ -41,7 +41,7 @@ public class FileOperateUtils {
      * @return 文件路径
      * @throws Exception
      */
-    public static final String upload(MultipartFile file, String fileName) throws Exception {
+    public static String upload(MultipartFile file, String fileName) throws Exception {
         return upload(DateUtils.datePath() + File.separator + fileName, file);
     }
 
@@ -53,7 +53,7 @@ public class FileOperateUtils {
      * @return 文件路径
      * @throws Exception
      */
-    public static final String upload(MultipartFile file, String[] allowedExtension)
+    public static String upload(MultipartFile file, String[] allowedExtension)
             throws IOException {
         return upload(FileUtils.fastFilePath(file), file, allowedExtension);
     }
@@ -66,7 +66,7 @@ public class FileOperateUtils {
      * @return 文件名称
      * @throws IOException
      */
-    public static final String upload(String filePath, MultipartFile file) throws Exception {
+    public static String upload(String filePath, MultipartFile file) throws Exception {
         return upload(filePath, file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION);
     }
 
@@ -79,7 +79,7 @@ public class FileOperateUtils {
      * @return 访问链接
      * @throws IOException
      */
-    public static final String upload(String filePath, MultipartFile file, String[] allowedExtension)
+    public static String upload(String filePath, MultipartFile file, String[] allowedExtension)
             throws IOException {
         try {
             StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
@@ -98,7 +98,7 @@ public class FileOperateUtils {
      * @return 文件名称
      * @throws IOException
      */
-    public static final void downLoad(String filePath, OutputStream outputStream) throws Exception {
+    public static void downLoad(String filePath, OutputStream outputStream) throws Exception {
         StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
         InputStream inputStream = fileService.downLoad(filePath);
         FileUtils.writeBytes(inputStream, outputStream);
@@ -112,7 +112,7 @@ public class FileOperateUtils {
      * @return 文件名称
      * @throws IOException
      */
-    public static final void downLoad(String filePath, HttpServletResponse response) throws Exception {
+    public static void downLoad(String filePath, HttpServletResponse response) throws Exception {
         StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
         StorageEntity fileEntity = fileService.getFile(filePath);
         InputStream inputStream = fileEntity.getInputStream();
@@ -127,12 +127,11 @@ public class FileOperateUtils {
      * 根据文件路径删除
      *
      * @param filePath 下载文件路径
-     * @return 是否成功
      * @throws IOException
      */
-    public static final boolean deleteFile(String filePath) throws Exception {
+    public static void deleteFile(String filePath) throws Exception {
         StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
-        return fileService.deleteFile(filePath);
+        fileService.deleteFile(filePath);
     }
 
     /**

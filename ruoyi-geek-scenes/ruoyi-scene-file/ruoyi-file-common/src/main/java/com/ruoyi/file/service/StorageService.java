@@ -129,7 +129,7 @@ public class StorageService {
      * @throws Exception 比如读写文件出错时
      *
      */
-    public boolean deleteFile(String filePath) throws Exception {
+    public void deleteFile(String filePath) throws Exception {
         this.storageBucket.remove(filePath);
         if (this.fastUpload) {
             String md5 = CacheUtils.get(CacheConstants.FILE_PATH_MD5_KEY, filePath, String.class);
@@ -138,7 +138,6 @@ public class StorageService {
                 CacheUtils.remove(CacheConstants.FILE_MD5_PATH_KEY, md5);
             }
         }
-        return true;
     }
 
     /**
