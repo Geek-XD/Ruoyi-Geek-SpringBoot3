@@ -1,4 +1,4 @@
-package com.ruoyi.file.oss.alibaba.config;
+package com.ruoyi.file.aliyun.oss.config;
 
 import lombok.Data;
 

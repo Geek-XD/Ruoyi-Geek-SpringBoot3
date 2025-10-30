@@ -2,7 +2,6 @@ package com.ruoyi.file.storage;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
@@ -35,15 +34,6 @@ public abstract class StorageFactory<P, S extends StorageBucket> implements Init
      */
     public S getBucket(String bucketName) {
         return targetBucket.get(bucketName);
-    }
-
-    /**
-     * 获取所有储存桶的名称
-     *
-     * @return 存储桶名称集合
-     */
-    public Set<String> getBuckets() {
-        return buckets.keySet();
     }
 
     /**

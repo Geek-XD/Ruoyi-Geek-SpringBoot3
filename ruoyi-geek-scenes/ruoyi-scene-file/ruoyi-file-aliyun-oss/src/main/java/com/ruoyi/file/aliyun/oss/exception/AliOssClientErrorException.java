@@ -1,4 +1,4 @@
-package com.ruoyi.file.oss.alibaba.exception;
+package com.ruoyi.file.aliyun.oss.exception;
 
 public class AliOssClientErrorException extends RuntimeException{
     public AliOssClientErrorException(String msg){

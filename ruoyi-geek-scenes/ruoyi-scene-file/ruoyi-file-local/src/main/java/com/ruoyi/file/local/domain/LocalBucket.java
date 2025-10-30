@@ -86,7 +86,7 @@ public class LocalBucket implements StorageBucket {
     }
 
     @Override
-    public URL generatePublicURL(String filePath) throws Exception {
+    public URL generatePublicUrl(String filePath) throws Exception {
         HttpServletRequest request = ServletUtils.getRequest();
         StringBuffer url = request.getRequestURL();
         String contextPath = request.getSession().getServletContext().getContextPath();

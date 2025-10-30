@@ -47,7 +47,7 @@
 
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-file-oss-alibaba</artifactId>
+                <artifactId>ruoyi-file-aliyun-oss</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
@@ -65,7 +65,7 @@
         <module>ruoyi-file-common</module>
         <module>ruoyi-file-local</module>
         <module>ruoyi-file-minio</module>
-        <module>ruoyi-file-oss-alibaba</module>
+        <module>ruoyi-file-aliyun-oss</module>
         <module>ruoyi-file-starter</module>
     </modules>
     <packaging>pom</packaging>

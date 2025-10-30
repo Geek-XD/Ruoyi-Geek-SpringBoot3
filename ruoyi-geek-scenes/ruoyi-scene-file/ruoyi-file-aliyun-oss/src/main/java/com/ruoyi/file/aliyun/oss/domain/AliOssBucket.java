@@ -1,4 +1,4 @@
-package com.ruoyi.file.oss.alibaba.domain;
+package com.ruoyi.file.aliyun.oss.domain;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -22,8 +22,8 @@ import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PartETag;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.UploadPartRequest;
+import com.ruoyi.file.aliyun.oss.exception.AliOssClientErrorException;
 import com.ruoyi.file.domain.SysFilePartETag;
-import com.ruoyi.file.oss.alibaba.exception.AliOssClientErrorException;
 import com.ruoyi.file.storage.StorageBucket;
 
 import lombok.Builder;
@@ -77,7 +77,7 @@ public class AliOssBucket implements StorageBucket {
     }
 
     @Override
-    public URL generatePublicURL(String filePath) throws Exception {
+    public URL generatePublicUrl(String filePath) throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("https://").append(getBucketName())
                 .append(".").append(getEndpoint())

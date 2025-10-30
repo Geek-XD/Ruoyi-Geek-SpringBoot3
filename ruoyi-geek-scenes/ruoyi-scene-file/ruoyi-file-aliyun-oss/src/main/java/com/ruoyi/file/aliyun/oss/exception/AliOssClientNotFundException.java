@@ -1,4 +1,4 @@
-package com.ruoyi.file.oss.alibaba.exception;
+package com.ruoyi.file.aliyun.oss.exception;
 
 /**
  * 当尝试获取阿里云OSS客户端实例但未能找到相应的配置或客户端实例时抛出此异常。

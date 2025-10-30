@@ -1,4 +1,4 @@
-package com.ruoyi.file.oss.alibaba.domain;
+package com.ruoyi.file.aliyun.oss.domain;
 
 import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.ObjectMetadata;

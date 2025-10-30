@@ -1,4 +1,4 @@
-package com.ruoyi.file.oss.alibaba.config;
+package com.ruoyi.file.aliyun.oss.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,7 @@ import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
-import com.ruoyi.file.oss.alibaba.domain.AliOssBucket;
+import com.ruoyi.file.aliyun.oss.domain.AliOssBucket;
 import com.ruoyi.file.storage.StorageFactory;
 
 /**

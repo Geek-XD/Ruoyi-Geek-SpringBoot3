@@ -23,7 +23,7 @@
 
         <dependency>
             <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-file-oss-alibaba</artifactId>
+            <artifactId>ruoyi-file-aliyun-oss</artifactId>
         </dependency>
 
         <dependency>

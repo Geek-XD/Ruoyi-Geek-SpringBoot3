@@ -150,7 +150,7 @@ public class StorageService {
      */
     public String generateUrl(String filePath) throws Exception {
         if ("public".equals(this.storageBucket.getPermission())) {
-            return this.storageBucket.generatePublicURL(filePath).toString();
+            return this.storageBucket.generatePublicUrl(filePath).toString();
         } else {
             return this.storageBucket.generatePresignedUrl(filePath, expireTime).toString();
         }

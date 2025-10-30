@@ -53,7 +53,7 @@ public interface StorageBucket {
      * @param filePath 文件路径
      * @return 公开访问URL
      */
-    URL generatePublicURL(String filePath) throws Exception;
+    URL generatePublicUrl(String filePath) throws Exception;
 
     /**
      * 获取存储渠道权限
@@ -71,7 +71,7 @@ public interface StorageBucket {
      */
     default URL getUrl(String filePath) throws Exception {
         if ("public".equals(getPermission())) {
-            return generatePublicURL(filePath);
+            return generatePublicUrl(filePath);
         } else {
             return generatePresignedUrl(filePath, 3600);
         }

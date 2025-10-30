@@ -85,7 +85,7 @@ public class MinioBucket implements StorageBucket {
     }
 
     @Override
-    public URL generatePublicURL(String filePath) throws Exception {
+    public URL generatePublicUrl(String filePath) throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append(getUrl())
                 .append("/").append(getBucketName())
