@@ -14,19 +14,6 @@ import com.ruoyi.common.core.domain.model.RegisterBody;
  * </p>
  */
 public interface TfaService {
-    /**
-     * 启动将TFA方法绑定到用户账户的流程。
-     *
-     * @param loginBody 包含TFA绑定所需数据的登录信息
-     */
-    public void doBind(LoginBody loginBody);
-
-    /**
-     * 使用验证码或其他确认方式验证TFA绑定流程。
-     *
-     * @param loginBody 包含验证数据的登录信息
-     */
-    public void doBindVerify(LoginBody loginBody);
 
     /**
      * 处理包含TFA设置的注册流程。
@@ -56,6 +43,20 @@ public interface TfaService {
      * @return 已认证会话的字符串令牌或会话标识符
      */
     public String doLoginVerify(LoginBody loginBody, boolean autoRegister);
+
+    /**
+     * 启动将TFA方法绑定到用户账户的流程。
+     *
+     * @param loginBody 包含TFA绑定所需数据的登录信息
+     */
+    public void doBind(LoginBody loginBody);
+
+    /**
+     * 使用验证码或其他确认方式验证TFA绑定流程。
+     *
+     * @param loginBody 包含验证数据的登录信息
+     */
+    public void doBindVerify(LoginBody loginBody);
 
     /**
      * 启动TFA重置流程的第一步。

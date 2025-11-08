@@ -85,13 +85,36 @@ public class DySmsServiceImpl implements DySmsService {
     }
 
     @Override
+    public void doRegister(RegisterBody registerBody) {
+        SysUser sysUser = userService.selectUserByPhone(registerBody.getPhonenumber());
+        if (sysUser != null) {
+            throw new ServiceException("该手机号已绑定用户");
+        }
+        sendCode(registerBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.REGISTER);
+    }
+
+    @Override
+    public void doRegisterVerify(RegisterBody registerBody) {
+        if (!checkCode(registerBody.getPhonenumber(), registerBody.getCode(), OauthVerificationUse.REGISTER)) {
+            throw new ServiceException("验证码错误");
+        }
+        SysUser sysUser = new SysUser();
+        sysUser.setUserName(registerBody.getPhonenumber());
+        sysUser.setNickName(registerBody.getUsername());
+        sysUser.setPassword(SecurityUtils.encryptPassword(registerBody.getPassword()));
+        sysUser.setPhonenumber(registerBody.getPhonenumber());
+        userService.registerUser(sysUser);
+        AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getUserName(), Constants.REGISTER,
+                MessageUtils.message("user.register.success")));
+    }
+
+    @Override
     public void doLogin(LoginBody loginBody, boolean autoRegister) {
         SysUser sysUser = userService.selectUserByPhone(loginBody.getPhonenumber());
         if (sysUser == null && !autoRegister) {
             throw new ServiceException("该手机号未绑定用户");
-        } else {
-            sendCode(loginBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.LOGIN);
         }
+        sendCode(loginBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.LOGIN);
     }
 
     @Override
@@ -120,26 +143,24 @@ public class DySmsServiceImpl implements DySmsService {
     }
 
     @Override
-    public void doRegister(RegisterBody registerBody) {
-        SysUser sysUser = userService.selectUserByPhone(registerBody.getPhonenumber());
+    public void doBind(LoginBody loginBody) {
+        SysUser sysUser = userService.selectUserByPhone(loginBody.getPhonenumber());
         if (sysUser != null) {
             throw new ServiceException("该手机号已绑定用户");
-        } else {
-            sendCode(registerBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.REGISTER);
         }
+        sysUser = userService.selectUserById(SecurityUtils.getUserId());
+        sendCode(loginBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.BIND);
     }
 
     @Override
-    public void doRegisterVerify(RegisterBody registerBody) {
-        if (checkCode(registerBody.getPhonenumber(), registerBody.getCode(), OauthVerificationUse.REGISTER)) {
-            SysUser sysUser = new SysUser();
-            sysUser.setUserName(registerBody.getPhonenumber());
-            sysUser.setNickName(registerBody.getUsername());
-            sysUser.setPassword(SecurityUtils.encryptPassword(registerBody.getPassword()));
-            sysUser.setPhonenumber(registerBody.getPhonenumber());
-            userService.registerUser(sysUser);
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getUserName(), Constants.REGISTER,
-                    MessageUtils.message("user.register.success")));
+    public void doBindVerify(LoginBody loginBody) {
+        if (checkCode(loginBody.getPhonenumber(), loginBody.getCode(), OauthVerificationUse.BIND)) {
+            SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());
+            sysUser.setPhonenumber(loginBody.getPhonenumber());
+            userService.updateUser(sysUser);
+            LoginUser loginUser = SecurityUtils.getLoginUser();
+            loginUser.setUser(sysUser);
+            tokenService.refreshToken(loginUser);
         } else {
             throw new ServiceException("验证码错误");
         }
@@ -149,45 +170,24 @@ public class DySmsServiceImpl implements DySmsService {
         SysUser sysUser = userService.selectUserByPhone(registerBody.getPhonenumber());
         if (sysUser == null) {
             throw new ServiceException("该手机号未绑定用户");
-        } else {
-            sendCode(registerBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.RESET);
         }
+        if (!sysUser.getUserName().equals(SecurityUtils.getUsername())) {
+            throw new ServiceException("只能解绑自己的手机号");
+        }
+        sendCode(registerBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.RESET);
     }
 
     public void doResetVerify(RegisterBody registerBody) {
         if (checkCode(registerBody.getPhonenumber(), registerBody.getCode(), OauthVerificationUse.RESET)) {
-            SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());
-            sysUser.setPhonenumber(registerBody.getPhonenumber());
+            SysUser sysUser = userService.selectUserByUserName(SecurityUtils.getUsername());
+            sysUser.setPhonenumber("");
             userService.updateUser(sysUser);
+            LoginUser loginUser = SecurityUtils.getLoginUser();
+            loginUser.setUser(sysUser);
+            tokenService.refreshToken(loginUser);
         } else {
             throw new ServiceException("验证码错误");
         }
     }
 
-    @Override
-    public void doBind(LoginBody loginBody) {
-        SysUser sysUser = userService.selectUserByPhone(loginBody.getPhonenumber());
-        if (sysUser != null) {
-            throw new ServiceException("该手机号已绑定用户");
-        }
-        sysUser = userService.selectUserById(SecurityUtils.getUserId());
-        if (!SecurityUtils.matchesPassword(loginBody.getPassword(), sysUser.getPassword())) {
-            throw new ServiceException("密码错误");
-        }
-        sendCode(loginBody.getPhonenumber(), RandomCodeUtil.numberCode(6), OauthVerificationUse.BIND);
-    }
-
-    @Override
-    public void doBindVerify(LoginBody loginBody) {
-        if (checkCode(loginBody.getPhonenumber(), loginBody.getCode(), OauthVerificationUse.BIND)) {
-            SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());
-            if (!SecurityUtils.matchesPassword(loginBody.getPassword(), sysUser.getPassword())) {
-                throw new ServiceException("密码错误");
-            }
-            sysUser.setPhonenumber(loginBody.getPhonenumber());
-            userService.updateUser(sysUser);
-        } else {
-            throw new ServiceException("验证码错误");
-        }
-    }
 }

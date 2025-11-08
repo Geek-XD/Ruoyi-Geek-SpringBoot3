@@ -73,13 +73,36 @@ public class MailServiceImpl implements IMailService {
     }
 
     @Override
+    public void doRegister(RegisterBody registerBody) {
+        SysUser sysUser = userService.selectUserByEmail(registerBody.getEmail());
+        if (sysUser != null) {
+            throw new ServiceException("该邮箱已绑定用户");
+        }
+        sendCode(registerBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.REGISTER);
+    }
+
+    @Override
+    public void doRegisterVerify(RegisterBody registerBody) {
+        if (!checkCode(registerBody.getEmail(), registerBody.getCode(), OauthVerificationUse.REGISTER)) {
+            throw new ServiceException("验证码错误");
+        }
+        SysUser sysUser = new SysUser();
+        sysUser.setUserName(registerBody.getEmail());
+        sysUser.setNickName(registerBody.getEmail());
+        sysUser.setPassword(SecurityUtils.encryptPassword(registerBody.getPassword()));
+        sysUser.setEmail(registerBody.getEmail());
+        userService.registerUser(sysUser);
+        AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getUserName(), Constants.REGISTER,
+                MessageUtils.message("user.register.success")));
+    }
+
+    @Override
     public void doLogin(LoginBody loginBody, boolean autoRegister) {
         SysUser sysUser = userService.selectUserByEmail(loginBody.getEmail());
         if (sysUser == null && !autoRegister) {
             throw new ServiceException("该邮箱未绑定用户");
-        } else {
-            sendCode(loginBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.LOGIN);
         }
+        sendCode(loginBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.LOGIN);
     }
 
     @Override
@@ -108,26 +131,24 @@ public class MailServiceImpl implements IMailService {
     }
 
     @Override
-    public void doRegister(RegisterBody registerBody) {
-        SysUser sysUser = userService.selectUserByEmail(registerBody.getEmail());
+    public void doBind(LoginBody loginBody) {
+        SysUser sysUser = userService.selectUserByEmail(loginBody.getEmail());
         if (sysUser != null) {
             throw new ServiceException("该邮箱已绑定用户");
-        } else {
-            sendCode(registerBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.REGISTER);
         }
+        sysUser = userService.selectUserById(SecurityUtils.getUserId());
+        sendCode(loginBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.BIND);
     }
 
     @Override
-    public void doRegisterVerify(RegisterBody registerBody) {
-        if (checkCode(registerBody.getEmail(), registerBody.getCode(), OauthVerificationUse.REGISTER)) {
-            SysUser sysUser = new SysUser();
-            sysUser.setUserName(registerBody.getEmail());
-            sysUser.setNickName(registerBody.getEmail());
-            sysUser.setPassword(SecurityUtils.encryptPassword(registerBody.getPassword()));
-            sysUser.setEmail(registerBody.getEmail());
-            userService.registerUser(sysUser);
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getUserName(), Constants.REGISTER,
-                    MessageUtils.message("user.register.success")));
+    public void doBindVerify(LoginBody loginBody) {
+        if (checkCode(loginBody.getEmail(), loginBody.getCode(), OauthVerificationUse.BIND)) {
+            SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());
+            sysUser.setEmail(loginBody.getEmail());
+            userService.updateUser(sysUser);
+            LoginUser loginUser = SecurityUtils.getLoginUser();
+            loginUser.setUser(sysUser);
+            tokenService.refreshToken(loginUser);
         } else {
             throw new ServiceException("验证码错误");
         }
@@ -137,43 +158,21 @@ public class MailServiceImpl implements IMailService {
         SysUser sysUser = userService.selectUserByEmail(registerBody.getEmail());
         if (sysUser == null) {
             throw new ServiceException("该邮箱未绑定用户");
-        } else {
-            sendCode(registerBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.RESET);
         }
+        if (!sysUser.getUserName().equals(SecurityUtils.getUsername())) {
+            throw new ServiceException("只能解绑自己的邮箱");
+        }
+        sendCode(registerBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.RESET);
     }
 
     public void doResetVerify(RegisterBody registerBody) {
         if (checkCode(registerBody.getEmail(), registerBody.getCode(), OauthVerificationUse.RESET)) {
-            SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());
-            sysUser.setEmail(registerBody.getEmail());
+            SysUser sysUser = userService.selectUserByUserName(SecurityUtils.getUsername());
+            sysUser.setEmail("");
             userService.updateUser(sysUser);
-        } else {
-            throw new ServiceException("验证码错误");
-        }
-    }
-
-    @Override
-    public void doBind(LoginBody loginBody) {
-        SysUser sysUser = userService.selectUserByEmail(loginBody.getEmail());
-        if (sysUser != null) {
-            throw new ServiceException("该邮箱已绑定用户");
-        }
-        sysUser = userService.selectUserById(SecurityUtils.getUserId());
-        if (!SecurityUtils.matchesPassword(loginBody.getPassword(), sysUser.getPassword())) {
-            throw new ServiceException("密码错误");
-        }
-        sendCode(loginBody.getEmail(), RandomCodeUtil.numberCode(6), OauthVerificationUse.BIND);
-    }
-
-    @Override
-    public void doBindVerify(LoginBody loginBody) {
-        if (checkCode(loginBody.getEmail(), loginBody.getCode(), OauthVerificationUse.BIND)) {
-            SysUser sysUser = userService.selectUserById(SecurityUtils.getUserId());
-            if (!SecurityUtils.matchesPassword(loginBody.getPassword(), sysUser.getPassword())) {
-                throw new ServiceException("密码错误");
-            }
-            sysUser.setEmail(loginBody.getEmail());
-            userService.updateUser(sysUser);
+            LoginUser loginUser = SecurityUtils.getLoginUser();
+            loginUser.setUser(sysUser);
+            tokenService.refreshToken(loginUser);
         } else {
             throw new ServiceException("验证码错误");
         }

@@ -107,7 +107,7 @@ public class TfaController extends BaseController {
     @PostMapping("/verify/reset")
     public AjaxResult verifyReset(@PathVariable String channel, @RequestBody RegisterBody registerBody) {
         TfaService tfaService = tfaServiceMap.get("auth:service:" + channel);
-        tfaService.doReset(registerBody);
+        tfaService.doResetVerify(registerBody);
         return success();
     }
 }
