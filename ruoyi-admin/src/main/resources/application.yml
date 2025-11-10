@@ -65,13 +65,6 @@ spring:
   cache:
     # 指定缓存类型 jcache 本地缓存 redis 缓存
     type: redis
-    redis:
-      # 指定存活时间（ms）
-      time-to-live: 86400000
-      # 指定前缀
-      use-key-prefix: true
-      # 是否缓存空值，可以防止缓存穿透
-      cache-null-values: true
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER

@@ -22,6 +22,14 @@ spring:
           max-active: 8
           # #连接池最大阻塞等待时间（使用负值表示没有限制）
           max-wait: -1ms
+  cache:
+    redis:
+      # 指定存活时间（ms）
+      time-to-live: 86400000
+      # 指定前缀
+      use-key-prefix: true
+      # 是否缓存空值，可以防止缓存穿透
+      cache-null-values: true
 
   #配置rabbitMq 服务器
   rabbitmq:

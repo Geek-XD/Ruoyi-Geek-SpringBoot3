@@ -72,11 +72,10 @@ RuoYi-Geek不仅仅是一个简单的升级版本，更是对于RuoYi生态的�
 * 测试中的模块请自己使用的时候一定要测试一下。
 * 对于小白，开发中的模块请直接删除。
 
-```
-
-
+```plaintext
 com.ruoyi   
-├── common            // 工具类
+├── ruoyi-admin             // 后台服务
+├── common                  // 工具类
 │       └── annotation                    // 自定义注解
 │       └── config                        // 全局配置
 │       └── constant                      // 通用常量
@@ -85,7 +84,7 @@ com.ruoyi
 │       └── exception                     // 通用异常
 │       └── filter                        // 过滤器处理
 │       └── utils                         // 通用类处理
-├── framework         // 框架核心
+├── framework               // 框架核心
 │       └── aspectj                       // 注解实现
 │       └── config                        // 系统配置
 │       └── datasource                    // 数据权限
@@ -93,45 +92,45 @@ com.ruoyi
 │       └── manager                       // 异步处理
 │       └── security                      // 权限控制
 │       └── web                           // 前端控制
-├── ruoyi-admin        // 后台服务
-├── ruoyi-pay          // 支付场景（基本业务完成）
-│       └── common                         // 支付框架基础模块（基础框架搭建完成）
-│       └── sqb	                           // 收钱吧支付模块（功能可用，业务需要开发）
-│       └── wx	                           // 微信支付模块（基础业务完成）
-│       └── alipay	                   // 支付宝支付模块（基础业务完成）
-│       └── starter	                   // 支付场景启动器
-├── ruoyi-auth        // 第三方认证场景（基础框架搭建完成）
-│       └── common                         // 第三方认证基础模块（开发中）
-│       └── justauth                       // 网站第三方认证模块（测试中，参照若依扩展改进，因没有这么多场景的code，请大家测试出问题后help解决一下发出来）
-│       └── wx                             // 微信小程序认证模块（测试中）
-│       └── phone                          // 手机认证模块（基础业务完成）
-│       └── email                          // 邮箱认证模块（基础业务完成）
-│       └── starter                        // 第三方认证启动器
-├── ruoyi-file         // 文件服务系统（支持公开访问、临时凭证、分片上传等常见功能）
-│       └── common                         // 基础模块和本地磁盘方式
-│       └── minio                          // minio分布式文件服务
-│       └── oss-alibaba                    // alibaba的oss云储存服务
-│       └── starter                        // 第三方认证启动器
-├── ruoyi-geek-models   	// 业务场景
-│       └── online			   // 在线开发模块（可移除）
-│       └── quartz			   // 定时任务（可移除）
-│       └── generator			   // 代码生成（可移除）
-│       └── form			   // 自定义在线表单（可移除）
-│       └── flowable			   // 流程管理（可移除）（依赖于form模块）
-│       └── message			   // 消息模块（可移除）（可以与phone、email模块协同）
-│       └── starter  		 	   // 业务场景启动器
-├── ruoyi-geek-plugins   	// 插件
-│       └── ehcache			   // ehcache缓存插件（与redis模块同类，两者二选一） 
-│       └── mybatis-jpa			   // mybatis-jpa插件（可移除）（简化CRUD，以数据模型为基础开发）
-│       └── mybatis-plus		   // mybatis-plus插件（可移除）（简化CRUD）
-│       └── mybatis-interceptor		   // mybatis-interceptor插件（可移除）（简化数据鉴权和分页，扩展性强）
-│       └── atomikos			   // atomikos分布式事务插件（可移除）
-│       └── netty			   // netty插件（可移除）
-│       └── rabbitmq			   // rabbitmq队列服务模块 
-│       └── redis			   // redis缓存服务模块（与ehcache插件同类，两者二选一） 
-│       └── websocket			   // websocket插件（可移除）
-│       └── starter  		 	   // 插件整合模块
-├── ruoyi-system        // 系统代码
+├── ruoyi-geek-models       // 业务模块
+│       └── online                        // 在线开发模块（可移除）
+│       └── quartz                        // 定时任务（可移除）
+│       └── generator                     // 代码生成（可移除）
+│       └── form                          // 自定义在线表单（可移除）
+│       └── flowable                      // 流程管理（可移除）（依赖于form模块）
+│       └── message                       // 消息模块（可移除）（可以与phone、email模块协同）
+│       └── starter                       // 业务场景启动器
+├── ruoyi-geek-plugins      // 插件
+│       └── ehcache                       // ehcache缓存插件（与redis模块同类，两者二选一） 
+│       └── mybatis-jpa                   // mybatis-jpa插件（可移除）（简化CRUD，以数据模型为基础开发）
+│       └── mybatis-plus                  // mybatis-plus插件（可移除）（简化CRUD）
+│       └── mybatis-interceptor           // mybatis-interceptor插件（可移除）（简化数据鉴权和分页，扩展性强）
+│       └── atomikos                      // atomikos分布式事务插件（可移除）
+│       └── netty                         // netty插件（可移除）
+│       └── rabbitmq                      // rabbitmq队列服务模块 
+│       └── redis                         // redis缓存服务模块（与ehcache插件同类，两者二选一） 
+│       └── websocket                     // websocket插件（可移除）
+│       └── starter                       // 插件整合模块
+├── ruoyi-geek-scenes        // 业务场景
+│       ├── ruoyi-scenes-pay              // 支付场景（基本业务完成）
+│       │       └── common                      // 支付框架基础模块（基础框架搭建完成）
+│       │       └── sqb                         // 收钱吧支付模块（功能可用，业务需要开发）
+│       │       └── wx                          // 微信支付模块（基础业务完成）
+│       │       └── alipay                      // 支付宝支付模块（基础业务完成）
+│       │       └── starter                     // 支付场景启动器
+│       ├── ruoyi-scenes-auth              // 第三方认证场景（基础框架搭建完成）
+│       │       └── common                      // 第三方认证基础模块（开发中）
+│       │       └── justauth                    // 网站第三方认证模块（测试中，参照若依扩展改进，因没有这么多场景的code，请大家测试出问题后help解决一下发出来）
+│       │       └── wx                          // 微信小程序认证模块（测试中）
+│       │       └── phone                       // 手机认证模块（基础业务完成）
+│       │       └── email                       // 邮箱认证模块（基础业务完成）
+│       │       └── starter                     // 第三方认证启动器
+│       ├── ruoyi-scenes-file              // 文件服务系统（支持公开访问、临时凭证、分片上传等常见功能）
+│       │       └── common                      // 基础模块和本地磁盘方式
+│       │       └── minio                       // minio分布式文件服务
+│       │       └── oss-alibaba                 // alibaba的oss云储存服务
+│       │       └── starter                     // 第三方认证启动器
+├── ruoyi-system             // 系统代码
 ```
 
 ## 内置功能
