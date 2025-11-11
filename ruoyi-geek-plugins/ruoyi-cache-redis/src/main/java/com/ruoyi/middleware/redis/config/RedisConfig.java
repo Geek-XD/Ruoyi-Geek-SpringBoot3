@@ -7,7 +7,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -26,32 +25,24 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig implements CachingConfigurer {
 
     @Bean
-    @Primary
-    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        RedisCacheConfiguration config = instanceConfig(3600 * 24 * 15L);
-        return RedisCacheManager.builder(connectionFactory).cacheDefaults(config).transactionAware().build();
-    }
-
-    @Bean
-    public CacheManager cacheManager30m(RedisConnectionFactory connectionFactory) {
-        RedisCacheConfiguration config = instanceConfig(1800L);
-        return RedisCacheManager.builder(connectionFactory).cacheDefaults(config).transactionAware().build();
-    }
-
     @SuppressWarnings(value = { "unchecked", "rawtypes" })
-    private RedisCacheConfiguration instanceConfig(Long ttl) {
-        FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
-        return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(ttl)).disableCachingNullValues()
-                .computePrefixWith(name -> name + ":")
-                .serializeKeysWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        return RedisCacheManager.builder(connectionFactory)
+                .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()
+                        .entryTtl(Duration.ofSeconds(3600 * 24 * 15L))
+                        .disableCachingNullValues()
+                        .computePrefixWith(name -> name + ":")
+                        .serializeKeysWith(RedisSerializationContext.SerializationPair
+                                .fromSerializer(new StringRedisSerializer()))
+                        .serializeValuesWith(RedisSerializationContext.SerializationPair
+                                .fromSerializer(new FastJson2JsonRedisSerializer(Object.class))))
+                .transactionAware()
+                .build();
     }
 
     @Bean
     @SuppressWarnings(value = { "unchecked", "rawtypes" })
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-
         RedisTemplate<Object, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
