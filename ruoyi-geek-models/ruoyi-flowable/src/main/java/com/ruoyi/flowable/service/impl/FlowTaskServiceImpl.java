@@ -661,9 +661,16 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
         SysUser sysUser = SecurityUtils.getLoginUser().getUser();
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .active()
-                .includeProcessVariables()
-                .taskCandidateGroupIn(sysUser.getRoles().stream().map(role -> role.getRoleId().toString())
-                        .collect(Collectors.toList()))
+                .includeProcessVariables();
+
+        List<String> groupIds = sysUser.getRoles().stream()
+                .map(role -> role.getRoleId().toString())
+                .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(groupIds)) {
+            taskQuery = taskQuery.taskCandidateGroupIn(groupIds);
+        }
+
+        taskQuery = taskQuery
                 .taskCandidateOrAssigned(sysUser.getUserId().toString())
                 .orderByTaskCreateTime().desc();
 
