@@ -47,6 +47,5 @@ public class Ehcache3Config {
         JCacheCacheManager jCacheCacheManager = new JCacheCacheManager(cacheManager);
 
         return jCacheCacheManager;
-
     }
 }

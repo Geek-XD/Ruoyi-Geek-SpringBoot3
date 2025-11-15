@@ -60,6 +60,18 @@
             <artifactId>ruoyi-rabbitmq</artifactId>
         </dependency>
 
+        <!-- ruoyi-file-minio -->
+        <dependency>
+            <groupId>com.ruoyi.geekxd</groupId>
+            <artifactId>ruoyi-file-minio</artifactId>
+        </dependency>
+
+        <!-- ruoyi-file-aliyun-oss -->
+        <dependency>
+            <groupId>com.ruoyi.geekxd</groupId>
+            <artifactId>ruoyi-file-aliyun-oss</artifactId>
+        </dependency>
+
         <!-- atomikos-->
         <!-- <dependency>
             <groupId>com.ruoyi.geekxd</groupId>

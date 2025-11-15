@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysFileInfoMapper">
+    
+    <resultMap type="SysFileInfo" id="SysFileInfoResult">
+        <result property="fileId" column="file_id" />
+        <result property="fileName" column="file_name" />
+        <result property="filePath" column="file_path" />
+        <result property="storageType" column="storage_type" />
+        <result property="fileType" column="file_type" />
+        <result property="fileSize" column="file_size" />
+        <result property="md5" column="md5" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+        <result property="delFlag" column="del_flag" />
+    </resultMap>
+
+    <sql id="selectSysFileInfoVo">
+        select 
+            sfi.file_id,
+            sfi.file_name,
+            sfi.file_path,
+            sfi.storage_type,
+            sfi.file_type,
+            sfi.file_size,
+            sfi.md5,
+            sfi.create_by,
+            sfi.create_time,
+            sfi.update_by,
+            sfi.update_time,
+            sfi.remark,
+            sfi.del_flag
+        from sys_file_info sfi
+    </sql>
+
+    <select id="selectSysFileInfoList" parameterType="SysFileInfo" resultMap="SysFileInfoResult">
+        <include refid="selectSysFileInfoVo"/>
+        <where>
+            <if test="fileName != null  and fileName != ''"> and sfi.file_name like concat('%', #{fileName}, '%')</if>
+            <if test="filePath != null  and filePath != ''"> and sfi.file_path = #{filePath}</if>
+            <if test="storageType != null  and storageType != ''"> and sfi.storage_type = #{storageType}</if>
+            <if test="fileType != null  and fileType != ''"> and sfi.file_type = #{fileType}</if>
+            <if test="fileSize != null "> and sfi.file_size = #{fileSize}</if>
+            <if test="md5 != null  and md5 != ''"> and sfi.md5 = #{md5}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysFileInfoByFileId" parameterType="Long" resultMap="SysFileInfoResult">
+        <include refid="selectSysFileInfoVo"/>
+        where sfi.file_id = #{fileId}
+    </select>
+        
+    <insert id="insertSysFileInfo" parameterType="SysFileInfo" useGeneratedKeys="true" keyProperty="fileId">
+        insert into sys_file_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fileName != null and fileName != ''">file_name,</if>
+            <if test="filePath != null and filePath != ''">file_path,</if>
+            <if test="storageType != null and storageType != ''">storage_type,</if>
+            <if test="fileType != null">file_type,</if>
+            <if test="fileSize != null">file_size,</if>
+            <if test="md5 != null">md5,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fileName != null and fileName != ''">#{fileName},</if>
+            <if test="filePath != null and filePath != ''">#{filePath},</if>
+            <if test="storageType != null and storageType != ''">#{storageType},</if>
+            <if test="fileType != null">#{fileType},</if>
+            <if test="fileSize != null">#{fileSize},</if>
+            <if test="md5 != null">#{md5},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysFileInfo" parameterType="SysFileInfo">
+        update sys_file_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fileName != null and fileName != ''">file_name = #{fileName},</if>
+            <if test="filePath != null and filePath != ''">file_path = #{filePath},</if>
+            <if test="storageType != null and storageType != ''">storage_type = #{storageType},</if>
+            <if test="fileType != null">file_type = #{fileType},</if>
+            <if test="fileSize != null">file_size = #{fileSize},</if>
+            <if test="md5 != null">md5 = #{md5},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where sys_file_info.file_id = #{fileId}
+    </update>
+
+    <delete id="deleteSysFileInfoByFileId" parameterType="Long">
+        delete from sys_file_info where file_id = #{fileId}
+    </delete>
+
+    <delete id="deleteSysFileInfoByFileIds" parameterType="String">
+        delete from sys_file_info where file_id in 
+        <foreach item="fileId" collection="array" open="(" separator="," close=")">
+            #{fileId}
+        </foreach>
+    </delete>
+</mapper>

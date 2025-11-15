@@ -28,13 +28,6 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
-            <!-- 文件管理启动器 -->
-            <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-file-starter</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
             <!-- 场景启动器 -->
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
@@ -48,7 +41,6 @@
     <modules>
         <module>ruoyi-scene-auth</module>
         <module>ruoyi-scene-pay</module>
-        <module>ruoyi-scene-file</module>
         <module>ruoyi-scene-starter</module>
     </modules>
     <packaging>pom</packaging>

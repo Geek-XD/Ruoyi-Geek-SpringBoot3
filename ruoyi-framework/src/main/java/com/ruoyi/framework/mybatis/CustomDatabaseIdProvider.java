@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.framework.manager.DataSourceManager;
+import com.ruoyi.framework.datasource.manager.DataSourceManager;
 
 /**
  * 自定义 DatabaseIdProvider：

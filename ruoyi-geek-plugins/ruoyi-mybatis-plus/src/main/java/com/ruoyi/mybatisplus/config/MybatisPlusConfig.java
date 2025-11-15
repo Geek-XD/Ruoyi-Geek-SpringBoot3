@@ -21,10 +21,10 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.github.pagehelper.PageInterceptor;
 import com.github.pagehelper.autoconfigure.PageHelperStandardProperties;
-import com.ruoyi.common.service.mybatis.CreateSqlSessionFactory;
+import com.ruoyi.common.core.mybatis.CreateSqlSessionFactory;
 import com.ruoyi.common.utils.MybatisUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.framework.manager.DataSourceManager;
+import com.ruoyi.framework.datasource.manager.DataSourceManager;
 import com.ruoyi.framework.mybatis.CustomDatabaseIdProvider;
 import com.ruoyi.mybatisinterceptor.interceptor.DataScopeInterceptor;
 /**
@@ -79,7 +79,7 @@ public class MybatisPlusConfig {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "createSqlSessionFactory", name = "use", havingValue = "mybatis-plus")
+    @ConditionalOnProperty(prefix = "enhance", name = "mybatis", havingValue = "mybatis-plus")
     public CreateSqlSessionFactory createSqlSessionFactory(PageHelperStandardProperties packageHelperStandardProperties) {
         return new CreateSqlSessionFactory() {
             public SqlSessionFactory createSqlSessionFactory(Environment env, DataSource dataSource) throws Exception {

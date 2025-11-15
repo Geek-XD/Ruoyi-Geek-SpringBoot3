@@ -26,11 +26,5 @@
             <groupId>com.ruoyi.geekxd</groupId>
             <artifactId>ruoyi-pay-starter</artifactId>
         </dependency>
-
-        <!-- 文件管理启动器 -->
-        <dependency>
-            <groupId>com.ruoyi.geekxd</groupId>
-            <artifactId>ruoyi-file-starter</artifactId>
-        </dependency>
     </dependencies>
 </project>

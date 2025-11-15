@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.atomikos.spring.AtomikosDataSourceBean;
 import com.ruoyi.atomikos.config.AtomikosConfig;
-import com.ruoyi.common.service.datasource.AfterCreateDataSource;
+import com.ruoyi.common.core.datasource.AfterCreateDataSource;
 
 @Component
 @ConditionalOnProperty(name = "atomikos.enabled", havingValue = "true")

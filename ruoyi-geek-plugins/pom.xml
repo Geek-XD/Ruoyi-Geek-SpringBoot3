@@ -15,6 +15,8 @@
         <mybatis-plus.version>3.5.8</mybatis-plus.version>
         <netty.version>4.1.112.Final</netty.version>
         <transactions.version>6.0.0</transactions.version>
+        <aliyunoss.version>3.18.1</aliyunoss.version>
+        <minio.version>8.2.1</minio.version>
     </properties>
 
     <description>
@@ -27,6 +29,20 @@
                 <groupId>org.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
                 <version>${ehcache.version}</version>
+            </dependency>
+
+            <!-- minio-->
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
+
+            <!-- oss-->
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyunoss.version}</version>
             </dependency>
 
             <!-- mybatis-plus -->
@@ -61,6 +77,20 @@
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
                 <artifactId>ruoyi-cache-redis</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- ruoyi-file-minio -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-file-minio</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- ruoyi-file-aliyun-oss -->
+            <dependency>
+                <groupId>com.ruoyi.geekxd</groupId>
+                <artifactId>ruoyi-file-aliyun-oss</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
@@ -119,7 +149,6 @@
 
 
     <modules>
-        <module>ruoyi-cache-ehcache</module>
         <module>ruoyi-mybatis-jpa</module>
         <module>ruoyi-mybatis-plus</module>
         <module>ruoyi-websocket</module>
@@ -129,6 +158,9 @@
         <module>ruoyi-atomikos</module>
         <module>ruoyi-rabbitmq</module>
         <module>ruoyi-cache-redis</module>
+        <module>ruoyi-cache-ehcache</module>
+        <module>ruoyi-file-minio</module>
+        <module>ruoyi-file-aliyun-oss</module>
     </modules>
     <packaging>pom</packaging>
 </project>
