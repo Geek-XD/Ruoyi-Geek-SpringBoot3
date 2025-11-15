@@ -1,0 +1,6 @@
+[submodule "ruoyi-geek-models"]
+	path = ruoyi-geek-models
+	url = https://gitee.com/geek-xd/geek-spring-boot-models.git
+[submodule "ruoyi-geek-plugins"]
+	path = ruoyi-geek-plugins
+	url = https://gitee.com/geek-xd/geek-spring-boot-plugins.git
