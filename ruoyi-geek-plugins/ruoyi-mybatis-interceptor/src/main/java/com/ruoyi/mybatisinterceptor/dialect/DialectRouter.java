@@ -3,7 +3,7 @@ package com.ruoyi.mybatisinterceptor.dialect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ruoyi.framework.manager.DataSourceManager;
+import com.ruoyi.framework.datasource.manager.DataSourceManager;
 
 @Component
 public class DialectRouter {

@@ -47,3 +47,11 @@ netty:
       workerThreads: 16
       port: 8081
       enable: true
+
+enhance:
+  # 选择MyBatis配置方式，mybatis / mybatis-plus
+  mybatis: mybatis
+  # default 原生数据范围注解   plus 增强数据范围注解
+  datascope: default
+  # default 使用PageHelper分页插件   custom 自研分页插件
+  pageutils: default

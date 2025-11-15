@@ -10,8 +10,8 @@ import org.springframework.cache.transaction.TransactionAwareCacheDecorator;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
-import com.ruoyi.common.service.cache.CacheKeys;
-import com.ruoyi.common.service.cache.CacheTimeOut;
+import com.ruoyi.common.core.cache.CacheKeys;
+import com.ruoyi.common.core.cache.CacheTimeOut;
 import com.ruoyi.common.utils.spring.SpringUtils;
 
 public class CacheUtils {

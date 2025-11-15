@@ -31,7 +31,7 @@ public class PageUtils {
     private static Method PI_GET_TOTAL;
     private static Constructor<?> PI_CTOR;
 
-    @Value("${pageutils.type:default}")
+    @Value("${enhance.pageutils:default}")
     private String pageUtilsType;
 
     @PostConstruct

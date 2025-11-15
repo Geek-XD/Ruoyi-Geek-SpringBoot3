@@ -45,7 +45,7 @@ import net.sf.jsqlparser.statement.select.SelectItem;
  */
 @Aspect
 @Component
-@ConditionalOnProperty(prefix = "datascope", name = "type", havingValue = "plus", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "enhance", name = "datascope", havingValue = "mybatis-plus", matchIfMissing = false)
 public class DataScopeAspect {
     /**
      * 全部数据权限

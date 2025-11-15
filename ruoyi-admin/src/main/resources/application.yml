@@ -64,7 +64,7 @@ spring:
     name: ruoyi
   cache:
     # 指定缓存类型 jcache 本地缓存 redis 缓存
-    type: redis
+    type: simple
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
@@ -111,18 +111,6 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
-
-createSqlSessionFactory:
-  # 选择MyBatis配置方式，mybatis / mybatis-plus
-  use: mybatis-plus
-
-datascope:
-  # default 原生数据范围注解   plus 增强数据范围注解
-  type: default
-
-pageutils:
-  # default 使用PageHelper分页插件   custom 自研分页插件
-  type: default
 
 # PageHelper分页插件
 pagehelper:
