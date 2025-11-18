@@ -1,4 +1,4 @@
-package com.ruoyi.common.core.file.utils;
+package com.ruoyi.common.utils.file;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.core.file.service.StorageService;
 import com.ruoyi.common.core.file.storage.StorageEntity;
 import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.common.utils.file.MimeTypeUtils;
 
 import jakarta.servlet.http.HttpServletResponse;
 

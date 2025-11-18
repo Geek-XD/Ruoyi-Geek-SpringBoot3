@@ -28,12 +28,12 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.file.domain.SysFilePartETag;
 import com.ruoyi.common.core.file.service.StorageService;
-import com.ruoyi.common.core.file.utils.FileOperateUtils;
-import com.ruoyi.common.core.file.utils.StorageUtils;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.file.FileOperateUtils;
 import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.common.utils.file.StorageUtils;
 import com.ruoyi.system.domain.SysFileInfo;
 import com.ruoyi.system.service.ISysFileInfoService;
 
