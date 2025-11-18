@@ -38,7 +38,7 @@ server:
 # 日志配置
 logging:
   level:
-    "[com.ruoyi]": DEBUG
+    "[com.ruoyi]": INFO
     "[org]": WARN
     "[org.springframework]": WARN
     "[org.apache]": WARN

@@ -1,4 +1,4 @@
-package com.ruoyi.common.core.file.utils;
+package com.ruoyi.common.utils.file;
 
 import java.util.ArrayList;
 import java.util.HashMap;
