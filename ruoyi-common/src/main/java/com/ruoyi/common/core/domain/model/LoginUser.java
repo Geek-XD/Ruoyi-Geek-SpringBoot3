@@ -231,6 +231,7 @@ public class LoginUser implements UserDetails {
         this.user = user;
     }
 
+    @JSONField(serialize = false)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
