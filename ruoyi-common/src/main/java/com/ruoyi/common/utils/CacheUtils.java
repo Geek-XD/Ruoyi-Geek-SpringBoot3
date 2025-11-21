@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.jcache.JCacheCache;
 import org.springframework.cache.transaction.TransactionAwareCacheDecorator;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
@@ -89,10 +88,7 @@ public class CacheUtils {
      */
     public static <T> void put(String cacheName, String key, T value, long timeout, TimeUnit unit) {
         Cache cache = getCache(cacheName);
-        if (cache instanceof JCacheCache) {
-            JCacheCache ehcache = (JCacheCache) cache;
-            ehcache.put(key, value);
-        } else if (cache instanceof TransactionAwareCacheDecorator) {
+        if (cache instanceof TransactionAwareCacheDecorator) {
             CacheTimeOut cacheTimeOut = SpringUtils.getBean(CacheTimeOut.class);
             if (timeout != 0 && unit != null) {
                 cacheTimeOut.setCacheObject(cacheName, key, value, timeout, unit);
