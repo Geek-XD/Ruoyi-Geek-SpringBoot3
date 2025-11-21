@@ -63,7 +63,7 @@ spring:
   application:
     name: ruoyi
   cache:
-    # 指定缓存类型 jcache 本地缓存 redis 缓存
+    # 指定缓存类型 simple 默认缓存 jcache 本地缓存 redis 缓存
     type: simple
   mvc:
     pathmatch:

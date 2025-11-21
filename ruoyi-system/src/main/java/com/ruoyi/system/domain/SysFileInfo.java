@@ -30,12 +30,12 @@ public class SysFileInfo extends BaseEntity {
 
     /** 统一逻辑路径（/开头） */
     @Schema(title = "统一逻辑路径（/开头）")
-    @Excel(name = "统一逻辑路径", readConverterExp = "/=开头")
+    @Excel(name = "统一逻辑路径")
     private String filePath;
 
     /** 存储类型（local/minio/oss） */
     @Schema(title = "存储类型（local/minio/oss）")
-    @Excel(name = "存储类型", readConverterExp = "l=ocal/minio/oss")
+    @Excel(name = "存储类型")
     private String storageType;
 
     /** 文件类型/后缀 */
@@ -45,7 +45,7 @@ public class SysFileInfo extends BaseEntity {
 
     /** 文件大小（字节） */
     @Schema(title = "文件大小（字节）")
-    @Excel(name = "文件大小", readConverterExp = "字=节")
+    @Excel(name = "文件大小")
     private Long fileSize;
 
     /** 文件MD5 */

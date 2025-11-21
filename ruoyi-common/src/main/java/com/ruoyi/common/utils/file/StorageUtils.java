@@ -51,6 +51,16 @@ public class StorageUtils {
     }
 
     /**
+     * 获取指定储存类型的存储工厂
+     * 
+     * @param storageType 存储类型
+     * @return 存储工厂
+     */
+    public static StorageFactory<?, ?> getStorageFactory(String storageType) {
+        return storageFactoryMap.get(storageType);
+    }
+
+    /**
      * 获取所有可用存储渠道及其存储桶列表
      * 
      * @return
