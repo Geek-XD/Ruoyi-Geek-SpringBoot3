@@ -1,6 +1,7 @@
 package com.ruoyi.framework.cache;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
@@ -17,21 +18,18 @@ import com.ruoyi.common.core.cache.CacheKeys;
 
 @Configuration
 @ConditionalOnProperty(prefix = "spring.cache", name = { "type" }, havingValue = "simple", matchIfMissing = false)
-public class SimpleCacheManager implements CacheKeys {
+public class SimpleCacheConfig implements CacheKeys {
+
+    private String[] cacheNames = new String[] {
+            "temp_cache", "eternal_cache", "sys_dict", "sys_config",
+            "repeat_submit", "captcha_codes", "login_tokens",
+            "ip_err_cnt_key", "rate_limit", "pwd_err_cnt"
+    };
+
     @Bean
     public CacheManager cacheManager() {
         ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager();
-        cacheManager.setCacheNames(java.util.List.of(
-                "temp_cache",
-                "eternal_cache",
-                "sys_dict",
-                "sys_config",
-                "repeat_submit",
-                "captcha_codes",
-                "login_tokens",
-                "ip_err_cnt_key",
-                "rate_limit",
-                "pwd_err_cnt"));
+        cacheManager.setCacheNames(List.of(cacheNames));
         return cacheManager;
     }
 
