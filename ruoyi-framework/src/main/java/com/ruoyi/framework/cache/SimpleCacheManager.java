@@ -20,6 +20,7 @@ import org.springframework.lang.Nullable;
 import com.ruoyi.common.core.cache.TimedValue;
 import com.ruoyi.common.core.cache.TtlCacheManager;
 
+@SuppressWarnings({"rawtypes", "unchecked" })
 public class SimpleCacheManager extends AbstractTransactionSupportingCacheManager implements TtlCacheManager {
 
     private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap(16);

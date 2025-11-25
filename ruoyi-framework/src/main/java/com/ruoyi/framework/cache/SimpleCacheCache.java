@@ -9,6 +9,7 @@ import org.springframework.lang.Nullable;
 
 import com.ruoyi.common.core.cache.TimedValue;
 
+@SuppressWarnings("unchecked")
 public class SimpleCacheCache extends ConcurrentMapCache {
 
     public SimpleCacheCache(String name) {
