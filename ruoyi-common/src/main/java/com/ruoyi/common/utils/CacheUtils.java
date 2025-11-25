@@ -4,12 +4,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
-import com.ruoyi.common.core.cache.CacheKeys;
-import com.ruoyi.common.core.cache.CacheTimeOut;
+import com.ruoyi.common.core.cache.TtlCacheManager;
 import com.ruoyi.common.utils.spring.SpringUtils;
 
 public class CacheUtils {
@@ -19,8 +17,8 @@ public class CacheUtils {
      *
      * @return
      */
-    public static CacheManager getCacheManager() {
-        return SpringUtils.getBean(CacheManager.class);
+    public static TtlCacheManager getCacheManager() {
+        return SpringUtils.getBean(TtlCacheManager.class);
     }
 
     /**
@@ -41,8 +39,7 @@ public class CacheUtils {
      */
     public static Set<String> getkeys(String cacheName) {
         Cache cache = getCache(cacheName);
-        CacheKeys cacheGetKets = SpringUtils.getBean(CacheKeys.class);
-        return cacheGetKets.getCachekeys(cache);
+        return getCacheManager().getCachekeys(cache);
     }
 
     /**
@@ -86,18 +83,11 @@ public class CacheUtils {
      * @param <T>
      */
     public static <T> void put(String cacheName, String key, T value, long timeout, TimeUnit unit) {
-        Cache cache = getCache(cacheName);
-        CacheTimeOut cacheTimeOut = SpringUtils.getBean(CacheTimeOut.class);
-
-        // if (cache instanceof TransactionAwareCacheDecorator) {
-            if (timeout != 0 && unit != null) {
-                cacheTimeOut.setCacheObject(cacheName, key, value, timeout, unit);
-            } else {
-                cacheTimeOut.setCacheObject(cacheName, key, value);
-            }
-        // } else {
-            // cache.put(key, value);
-        // }
+        if (timeout != 0 && unit != null) {
+            getCacheManager().setCacheObject(cacheName, key, value, timeout, unit);
+        } else {
+            getCacheManager().setCacheObject(cacheName, key, value);
+        }
     }
 
     /**

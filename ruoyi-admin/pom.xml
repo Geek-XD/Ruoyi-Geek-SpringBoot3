@@ -60,10 +60,10 @@
         </dependency> -->
 
         <!-- 集成插件启动器 -->
-        <!-- <dependency>
+        <dependency>
             <groupId>com.ruoyi.geekxd</groupId>
             <artifactId>ruoyi-plugins-starter</artifactId>
-        </dependency> -->
+        </dependency>
 
         <!-- 集成业务启动器 -->
         <!-- <dependency>
