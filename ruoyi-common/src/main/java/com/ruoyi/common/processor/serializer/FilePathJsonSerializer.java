@@ -1,4 +1,4 @@
-package com.ruoyi.common.serializer;
+package com.ruoyi.common.processor.serializer;
 
 import java.io.IOException;
 import java.util.Objects;

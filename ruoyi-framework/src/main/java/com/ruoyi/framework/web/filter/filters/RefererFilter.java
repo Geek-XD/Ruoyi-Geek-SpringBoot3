@@ -1,4 +1,4 @@
-package com.ruoyi.common.filter;
+package com.ruoyi.framework.web.filter.filters;
 
 import java.io.IOException;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package com.ruoyi.common.handler;
+package com.ruoyi.common.core.orm;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

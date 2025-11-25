@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ruoyi.common.serializer.FilePathJsonSerializer;
+import com.ruoyi.common.processor.serializer.FilePathJsonSerializer;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

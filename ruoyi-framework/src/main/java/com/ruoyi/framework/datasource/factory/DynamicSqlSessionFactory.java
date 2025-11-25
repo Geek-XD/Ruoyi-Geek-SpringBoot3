@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.ruoyi.common.core.mybatis.CreateSqlSessionFactory;
+import com.ruoyi.common.core.orm.CreateSqlSessionFactory;
 import com.ruoyi.framework.datasource.DynamicSqlSessionTemplate;
 import com.ruoyi.framework.datasource.manager.DataSourceManager;
 import com.ruoyi.framework.datasource.properties.DynamicDataSourceProperties;

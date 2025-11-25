@@ -3,8 +3,8 @@ package com.ruoyi.system.domain;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.ruoyi.common.annotation.Xss;
 import com.ruoyi.common.core.domain.BaseEntity;
-import com.ruoyi.common.xss.Xss;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

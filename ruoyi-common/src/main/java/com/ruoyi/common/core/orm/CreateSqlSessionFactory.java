@@ -1,4 +1,4 @@
-package com.ruoyi.common.core.mybatis;
+package com.ruoyi.common.core.orm;
 
 import javax.sql.DataSource;
 

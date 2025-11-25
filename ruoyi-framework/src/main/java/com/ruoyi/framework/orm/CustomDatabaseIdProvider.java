@@ -1,4 +1,4 @@
-package com.ruoyi.framework.mybatis;
+package com.ruoyi.framework.orm;
 
 import java.sql.SQLException;
 import java.util.Properties;

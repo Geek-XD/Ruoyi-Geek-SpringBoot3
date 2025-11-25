@@ -1,4 +1,4 @@
-package com.ruoyi.framework.mybatis;
+package com.ruoyi.framework.orm;
 
 import javax.sql.DataSource;
 
@@ -16,7 +16,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 
 import com.github.pagehelper.PageInterceptor;
 import com.github.pagehelper.autoconfigure.PageHelperStandardProperties;
-import com.ruoyi.common.core.mybatis.CreateSqlSessionFactory;
+import com.ruoyi.common.core.orm.CreateSqlSessionFactory;
 import com.ruoyi.common.utils.MybatisUtils;
 import com.ruoyi.common.utils.StringUtils;
 

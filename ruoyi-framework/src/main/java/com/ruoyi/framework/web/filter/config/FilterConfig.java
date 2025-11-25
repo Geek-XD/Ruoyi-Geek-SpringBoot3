@@ -1,4 +1,4 @@
-package com.ruoyi.framework.config;
+package com.ruoyi.framework.web.filter.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.filter.RefererFilter;
-import com.ruoyi.common.filter.RepeatableFilter;
-import com.ruoyi.common.filter.XssFilter;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.web.filter.filters.RefererFilter;
+import com.ruoyi.framework.web.filter.filters.RepeatableFilter;
+import com.ruoyi.framework.web.filter.filters.XssFilter;
 
 import jakarta.servlet.DispatcherType;
 
