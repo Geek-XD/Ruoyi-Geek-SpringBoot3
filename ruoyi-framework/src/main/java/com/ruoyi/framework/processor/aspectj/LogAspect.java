@@ -17,13 +17,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.filter.SimplePropertyPreFilter;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.enums.BusinessStatus;
 import com.ruoyi.common.enums.HttpMethod;
-import com.ruoyi.common.filter.PropertyPreExcludeFilter;
 import com.ruoyi.common.utils.ExceptionUtil;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
@@ -194,8 +194,13 @@ public class LogAspect {
     /**
      * 忽略敏感属性
      */
-    public PropertyPreExcludeFilter excludePropertyPreFilter(String[] excludeParamNames) {
-        return new PropertyPreExcludeFilter().addExcludes(ArrayUtils.addAll(EXCLUDE_PROPERTIES, excludeParamNames));
+    public SimplePropertyPreFilter excludePropertyPreFilter(String[] excludeParamNames) {
+        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+        String[] all = ArrayUtils.addAll(EXCLUDE_PROPERTIES, excludeParamNames);
+        for (String excludeProperty : all) {
+            filter.getExcludes().add(excludeProperty);
+        }
+        return filter;
     }
 
     /**
