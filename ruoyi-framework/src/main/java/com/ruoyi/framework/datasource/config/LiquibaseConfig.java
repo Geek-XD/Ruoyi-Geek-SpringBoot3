@@ -26,7 +26,7 @@ public class LiquibaseConfig {
         nativeDs.setDriverClassName(druidDataSource.getDriverClassName());
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(nativeDs);
-        liquibase.setChangeLog("classpath:liquibase/master.xml");
+        liquibase.setChangeLog("classpath:db/changelog-master.xml");
         liquibase.setShouldRun(true);
         return liquibase;
     }
