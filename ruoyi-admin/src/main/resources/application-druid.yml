@@ -1,26 +1,19 @@
+mybatis-flex:
+    datasource:
+        MASTER:
+            url: jdbc:mysql://127.0.0.1/ry?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
+            username: root
+            password: 123456
+        SLAVE:
+            url: jdbc:postgresql://127.0.0.1/ry
+            username: postgres
+            password: 123456
+
 # 数据源配置
 spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: com.mysql.cj.jdbc.Driver
-        dynamic:
-            primary: MASTER
-            xa: true
-            datasource:
-                # 主库数据源
-                MASTER:
-                    url: jdbc:mysql://127.0.0.1/ry?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
-                    username: root
-                    password: 123456
-                # MASTER:
-                #     url: jdbc:postgresql://127.0.0.1/ry
-                #     username: postgres
-                #     password: 123456
-                # 从库数据源
-                # SLAVE:
-                #     url: jdbc:mysql://127.0.0.1/ruoyi?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-                #     username: root
-                #     password: 123456
         druid:
             # 初始连接数
             initialSize: 5

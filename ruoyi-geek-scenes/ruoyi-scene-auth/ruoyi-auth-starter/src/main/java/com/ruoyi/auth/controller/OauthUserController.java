@@ -45,7 +45,7 @@ public class OauthUserController extends BaseController {
     @Operation(summary = "查询第三方认证列表")
     @PreAuthorize("@ss.hasPermi('system:oauth:list')")
     @GetMapping("/list")
-    public TableDataInfo list(OauthUser oauthUser) {
+    public TableDataInfo<OauthUser> list(OauthUser oauthUser) {
         startPage();
         List<OauthUser> list = oauthUserService.selectOauthUserList(oauthUser);
         return getDataTable(list);

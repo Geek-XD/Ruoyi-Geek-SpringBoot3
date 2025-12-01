@@ -45,7 +45,7 @@ public class SysOperlogController extends BaseController {
     @Operation(summary = "获取操作日志记录列表")
     @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysOperLog operLog) {
+    public TableDataInfo<SysOperLog> list(SysOperLog operLog) {
         startPage();
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
         return getDataTable(list);

@@ -43,7 +43,7 @@ public class SysDictTypeController extends BaseController {
     @Operation(summary = "查询字典类型列表")
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysDictType dictType) {
+    public TableDataInfo<SysDictType> list(SysDictType dictType) {
         startPage();
         List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
         return getDataTable(list);

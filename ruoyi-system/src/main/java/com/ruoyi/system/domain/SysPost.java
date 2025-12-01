@@ -3,6 +3,7 @@ package com.ruoyi.system.domain;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.core.domain.BaseEntity;
@@ -17,6 +18,7 @@ import jakarta.validation.constraints.Size;
  * 
  * @author ruoyi
  */
+@Table("sys_post")
 @Schema(title = "岗位表")
 public class SysPost extends BaseEntity
 {

@@ -37,6 +37,7 @@
         <knife4j.version>4.5.0</knife4j.version>
         <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
         <mybatis.version>3.5.16</mybatis.version>
+        <mybatis-plus.version>3.5.8</mybatis-plus.version>
         <!-- druid 的 xa暂时不支持 mysql 9.0.0+ 连接速度:8.3.0>8.2.0>8.4.0 -->
         <mysql.version>8.3.0</mysql.version>
         <postgresql.version>42.7.7</postgresql.version>
@@ -91,6 +92,19 @@
                 <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>
                 <version>${mybatis-spring-boot.version}</version>
+            </dependency>
+
+            <!-- mybatis-plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
+                <version>1.11.4</version>
             </dependency>
 
             <!-- pagehelper 分页插件 -->

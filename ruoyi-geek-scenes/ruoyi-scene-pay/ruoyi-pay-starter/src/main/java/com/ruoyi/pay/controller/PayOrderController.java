@@ -47,7 +47,7 @@ public class PayOrderController extends BaseController
     @Operation(summary = "查询订单列表")
     @PreAuthorize("@ss.hasPermi('pay:order:list')")
     @GetMapping("/list")
-    public TableDataInfo list(PayOrder payOrder)
+    public TableDataInfo<PayOrder> list(PayOrder payOrder)
     {
         startPage();
         List<PayOrder> list = payOrderService.selectPayOrderList(payOrder);

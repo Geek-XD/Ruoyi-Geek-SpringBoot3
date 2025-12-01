@@ -46,7 +46,7 @@ public class SysPostController extends BaseController {
     @Operation(summary = "获取岗位列表")
     @PreAuthorize("@ss.hasPermi('system:post:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysPost post) {
+    public TableDataInfo<SysPost> list(SysPost post) {
         startPage();
         List<SysPost> list = postService.selectPostList(post);
         return getDataTable(list);

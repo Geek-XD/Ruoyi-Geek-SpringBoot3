@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot3.autoconfigure.properties.DruidStatProperties;
 import com.alibaba.druid.util.Utils;
-import com.ruoyi.framework.datasource.properties.DynamicDataSourceProperties;
 
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.Filter;
@@ -32,8 +30,8 @@ import jakarta.servlet.ServletResponse;
 @Configuration
 public class DruidConfig {
 
-    @Autowired
-    DynamicDataSourceProperties dataSourceProperties;
+    // @Autowired
+    // DynamicDataSourceProperties dataSourceProperties;
 
     private List<DruidDataSource> druidDataSources = new ArrayList<>();
 

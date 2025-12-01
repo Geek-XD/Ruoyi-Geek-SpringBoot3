@@ -1,0 +1,7 @@
+# db.changelog-master.yaml（放在 resources/db/changelog/ 目录下）
+databaseChangeLog:
+  # 引入具体的变更脚本（file路径是相对于 classpath 的路径）
+  - include:
+      file: db/changelog/changelog-output-0.0.1.xml  # 对应你创建的变更文件
+      relativeToChangelogFile: false  # 固定为false（按classpath路径查找）
+      errorIfMissingOrEmpty: true     # 若文件不存在则报错（避免漏配置）

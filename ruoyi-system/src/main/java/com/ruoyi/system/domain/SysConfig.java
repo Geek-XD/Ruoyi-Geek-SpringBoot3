@@ -3,6 +3,7 @@ package com.ruoyi.system.domain;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.core.domain.BaseEntity;
@@ -16,6 +17,7 @@ import jakarta.validation.constraints.Size;
  * 
  * @author ruoyi
  */
+@Table("sys_config")
 @Schema(title = "参数配置表")
 public class SysConfig extends BaseEntity
 {

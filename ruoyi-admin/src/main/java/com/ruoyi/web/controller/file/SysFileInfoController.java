@@ -46,7 +46,7 @@ public class SysFileInfoController extends BaseController
     @Operation(summary = "查询文件列表")
     @PreAuthorize("@ss.hasPermi('system:file:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysFileInfo sysFileInfo)
+    public TableDataInfo<SysFileInfo> list(SysFileInfo sysFileInfo)
     {
         startPage();
         List<SysFileInfo> list = sysFileInfoService.selectSysFileInfoList(sysFileInfo);

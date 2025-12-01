@@ -47,7 +47,7 @@ public class SysConfigController extends BaseController {
     @Operation(summary = "获取参数配置列表")
     @PreAuthorize("@ss.hasPermi('system:config:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysConfig config) {
+    public TableDataInfo<SysConfig> list(SysConfig config) {
         startPage();
         List<SysConfig> list = configService.selectConfigList(config);
         return getDataTable(list);

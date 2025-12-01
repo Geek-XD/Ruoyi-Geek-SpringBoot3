@@ -64,7 +64,7 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "获取角色列表")
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysRole role) {
+    public TableDataInfo<SysRole> list(SysRole role) {
         startPage();
         List<SysRole> list = roleService.selectRoleList(role);
         return getDataTable(list);
@@ -193,7 +193,7 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "查询已分配用户角色列表")
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/allocatedList")
-    public TableDataInfo allocatedList(SysUser user) {
+    public TableDataInfo<SysUser> allocatedList(SysUser user) {
         startPage();
         List<SysUser> list = userService.selectAllocatedList(user);
         return getDataTable(list);
@@ -205,7 +205,7 @@ public class SysRoleController extends BaseController {
     @Operation(summary = "查询未分配用户角色列表")
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/unallocatedList")
-    public TableDataInfo unallocatedList(SysUser user) {
+    public TableDataInfo<SysUser> unallocatedList(SysUser user) {
         startPage();
         List<SysUser> list = userService.selectUnallocatedList(user);
         return getDataTable(list);

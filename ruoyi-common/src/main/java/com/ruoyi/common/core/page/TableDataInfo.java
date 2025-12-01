@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author ruoyi
  */
 @Schema(title = "表格分页数据对象")
-public class TableDataInfo implements Serializable
+public class TableDataInfo<T> implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -21,7 +21,7 @@ public class TableDataInfo implements Serializable
 
     /** 列表数据 */
     @Schema(title = "列表数据")
-    private List<?> rows;
+    private List<T> rows;
 
     /** 消息状态码 */
     @Schema(title = "消息状态码")
@@ -44,7 +44,7 @@ public class TableDataInfo implements Serializable
      * @param list 列表数据
      * @param total 总记录数
      */
-    public TableDataInfo(List<?> list, int total)
+    public TableDataInfo(List<T> list, int total)
     {
         this.rows = list;
         this.total = total;
@@ -60,12 +60,12 @@ public class TableDataInfo implements Serializable
         this.total = total;
     }
 
-    public List<?> getRows()
+    public List<T> getRows()
     {
         return rows;
     }
 
-    public void setRows(List<?> rows)
+    public void setRows(List<T> rows)
     {
         this.rows = rows;
     }

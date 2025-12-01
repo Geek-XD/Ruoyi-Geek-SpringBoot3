@@ -44,7 +44,7 @@ public class SysNoticeController extends BaseController {
      */
     @Operation(summary = "获取通知公告列表")
     @GetMapping("/list")
-    public TableDataInfo list(SysNotice notice) {
+    public TableDataInfo<SysNotice> list(SysNotice notice) {
         startPage();
         if (!SecurityUtils.hasPermi("system:notice:list")) {
             notice.setStatus("0");

@@ -46,7 +46,7 @@ public class SysLogininforController extends BaseController {
     @Operation(summary = "获取系统访问记录列表")
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysLogininfor logininfor) {
+    public TableDataInfo<SysLogininfor> list(SysLogininfor logininfor) {
         startPage();
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
         return getDataTable(list);

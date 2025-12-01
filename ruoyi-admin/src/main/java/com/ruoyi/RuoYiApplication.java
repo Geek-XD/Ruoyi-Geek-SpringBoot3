@@ -3,6 +3,7 @@ package com.ruoyi;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -19,6 +20,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableCaching
 @EnableMethodSecurity
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
+@MapperScan(basePackages = "com.ruoyi.**.mapper")
 public class RuoYiApplication {
     public static void main(String[] args) throws UnknownHostException {
         // System.setProperty("spring.devtools.restart.enabled", "false");

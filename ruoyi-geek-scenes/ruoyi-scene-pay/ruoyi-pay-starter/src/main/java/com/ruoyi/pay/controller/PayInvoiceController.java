@@ -46,7 +46,7 @@ public class PayInvoiceController extends BaseController
     @Operation(summary = "查询发票列表")
     @PreAuthorize("@ss.hasPermi('pay:invoice:list')")
     @GetMapping("/list")
-    public TableDataInfo list(PayInvoice payInvoice)
+    public TableDataInfo<PayInvoice> list(PayInvoice payInvoice)
     {
         startPage();
         List<PayInvoice> list = payInvoiceService.selectPayInvoiceList(payInvoice);

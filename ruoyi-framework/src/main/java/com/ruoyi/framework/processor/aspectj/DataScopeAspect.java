@@ -6,10 +6,13 @@ import java.util.List;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import com.mybatisflex.core.FlexGlobalConfig;
+import com.mybatisflex.core.datasource.DataSourceKey;
+import com.mybatisflex.core.datasource.FlexDataSource;
+import com.mybatisflex.core.dialect.DbType;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.BaseEntity;
@@ -19,7 +22,6 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.framework.datasource.manager.DataSourceManager;
 import com.ruoyi.framework.security.context.PermissionContextHolder;
 
 /**
@@ -32,8 +34,8 @@ import com.ruoyi.framework.security.context.PermissionContextHolder;
 @ConditionalOnProperty(prefix = "enhance", name = "datascope", havingValue = "default", matchIfMissing = true)
 public class DataScopeAspect {
 
-    @Autowired
-    DataSourceManager dataSourceManager;
+    // @Autowired
+    // DataSourceManager dataSourceManager;
     /**
      * 全部数据权限
      */
@@ -134,12 +136,13 @@ public class DataScopeAspect {
             } else if (DATA_SCOPE_DEPT.equals(dataScope)) {
                 sqlString.append(StringUtils.format(" OR {}.dept_id = {} ", deptAlias, user.getDeptId()));
             } else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope)) {
-                String databaseId = dataSourceManager.getCurrentDatabaseId();
-                if (databaseId.equals("postgresql")) {
+                FlexDataSource flexDataSource = FlexGlobalConfig.getDefaultConfig().getDataSource();
+                DbType dbType = flexDataSource.getDbType(DataSourceKey.get());
+                if (DbType.POSTGRE_SQL.equals(dbType)) {
                     sqlString.append(StringUtils.format(
                             " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or array_position(string_to_array(ancestors , ','), CAST( {}  AS TEXT)) IS NOT NULL )",
                             deptAlias, user.getDeptId(), user.getDeptId()));
-                } else if (databaseId.equals("openGauss")) {
+                } else if (DbType.OPENGAUSS.equals(dbType)) {
                     sqlString.append(StringUtils.format(
                             " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or CAST( {}  AS TEXT) = ANY(string_to_array(ancestors , ',')) )",
                             deptAlias, user.getDeptId(), user.getDeptId()));
