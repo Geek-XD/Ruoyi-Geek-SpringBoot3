@@ -1,5 +1,7 @@
 package com.ruoyi.system.domain;
 
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
@@ -14,13 +16,14 @@ import lombok.EqualsAndHashCode;
  * @date 2025-04-25
  */
 @Schema(description = "文件对象")
+@Table("sys_file_info")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SysFileInfo extends BaseEntity {
-    private static final long serialVersionUID = 1L;
 
     /** 文件主键 */
     @Schema(title = "文件主键")
+    @Id
     private Long fileId;
 
     /** 原始文件名 */

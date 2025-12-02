@@ -24,7 +24,6 @@
         <bitwalker.version>1.21</bitwalker.version>
         <!-- kaptcha目前处于准废弃状态:最近一次更新2015.5.18 -->
         <kaptcha.version>2.3.3</kaptcha.version>
-        <pagehelper.boot.version>2.1.1</pagehelper.boot.version>
         <fastjson.version>2.0.58</fastjson.version>
         <jackson.version>2.19.2</jackson.version>
         <oshi.version>6.8.3</oshi.version>
@@ -110,15 +109,8 @@
             <!-- pagehelper 分页插件 -->
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
-                <artifactId>pagehelper-spring-boot-starter</artifactId>
-                <version>${pagehelper.boot.version}</version>
-                <!-- 排除低版本的 mybatis -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mybatis.spring.boot</groupId>
-                        <artifactId>mybatis-spring-boot-starter</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>pagehelper</artifactId>
+                <version>5.3.3</version>
             </dependency>
 
             <!-- 获取系统信息 -->

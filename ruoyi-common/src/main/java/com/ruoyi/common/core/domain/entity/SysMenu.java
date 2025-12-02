@@ -3,6 +3,7 @@ package com.ruoyi.common.core.domain.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +18,7 @@ import lombok.EqualsAndHashCode;
  * 
  * @author ruoyi
  */
+@Table("sys_menu")
 @Schema(title = "菜单权限")
 @Data
 @EqualsAndHashCode(callSuper = true)

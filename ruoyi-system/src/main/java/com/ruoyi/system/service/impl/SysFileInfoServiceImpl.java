@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.system.domain.SysFileInfo;
 import com.ruoyi.system.mapper.SysFileInfoMapper;
@@ -17,8 +18,7 @@ import com.ruoyi.system.service.ISysFileInfoService;
  * @date 2025-04-25
  */
 @Service
-public class SysFileInfoServiceImpl implements ISysFileInfoService 
-{
+public class SysFileInfoServiceImpl extends ServiceImpl<SysFileInfoMapper, SysFileInfo> implements ISysFileInfoService {
     @Autowired
     private SysFileInfoMapper sysFileInfoMapper;
 
@@ -29,8 +29,7 @@ public class SysFileInfoServiceImpl implements ISysFileInfoService
      * @return 文件
      */
     @Override
-    public SysFileInfo selectSysFileInfoByFileId(Long fileId)
-    {
+    public SysFileInfo selectSysFileInfoByFileId(Long fileId) {
         return sysFileInfoMapper.selectSysFileInfoByFileId(fileId);
     }
 
@@ -41,8 +40,7 @@ public class SysFileInfoServiceImpl implements ISysFileInfoService
      * @return 文件
      */
     @Override
-    public List<SysFileInfo> selectSysFileInfoList(SysFileInfo sysFileInfo)
-    {
+    public List<SysFileInfo> selectSysFileInfoList(SysFileInfo sysFileInfo) {
         return sysFileInfoMapper.selectSysFileInfoList(sysFileInfo);
     }
 
@@ -53,8 +51,7 @@ public class SysFileInfoServiceImpl implements ISysFileInfoService
      * @return 结果
      */
     @Override
-    public int insertSysFileInfo(SysFileInfo sysFileInfo)
-    {
+    public int insertSysFileInfo(SysFileInfo sysFileInfo) {
         sysFileInfo.setCreateTime(DateUtils.getNowDate());
         return sysFileInfoMapper.insertSysFileInfo(sysFileInfo);
     }
@@ -66,8 +63,7 @@ public class SysFileInfoServiceImpl implements ISysFileInfoService
      * @return 结果
      */
     @Override
-    public int updateSysFileInfo(SysFileInfo sysFileInfo)
-    {
+    public int updateSysFileInfo(SysFileInfo sysFileInfo) {
         sysFileInfo.setUpdateTime(DateUtils.getNowDate());
         return sysFileInfoMapper.updateSysFileInfo(sysFileInfo);
     }
@@ -79,8 +75,7 @@ public class SysFileInfoServiceImpl implements ISysFileInfoService
      * @return 结果
      */
     @Override
-    public int deleteSysFileInfoByFileIds(Long[] fileIds)
-    {
+    public int deleteSysFileInfoByFileIds(Long[] fileIds) {
         return sysFileInfoMapper.deleteSysFileInfoByFileIds(fileIds);
     }
 
@@ -91,8 +86,7 @@ public class SysFileInfoServiceImpl implements ISysFileInfoService
      * @return 结果
      */
     @Override
-    public int deleteSysFileInfoByFileId(Long fileId)
-    {
+    public int deleteSysFileInfoByFileId(Long fileId) {
         return sysFileInfoMapper.deleteSysFileInfoByFileId(fileId);
     }
 }

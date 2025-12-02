@@ -3,6 +3,7 @@ package com.ruoyi.system.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.mybatisflex.core.BaseMapper;
 import com.ruoyi.system.domain.SysOperLog;
 
 /**
@@ -10,8 +11,7 @@ import com.ruoyi.system.domain.SysOperLog;
  * 
  * @author ruoyi
  */
-public interface SysOperLogMapper
-{
+public interface SysOperLogMapper extends BaseMapper<SysOperLog> {
     /**
      * 新增操作日志
      * 
@@ -63,7 +63,7 @@ public interface SysOperLogMapper
      */
     public List<Map<String, Object>> getStatusStats(SysOperLog operLog);
 
-    /** 
+    /**
      * 获取按模块和操作类型分类的操作统计信息
      */
     public List<Map<String, Object>> getModuleOperationStats(SysOperLog operLog);

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mybatisflex.core.service.IService;
 import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.system.domain.SysFileInfo;
 
@@ -14,7 +15,7 @@ import com.ruoyi.system.domain.SysFileInfo;
  * @author ruoyi
  * @date 2025-04-25
  */
-public interface ISysFileInfoService {
+public interface ISysFileInfoService extends IService<SysFileInfo> {
     /**
      * 查询文件
      * 

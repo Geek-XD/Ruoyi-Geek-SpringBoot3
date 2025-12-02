@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+
+import com.mybatisflex.core.service.IService;
 import com.ruoyi.system.domain.SysLogininfor;
 
 /**
@@ -8,8 +10,7 @@ import com.ruoyi.system.domain.SysLogininfor;
  * 
  * @author ruoyi
  */
-public interface ISysLogininforService
-{
+public interface ISysLogininforService extends IService<SysLogininfor> {
     /**
      * 新增系统登录日志
      * 

@@ -2,6 +2,7 @@ package com.ruoyi.common.core.domain.entity;
 
 import java.util.Set;
 
+import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.core.domain.BaseEntity;
@@ -18,6 +19,7 @@ import lombok.EqualsAndHashCode;
  *
  * @author ruoyi
  */
+@Table("sys_role")
 @Schema(title = "角色表")
 @Data
 @EqualsAndHashCode(callSuper = true)

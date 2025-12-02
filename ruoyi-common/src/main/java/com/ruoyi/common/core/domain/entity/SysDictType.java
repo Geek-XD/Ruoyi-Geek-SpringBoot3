@@ -1,5 +1,6 @@
 package com.ruoyi.common.core.domain.entity;
 
+import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.core.domain.BaseEntity;
@@ -16,6 +17,7 @@ import lombok.EqualsAndHashCode;
  * 
  * @author ruoyi
  */
+@Table("sys_dict_type")
 @Schema(title = "字典类型")
 @Data
 @EqualsAndHashCode(callSuper = true)

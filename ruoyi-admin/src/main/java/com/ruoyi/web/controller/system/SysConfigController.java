@@ -1,7 +1,5 @@
 package com.ruoyi.web.controller.system;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -14,11 +12,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
 import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.PageDomain;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.page.TableSupport;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysConfig;
@@ -48,8 +50,9 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:list')")
     @GetMapping("/list")
     public TableDataInfo<SysConfig> list(SysConfig config) {
-        startPage();
-        List<SysConfig> list = configService.selectConfigList(config);
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        QueryChain<SysConfig> queryChain = configService.selectConfigList(config);
+        Page<SysConfig> list = queryChain.page(Page.of(pageDomain.getPageNum(), pageDomain.getPageSize()));
         return getDataTable(list);
     }
 
@@ -58,9 +61,9 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysConfig config) {
-        List<SysConfig> list = configService.selectConfigList(config);
+        QueryChain<SysConfig> queryChain = configService.selectConfigList(config);
         ExcelUtil<SysConfig> util = new ExcelUtil<SysConfig>(SysConfig.class);
-        util.exportExcel(response, list, "参数数据");
+        util.exportExcel(response, queryChain.list(), "参数数据");
     }
 
     /**
@@ -70,7 +73,7 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping(value = "/{configId}")
     public AjaxResult getInfo(@PathVariable(name = "configId") Long configId) {
-        return success(configService.selectConfigById(configId));
+        return success(configService.getById(configId));
     }
 
     /**

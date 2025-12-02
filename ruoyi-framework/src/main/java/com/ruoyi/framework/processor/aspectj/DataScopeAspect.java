@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,6 +23,7 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.processor.context.DataScopeContextHolder;
 import com.ruoyi.framework.security.context.PermissionContextHolder;
 
 /**
@@ -70,6 +72,11 @@ public class DataScopeAspect {
     public void doBefore(JoinPoint point, DataScope controllerDataScope) throws Throwable {
         clearDataScope(point);
         handleDataScope(point, controllerDataScope);
+    }
+
+    @After(value = "@annotation(controllerDataScope)")
+    public void doAfter(final JoinPoint point, DataScope controllerDataScope) {
+        DataScopeContextHolder.clear();
     }
 
     protected void handleDataScope(final JoinPoint joinPoint, DataScope controllerDataScope) {
@@ -172,6 +179,7 @@ public class DataScopeAspect {
             if (StringUtils.isNotNull(params) && params instanceof BaseEntity) {
                 BaseEntity baseEntity = (BaseEntity) params;
                 baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
+                DataScopeContextHolder.use("(" + sqlString.substring(4) + ")");
             }
         }
     }

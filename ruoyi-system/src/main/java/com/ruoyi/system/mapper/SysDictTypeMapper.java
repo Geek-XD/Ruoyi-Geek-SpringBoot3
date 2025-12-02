@@ -1,6 +1,8 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+
+import com.mybatisflex.core.BaseMapper;
 import com.ruoyi.common.core.domain.entity.SysDictType;
 
 /**
@@ -8,8 +10,7 @@ import com.ruoyi.common.core.domain.entity.SysDictType;
  * 
  * @author ruoyi
  */
-public interface SysDictTypeMapper
-{
+public interface SysDictTypeMapper extends BaseMapper<SysDictType> {
     /**
      * 根据条件分页查询字典类型
      * 

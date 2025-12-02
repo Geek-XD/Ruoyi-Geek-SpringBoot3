@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 
+import com.mybatisflex.core.BaseMapper;
 import com.ruoyi.system.domain.SysFileInfo;
 
 /**
@@ -10,8 +11,7 @@ import com.ruoyi.system.domain.SysFileInfo;
  * @author ruoyi
  * @date 2025-04-25
  */
-public interface SysFileInfoMapper 
-{
+public interface SysFileInfoMapper extends BaseMapper<SysFileInfo> {
     /**
      * 查询文件
      * 

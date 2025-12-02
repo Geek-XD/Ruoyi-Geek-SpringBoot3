@@ -3,6 +3,7 @@ package com.ruoyi.common.core.domain.entity;
 import java.util.Date;
 import java.util.List;
 
+import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.annotation.Excel.Type;
@@ -22,6 +23,7 @@ import lombok.EqualsAndHashCode;
  * 
  * @author ruoyi
  */
+@Table("sys_user")
 @Schema(title = "用户")
 @Data
 @EqualsAndHashCode(callSuper = true)

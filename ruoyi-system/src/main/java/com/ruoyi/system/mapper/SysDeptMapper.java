@@ -12,8 +12,7 @@ import com.ruoyi.common.core.domain.entity.SysDept;
  * 
  * @author ruoyi
  */
-public interface SysDeptMapper extends BaseMapper<SysDept>
-{
+public interface SysDeptMapper extends BaseMapper<SysDept> {
     /**
      * 查询部门管理数据
      * 
@@ -25,11 +24,12 @@ public interface SysDeptMapper extends BaseMapper<SysDept>
     /**
      * 根据角色ID查询部门树信息
      * 
-     * @param roleId 角色ID
+     * @param roleId            角色ID
      * @param deptCheckStrictly 部门树选择项是否关联显示
      * @return 选中部门列表
      */
-    public List<Long> selectDeptListByRoleId(@Param("roleId") Long roleId, @Param("deptCheckStrictly") boolean deptCheckStrictly);
+    public List<Long> selectDeptListByRoleId(@Param("roleId") Long roleId,
+            @Param("deptCheckStrictly") boolean deptCheckStrictly);
 
     /**
      * 根据部门ID查询信息

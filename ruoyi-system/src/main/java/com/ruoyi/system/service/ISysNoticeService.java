@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+
+import com.mybatisflex.core.service.IService;
 import com.ruoyi.system.domain.SysNotice;
 
 /**
@@ -8,8 +10,7 @@ import com.ruoyi.system.domain.SysNotice;
  * 
  * @author ruoyi
  */
-public interface ISysNoticeService
-{
+public interface ISysNoticeService extends IService<SysNotice> {
     /**
      * 查询公告信息
      * 
@@ -49,7 +50,7 @@ public interface ISysNoticeService
      * @return 结果
      */
     public int deleteNoticeById(Long noticeId);
-    
+
     /**
      * 批量删除公告信息
      * 

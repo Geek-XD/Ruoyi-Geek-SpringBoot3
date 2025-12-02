@@ -565,6 +565,7 @@
             <column name="create_time" remarks="创建时间" type="datetime(0)"/>
             <column defaultValue="" name="update_by" remarks="更新者" type="VARCHAR(64)"/>
             <column name="update_time" remarks="更新时间" type="datetime(0)"/>
+            <column name="remark" remarks="备注" type="VARCHAR(500)"/>
         </createTable>
 
         <loadData tableName="sys_dept" file="../../db/data/sys_dept.csv" separator="," encoding="UTF-8" relativeToChangelogFile="true"/>

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mybatisflex.annotation.Column;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -45,6 +46,7 @@ public class BaseEntity implements Serializable {
 
     /** 请求参数 */
     @Schema(title = "请求参数", example = "{'pageNum': 1, 'pageSize': 10, 'startXXX':'', 'endXXX':''}")
+    @Column(ignore = true)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private HashMap<String, Object> params;
 

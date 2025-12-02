@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+
+import com.mybatisflex.core.service.IService;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.domain.entity.SysDictType;
 
@@ -9,8 +11,8 @@ import com.ruoyi.common.core.domain.entity.SysDictType;
  * 
  * @author ruoyi
  */
-public interface ISysDictTypeService
-{
+public interface ISysDictTypeService extends IService<SysDictType> {
+
     /**
      * 根据条件分页查询字典类型
      * 

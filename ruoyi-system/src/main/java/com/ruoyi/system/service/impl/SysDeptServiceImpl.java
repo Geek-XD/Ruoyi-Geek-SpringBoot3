@@ -1,22 +1,31 @@
 package com.ruoyi.system.service.impl;
 
+import static com.ruoyi.common.core.domain.entity.table.SysDeptTableDef.*;
+import static com.ruoyi.system.domain.table.SysRoleDeptTableDef.*;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.entity.table.SysDeptTableDef;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.system.domain.table.SysRoleDeptTableDef;
 import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.service.ISysDeptService;
@@ -27,8 +36,7 @@ import com.ruoyi.system.service.ISysDeptService;
  * @author ruoyi
  */
 @Service
-public class SysDeptServiceImpl implements ISysDeptService
-{
+public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> implements ISysDeptService {
     @Autowired
     private SysDeptMapper deptMapper;
 
@@ -43,9 +51,17 @@ public class SysDeptServiceImpl implements ISysDeptService
      */
     @Override
     @DataScope(deptAlias = "d")
-    public List<SysDept> selectDeptList(SysDept dept)
-    {
-        return deptMapper.selectDeptList(dept);
+    public List<SysDept> selectDeptList(SysDept dept) {
+        return this.queryChain()
+                .from(SysDept.class)
+                .as("d")
+                .eq(SysDept::getDeptId, dept.getDeptId())
+                .eq(SysDept::getParentId, dept.getParentId())
+                .like(SysDept::getDeptName, dept.getDeptName())
+                .eq(SysDept::getStatus, dept.getStatus())
+                .orderBy(SysDept::getParentId, true)
+                .orderBy(SysDept::getOrderNum, true)
+                .list();
     }
 
     /**
@@ -55,8 +71,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 部门树信息集合
      */
     @Override
-    public List<TreeSelect> selectDeptTreeList(SysDept dept)
-    {
+    public List<TreeSelect> selectDeptTreeList(SysDept dept) {
         List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
         return buildDeptTreeSelect(depts);
     }
@@ -68,21 +83,17 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 树结构列表
      */
     @Override
-    public List<SysDept> buildDeptTree(List<SysDept> depts)
-    {
+    public List<SysDept> buildDeptTree(List<SysDept> depts) {
         List<SysDept> returnList = new ArrayList<SysDept>();
         List<Long> tempList = depts.stream().map(SysDept::getDeptId).collect(Collectors.toList());
-        for (SysDept dept : depts)
-        {
+        for (SysDept dept : depts) {
             // 如果是顶级节点, 遍历该父节点的所有子节点
-            if (!tempList.contains(dept.getParentId()))
-            {
+            if (!tempList.contains(dept.getParentId())) {
                 recursionFn(depts, dept);
                 returnList.add(dept);
             }
         }
-        if (returnList.isEmpty())
-        {
+        if (returnList.isEmpty()) {
             returnList = depts;
         }
         return returnList;
@@ -95,8 +106,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 下拉树结构列表
      */
     @Override
-    public List<TreeSelect> buildDeptTreeSelect(List<SysDept> depts)
-    {
+    public List<TreeSelect> buildDeptTreeSelect(List<SysDept> depts) {
         List<SysDept> deptTrees = buildDeptTree(depts);
         return deptTrees.stream().map(TreeSelect::new).collect(Collectors.toList());
     }
@@ -108,10 +118,21 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 选中部门列表
      */
     @Override
-    public List<Long> selectDeptListByRoleId(Long roleId)
-    {
+    public List<Long> selectDeptListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectRoleById(roleId);
-        return deptMapper.selectDeptListByRoleId(roleId, role.isDeptCheckStrictly());
+        SysDeptTableDef D = SYS_DEPT.as("d");
+        SysRoleDeptTableDef RD = SYS_ROLE_DEPT.as("rd");
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.select(D.DEPT_ID).from(D)
+                .leftJoin(RD).on(RD.DEPT_ID.eq(D.DEPT_ID))
+                .where(RD.ROLE_ID.eq(roleId));
+        if (role.isDeptCheckStrictly()) {
+            queryWrapper.and(D.DEPT_ID.notIn(QueryWrapper.create()
+                    .select(D.PARENT_ID).from(D)
+                    .innerJoin(RD).on(D.DEPT_ID.eq(RD.DEPT_ID).and(RD.ROLE_ID.eq(roleId)))));
+        }
+        queryWrapper.orderBy(D.PARENT_ID, true).orderBy(D.ORDER_NUM, true);
+        return mapper.selectListByQueryAs(queryWrapper, Long.class);
     }
 
     /**
@@ -121,8 +142,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 部门信息
      */
     @Override
-    public SysDept selectDeptById(Long deptId)
-    {
+    public SysDept selectDeptById(Long deptId) {
         return deptMapper.selectDeptById(deptId);
     }
 
@@ -133,8 +153,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 子部门数
      */
     @Override
-    public int selectNormalChildrenDeptById(Long deptId)
-    {
+    public int selectNormalChildrenDeptById(Long deptId) {
         return deptMapper.selectNormalChildrenDeptById(deptId);
     }
 
@@ -145,8 +164,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 结果
      */
     @Override
-    public boolean hasChildByDeptId(Long deptId)
-    {
+    public boolean hasChildByDeptId(Long deptId) {
         int result = deptMapper.hasChildByDeptId(deptId);
         return result > 0;
     }
@@ -158,8 +176,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 结果 true 存在 false 不存在
      */
     @Override
-    public boolean checkDeptExistUser(Long deptId)
-    {
+    public boolean checkDeptExistUser(Long deptId) {
         int result = deptMapper.checkDeptExistUser(deptId);
         return result > 0;
     }
@@ -171,12 +188,10 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 结果
      */
     @Override
-    public boolean checkDeptNameUnique(SysDept dept)
-    {
+    public boolean checkDeptNameUnique(SysDept dept) {
         Long deptId = StringUtils.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
         SysDept info = deptMapper.checkDeptNameUnique(dept.getDeptName(), dept.getParentId());
-        if (StringUtils.isNotNull(info) && info.getDeptId().longValue() != deptId.longValue())
-        {
+        if (StringUtils.isNotNull(info) && info.getDeptId().longValue() != deptId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -188,15 +203,12 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @param deptId 部门id
      */
     @Override
-    public void checkDeptDataScope(Long deptId)
-    {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId()))
-        {
+    public void checkDeptDataScope(Long deptId) {
+        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
             SysDept dept = new SysDept();
             dept.setDeptId(deptId);
             List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
-            if (StringUtils.isEmpty(depts))
-            {
+            if (StringUtils.isEmpty(depts)) {
                 throw new ServiceException("没有权限访问部门数据！");
             }
         }
@@ -209,12 +221,10 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 结果
      */
     @Override
-    public int insertDept(SysDept dept)
-    {
+    public int insertDept(SysDept dept) {
         SysDept info = deptMapper.selectDeptById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
-        if (!UserConstants.DEPT_NORMAL.equals(info.getStatus()))
-        {
+        if (!UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
             throw new ServiceException("部门停用，不允许新增");
         }
         dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
@@ -228,12 +238,10 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 结果
      */
     @Override
-    public int updateDept(SysDept dept)
-    {
+    public int updateDept(SysDept dept) {
         SysDept newParentDept = deptMapper.selectDeptById(dept.getParentId());
         SysDept oldDept = deptMapper.selectDeptById(dept.getDeptId());
-        if (StringUtils.isNotNull(newParentDept) && StringUtils.isNotNull(oldDept))
-        {
+        if (StringUtils.isNotNull(newParentDept) && StringUtils.isNotNull(oldDept)) {
             String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
             String oldAncestors = oldDept.getAncestors();
             dept.setAncestors(newAncestors);
@@ -241,8 +249,7 @@ public class SysDeptServiceImpl implements ISysDeptService
         }
         int result = deptMapper.updateDept(dept);
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
-                && !StringUtils.equals("0", dept.getAncestors()))
-        {
+                && !StringUtils.equals("0", dept.getAncestors())) {
             // 如果该部门是启用状态，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
         }
@@ -254,8 +261,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * 
      * @param dept 当前部门
      */
-    private void updateParentDeptStatusNormal(SysDept dept)
-    {
+    private void updateParentDeptStatusNormal(SysDept dept) {
         String ancestors = dept.getAncestors();
         Long[] deptIds = Convert.toLongArray(ancestors);
         deptMapper.updateDeptStatusNormal(deptIds);
@@ -264,19 +270,16 @@ public class SysDeptServiceImpl implements ISysDeptService
     /**
      * 修改子元素关系
      * 
-     * @param deptId 被修改的部门ID
+     * @param deptId       被修改的部门ID
      * @param newAncestors 新的父ID集合
      * @param oldAncestors 旧的父ID集合
      */
-    public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors)
-    {
+    public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
         List<SysDept> children = deptMapper.selectChildrenDeptById(deptId);
-        for (SysDept child : children)
-        {
+        for (SysDept child : children) {
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }
-        if (children.size() > 0)
-        {
+        if (children.size() > 0) {
             deptMapper.updateDeptChildren(children);
         }
     }
@@ -288,23 +291,19 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @return 结果
      */
     @Override
-    public int deleteDeptById(Long deptId)
-    {
+    public int deleteDeptById(Long deptId) {
         return deptMapper.deleteDeptById(deptId);
     }
 
     /**
      * 递归列表
      */
-    private void recursionFn(List<SysDept> list, SysDept t)
-    {
+    private void recursionFn(List<SysDept> list, SysDept t) {
         // 得到子节点列表
         List<SysDept> childList = getChildList(list, t);
         t.setChildren(childList);
-        for (SysDept tChild : childList)
-        {
-            if (hasChild(list, tChild))
-            {
+        for (SysDept tChild : childList) {
+            if (hasChild(list, tChild)) {
                 recursionFn(list, tChild);
             }
         }
@@ -313,15 +312,12 @@ public class SysDeptServiceImpl implements ISysDeptService
     /**
      * 得到子节点列表
      */
-    private List<SysDept> getChildList(List<SysDept> list, SysDept t)
-    {
+    private List<SysDept> getChildList(List<SysDept> list, SysDept t) {
         List<SysDept> tlist = new ArrayList<SysDept>();
         Iterator<SysDept> it = list.iterator();
-        while (it.hasNext())
-        {
+        while (it.hasNext()) {
             SysDept n = (SysDept) it.next();
-            if (StringUtils.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue())
-            {
+            if (StringUtils.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue()) {
                 tlist.add(n);
             }
         }
@@ -331,8 +327,7 @@ public class SysDeptServiceImpl implements ISysDeptService
     /**
      * 判断是否有子节点
      */
-    private boolean hasChild(List<SysDept> list, SysDept t)
-    {
+    private boolean hasChild(List<SysDept> list, SysDept t) {
         return getChildList(list, t).size() > 0;
     }
 }

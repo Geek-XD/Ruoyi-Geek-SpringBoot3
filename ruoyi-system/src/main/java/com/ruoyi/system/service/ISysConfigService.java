@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
-import java.util.List;
+import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.service.IService;
 import com.ruoyi.system.domain.SysConfig;
 
 /**
@@ -8,15 +9,7 @@ import com.ruoyi.system.domain.SysConfig;
  * 
  * @author ruoyi
  */
-public interface ISysConfigService
-{
-    /**
-     * 查询参数配置信息
-     * 
-     * @param configId 参数配置ID
-     * @return 参数配置信息
-     */
-    public SysConfig selectConfigById(Long configId);
+public interface ISysConfigService extends IService<SysConfig> {
 
     /**
      * 根据键名查询参数配置信息
@@ -39,7 +32,7 @@ public interface ISysConfigService
      * @param config 参数配置信息
      * @return 参数配置集合
      */
-    public List<SysConfig> selectConfigList(SysConfig config);
+    public QueryChain<SysConfig> selectConfigList(SysConfig config);
 
     /**
      * 新增参数配置
@@ -47,7 +40,7 @@ public interface ISysConfigService
      * @param config 参数配置信息
      * @return 结果
      */
-    public int insertConfig(SysConfig config);
+    public boolean insertConfig(SysConfig config);
 
     /**
      * 修改参数配置
@@ -55,7 +48,7 @@ public interface ISysConfigService
      * @param config 参数配置信息
      * @return 结果
      */
-    public int updateConfig(SysConfig config);
+    public boolean updateConfig(SysConfig config);
 
     /**
      * 批量删除参数信息

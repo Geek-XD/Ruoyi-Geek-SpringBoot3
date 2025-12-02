@@ -3,6 +3,7 @@ package com.ruoyi.common.core.domain.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.core.domain.BaseEntity;
 
@@ -74,9 +75,11 @@ public class SysDept extends BaseEntity {
 
     /** 父部门名称 */
     @Schema(title = "父部门名称")
+    @Column(ignore = true)
     private String parentName;
 
     /** 子部门 */
     @Schema(title = "子部门")
+    @Column(ignore = true)
     private List<SysDept> children = new ArrayList<SysDept>();
 }
