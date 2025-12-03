@@ -1,8 +1,11 @@
 package com.ruoyi.system.domain;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
@@ -113,4 +116,17 @@ public class SysOperLog {
     @Schema(title = "消耗时间")
     @Excel(name = "消耗时间", suffix = "毫秒")
     private Long costTime;
+
+    /** 请求参数 */
+    @Schema(title = "请求参数", example = "{'pageNum': 1, 'pageSize': 10, 'startXXX':'', 'endXXX':''}")
+    @Column(ignore = true)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private HashMap<String, Object> params;
+
+    public Map<String, Object> getParams() {
+        if (params == null) {
+            params = new HashMap<>();
+        }
+        return params;
+    }
 }
