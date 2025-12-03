@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mybatisflex.annotation.Column;
+import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.core.domain.BaseEntity;
 
@@ -29,6 +30,7 @@ public class SysDept extends BaseEntity {
 
     /** 部门ID */
     @Schema(title = "部门ID")
+    @Id
     private Long deptId;
 
     /** 父部门ID */

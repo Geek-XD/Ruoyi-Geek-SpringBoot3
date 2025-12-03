@@ -1,5 +1,6 @@
 package com.ruoyi.common.core.domain.entity;
 
+import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
@@ -25,6 +26,7 @@ public class SysDictType extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /** 字典主键 */
+    @Id
     @Schema(title = "字典主键")
     @Excel(name = "字典主键", cellType = ColumnType.NUMERIC)
     private Long dictId;

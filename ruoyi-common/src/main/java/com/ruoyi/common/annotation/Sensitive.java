@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ruoyi.common.enums.DesensitizedType;
 import com.ruoyi.common.processor.serializer.SensitiveJsonSerializer;
 
 /**
@@ -21,5 +20,5 @@ import com.ruoyi.common.processor.serializer.SensitiveJsonSerializer;
 @JsonSerialize(using = SensitiveJsonSerializer.class)
 public @interface Sensitive
 {
-    DesensitizedType desensitizedType();
+    String desensitizedType();
 }

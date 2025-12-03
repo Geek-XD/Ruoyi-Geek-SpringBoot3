@@ -3,6 +3,7 @@ package com.ruoyi.common.core.domain.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.core.domain.BaseEntity;
 
@@ -26,6 +27,7 @@ public class SysMenu extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /** 菜单ID */
+    @Id
     @Schema(title = "菜单ID")
     private Long menuId;
 

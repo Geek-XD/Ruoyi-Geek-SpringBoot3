@@ -72,7 +72,7 @@ public class SysDictDataController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dict:query')")
     @GetMapping(value = "/{dictCode}")
     public AjaxResult getInfo(@PathVariable(name = "dictCode") Long dictCode) {
-        return success(dictDataService.selectDictDataById(dictCode));
+        return success(dictDataService.getById(dictCode));
     }
 
     /**

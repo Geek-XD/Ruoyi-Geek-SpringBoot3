@@ -119,7 +119,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      */
     @Override
     public List<Long> selectDeptListByRoleId(Long roleId) {
-        SysRole role = roleMapper.selectRoleById(roleId);
+        SysRole role = roleMapper.selectOneById(roleId);
         SysDeptTableDef D = SYS_DEPT.as("d");
         SysRoleDeptTableDef RD = SYS_ROLE_DEPT.as("rd");
         QueryWrapper queryWrapper = new QueryWrapper();
@@ -143,7 +143,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      */
     @Override
     public SysDept selectDeptById(Long deptId) {
-        return deptMapper.selectDeptById(deptId);
+        return this.getById(deptId);
     }
 
     /**
@@ -165,8 +165,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      */
     @Override
     public boolean hasChildByDeptId(Long deptId) {
-        int result = deptMapper.hasChildByDeptId(deptId);
-        return result > 0;
+        return exists(SYS_DEPT.PARENT_ID.eq(deptId));
     }
 
     /**
@@ -177,8 +176,10 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      */
     @Override
     public boolean checkDeptExistUser(Long deptId) {
-        int result = deptMapper.checkDeptExistUser(deptId);
-        return result > 0;
+        return this.queryChain()
+                .from(SysUser.class)
+                .eq(SysUser::getDeptId, deptId)
+                .exists();
     }
 
     /**
@@ -189,12 +190,11 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      */
     @Override
     public boolean checkDeptNameUnique(SysDept dept) {
-        Long deptId = StringUtils.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
-        SysDept info = deptMapper.checkDeptNameUnique(dept.getDeptName(), dept.getParentId());
-        if (StringUtils.isNotNull(info) && info.getDeptId().longValue() != deptId.longValue()) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !this.queryChain()
+                .eq(SysDept::getDeptName, dept.getDeptName())
+                .eq(SysDept::getParentId, dept.getParentId())
+                .ne(SysDept::getDeptId, dept.getDeptId())
+                .exists();
     }
 
     /**
@@ -221,14 +221,14 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      * @return 结果
      */
     @Override
-    public int insertDept(SysDept dept) {
-        SysDept info = deptMapper.selectDeptById(dept.getParentId());
+    public boolean insertDept(SysDept dept) {
+        SysDept info = this.getById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
             throw new ServiceException("部门停用，不允许新增");
         }
         dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
-        return deptMapper.insertDept(dept);
+        return save(dept);
     }
 
     /**
@@ -238,16 +238,16 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      * @return 结果
      */
     @Override
-    public int updateDept(SysDept dept) {
-        SysDept newParentDept = deptMapper.selectDeptById(dept.getParentId());
-        SysDept oldDept = deptMapper.selectDeptById(dept.getDeptId());
+    public boolean updateDept(SysDept dept) {
+        SysDept newParentDept = this.getById(dept.getParentId());
+        SysDept oldDept = this.getById(dept.getDeptId());
         if (StringUtils.isNotNull(newParentDept) && StringUtils.isNotNull(oldDept)) {
             String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
             String oldAncestors = oldDept.getAncestors();
             dept.setAncestors(newAncestors);
             updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
         }
-        int result = deptMapper.updateDept(dept);
+        boolean result = this.updateById(dept);
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
                 && !StringUtils.equals("0", dept.getAncestors())) {
             // 如果该部门是启用状态，则启用该部门的所有上级部门
@@ -282,17 +282,6 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         if (children.size() > 0) {
             deptMapper.updateDeptChildren(children);
         }
-    }
-
-    /**
-     * 删除部门管理信息
-     * 
-     * @param deptId 部门ID
-     * @return 结果
-     */
-    @Override
-    public int deleteDeptById(Long deptId) {
-        return deptMapper.deleteDeptById(deptId);
     }
 
     /**

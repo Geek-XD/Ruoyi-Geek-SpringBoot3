@@ -3,6 +3,7 @@ package com.ruoyi.common.core.domain.entity;
 import java.util.Date;
 import java.util.List;
 
+import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
@@ -31,6 +32,7 @@ public class SysUser extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /** 用户ID */
+    @Id
     @Schema(title = "用户序号")
     @Excel(name = "用户序号", cellType = ColumnType.NUMERIC, prompt = "用户编号")
     private Long userId;

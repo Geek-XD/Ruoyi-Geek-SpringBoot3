@@ -173,8 +173,9 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
      */
     @Override
     public boolean checkConfigKeyUnique(SysConfig config) {
-        return this.queryChain()
+        return !this.queryChain()
                 .eq(SysConfig::getConfigKey, config.getConfigKey())
+                .ne(SysConfig::getConfigId, config.getConfigId())
                 .exists();
     }
 

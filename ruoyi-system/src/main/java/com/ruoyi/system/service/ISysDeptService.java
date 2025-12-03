@@ -105,7 +105,7 @@ public interface ISysDeptService extends IService<SysDept> {
      * @param dept 部门信息
      * @return 结果
      */
-    public int insertDept(SysDept dept);
+    public boolean insertDept(SysDept dept);
 
     /**
      * 修改保存部门信息
@@ -113,13 +113,5 @@ public interface ISysDeptService extends IService<SysDept> {
      * @param dept 部门信息
      * @return 结果
      */
-    public int updateDept(SysDept dept);
-
-    /**
-     * 删除部门管理信息
-     * 
-     * @param deptId 部门ID
-     * @return 结果
-     */
-    public int deleteDeptById(Long deptId);
+    public boolean updateDept(SysDept dept);
 }
