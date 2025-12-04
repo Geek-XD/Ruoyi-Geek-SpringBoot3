@@ -14,6 +14,5 @@ import com.ruoyi.common.processor.serializer.FilePathJsonSerializer;
 @JacksonAnnotationsInside
 @JsonSerialize(using = FilePathJsonSerializer.class)
 public @interface FilePath {
-    String storageType() default "";
-    String storageName() default "";
+    String value() default "";
 }

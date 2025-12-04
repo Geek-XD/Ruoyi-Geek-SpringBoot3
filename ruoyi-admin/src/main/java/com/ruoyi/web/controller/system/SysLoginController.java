@@ -18,9 +18,9 @@ import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.Sb;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.FileOperateUtils;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
@@ -94,7 +94,7 @@ public class SysLoginController {
         }
         if (user.getAvatar() != null) {
             try {
-                user.setAvatar(FileOperateUtils.getURL(user.getAvatar()));
+                user.setAvatar(Sb.getURL(user.getAvatar()));
             } catch (Exception e) {
             }
         }

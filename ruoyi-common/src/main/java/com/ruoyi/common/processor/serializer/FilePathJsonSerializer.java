@@ -10,11 +10,10 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.ruoyi.common.annotation.FilePath;
+import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.core.file.GeekStorageBucket;
 import com.ruoyi.common.core.file.service.StorageService;
-import com.ruoyi.common.core.file.storage.StorageBucket;
-import com.ruoyi.common.core.file.storage.StorageFactory;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.StorageUtils;
 
 public class FilePathJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
 
@@ -25,19 +24,13 @@ public class FilePathJsonSerializer extends JsonSerializer<String> implements Co
             throws JsonMappingException {
         FilePath annotation = property.getAnnotation(FilePath.class);
         if (Objects.nonNull(annotation) && Objects.equals(String.class, property.getType().getRawClass())) {
-            String storageType = annotation.storageType();
-            String storageName = annotation.storageName();
-            if (StringUtils.isEmpty(storageType)) {
-                storageType = StorageUtils.getPrimaryStorageType();
-            }
-            StorageFactory<?, ?> factory = StorageUtils.getStorageFactory(storageType);
-            StorageBucket bucket;
-            if (StringUtils.isEmpty(storageName)) {
-                bucket = factory.getPrimaryBucket();
+            String storageName = annotation.value();
+            GeekStorageBucket geekStorageBucket = RuoYiConfig.getGeekStorageBucket();
+            if (StringUtils.isNotEmpty(storageName)) {
+                this.storageService = new StorageService(geekStorageBucket.getStorageBucket(storageName));
             } else {
-                bucket = factory.getBucket(storageName);
+                this.storageService = new StorageService(geekStorageBucket);
             }
-            this.storageService = new StorageService(bucket);
             return this;
         }
         return prov.findValueSerializer(property.getType(), property);

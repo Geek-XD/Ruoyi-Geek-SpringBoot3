@@ -17,8 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.utils.Sb;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.FileOperateUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.framework.config.ServerConfig;
 
@@ -75,9 +75,9 @@ public class CommonController {
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, realFileName);
             // FileUtils.writeBytes(filePath, response.getOutputStream());
-            FileOperateUtils.downLoad(filePath, response.getOutputStream());
+            Sb.downLoad(filePath, response.getOutputStream());
             if (delete) {
-                FileOperateUtils.deleteFile(fileName);
+                Sb.deleteFile(fileName);
             }
         } catch (Exception e) {
             log.error("下载文件失败", e);
@@ -92,7 +92,7 @@ public class CommonController {
     @Anonymous
     public AjaxResult uploadFile(@RequestBody MultipartFile file) throws Exception {
         try {
-            String url = FileOperateUtils.upload(file);
+            String url = Sb.upload(file);
             AjaxResult ajax = AjaxResult.success();
             ajax.put("url", url);
             ajax.put("fileName", file.getOriginalFilename());
@@ -121,7 +121,7 @@ public class CommonController {
             List<String> originalFilenames = new ArrayList<String>();
             for (MultipartFile file : files) {
                 // 上传并返回新文件名称
-                String fileName = FileOperateUtils.upload(filePath, file);
+                String fileName = Sb.upload(filePath, file);
                 String url = serverConfig.getUrl() + fileName;
                 urls.add(url);
                 fileNames.add(fileName);
@@ -154,7 +154,7 @@ public class CommonController {
             }
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, resource);
-            FileOperateUtils.downLoad(resource, response.getOutputStream());
+            Sb.downLoad(resource, response.getOutputStream());
         } catch (Exception e) {
             log.error("下载文件失败", e);
         }

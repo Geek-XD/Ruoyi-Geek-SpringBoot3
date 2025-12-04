@@ -5,11 +5,9 @@ import java.io.OutputStream;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +23,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.file.GeekStorageBucket;
+import com.ruoyi.common.core.file.StorageBucketKey;
 import com.ruoyi.common.core.file.domain.SysFilePartETag;
 import com.ruoyi.common.core.file.service.StorageService;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.Sb;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.FileOperateUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.common.utils.file.StorageUtils;
 import com.ruoyi.system.domain.SysFileInfo;
 import com.ruoyi.system.service.ISysFileInfoService;
 
@@ -45,7 +45,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @Tag(name = "默认文件存储")
 @RestController
 @RequestMapping("/file")
-public class FileController {
+@Anonymous
+public class FileController extends BaseController {
 
     @Autowired
     private ISysFileInfoService sysFileInfoService;
@@ -55,34 +56,36 @@ public class FileController {
      */
     @GetMapping("/client-list")
     public AjaxResult getClientList() {
-        return AjaxResult.success(StorageUtils.getClientList());
+        return success(RuoYiConfig.getGeekStorageBucket().getStorageBucketMap().keySet());
     }
 
     /**
-     * 统一上传接口：/file/{storageType}/{bucketName}/upload
+     * 统一上传接口：/file/{bucketName}/upload
      */
-    @PostMapping({ "/upload", "/{storageType}/{bucketName}/upload" })
+    @PostMapping({ "/upload", "/{bucketName}/upload" })
     public AjaxResult uploadUnified(
-            @PathVariable(name = "storageType", required = false) String storageType,
             @PathVariable(name = "bucketName", required = false) String bucketName,
             @RequestParam("file") MultipartFile file) {
         try {
+            GeekStorageBucket geekStorageBucket = RuoYiConfig.getGeekStorageBucket();
             String filePath = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            StorageService storageService = null;
             SysFileInfo sysFileInfo = sysFileInfoService.buildSysFileInfo(file);
-            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(bucketName)) {
-                sysFileInfo.setStorageType(StorageUtils.getPrimaryStorageType());
-                storageService = new StorageService(StorageUtils.getPrimaryStorageBucket());
-            } else {
-                sysFileInfo.setStorageType(storageType);
-                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, bucketName));
-            }
-            filePath = storageService.upload(filePath, file);
-            String url = storageService.generateUrl(filePath);
-            sysFileInfo.setFilePath(filePath);
-            sysFileInfoService.insertSysFileInfo(sysFileInfo);
             AjaxResult ajax = AjaxResult.success();
-            ajax.put("url", url);
+            if (StringUtils.isEmpty(bucketName)) {
+                sysFileInfo.setStorageType(geekStorageBucket.getDefaultSbType());
+                sysFileInfo.setFilePath(Sb.upload(filePath, file));
+                ajax.put("url", Sb.getURL(filePath));
+            } else {
+                sysFileInfo.setStorageType(geekStorageBucket.getSbType(bucketName));
+                try {
+                    StorageBucketKey.use(bucketName);
+                    sysFileInfo.setFilePath(Sb.upload(filePath, file));
+                    ajax.put("url", Sb.getURL(filePath));
+                } finally {
+                    StorageBucketKey.clear();
+                }
+            }
+            sysFileInfoService.insertSysFileInfo(sysFileInfo);
             ajax.put("info", sysFileInfo);
             ajax.put("fileName", sysFileInfo.getFileName());
             return ajax;
@@ -94,21 +97,20 @@ public class FileController {
     /**
      * 统一下载接口：/file/{storageType}/{bucketName}/download?filePath=xxx
      */
-    @GetMapping({ "/download", "/{storageType}/{bucketName}/download" })
+    @GetMapping({ "/download", "/{bucketName}/download" })
     public void downloadUnified(
-            @PathVariable(name = "storageType", required = false) String storageType,
             @PathVariable(name = "bucketName", required = false) String bucketName,
             @RequestParam("filePath") String filePath,
             HttpServletResponse response) throws Exception {
         try {
-            StorageService storageService = null;
-            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(bucketName)) {
-                storageService = new StorageService(StorageUtils.getPrimaryStorageBucket());
-            } else {
-                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, bucketName));
-            }
             response.setContentType("application/octet-stream");
-            storageService.downLoad(filePath, response);
+            if (StringUtils.isEmpty(bucketName)) {
+                Sb.downLoad(filePath, response);
+            } else {
+                StorageBucketKey.use(bucketName, () -> {
+                    Sb.downLoad(filePath, response);
+                });
+            }
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("下载失败: " + e.getMessage());
@@ -119,19 +121,17 @@ public class FileController {
      * 统一预览接口：/file/{storageType}/{bucketName}/preview?filePath=xxx
      */
     @Anonymous
-    @GetMapping({ "/preview", "/{storageType}/{bucketName}/preview" })
+    @GetMapping({ "/preview", "/{bucketName}/preview" })
     public void preview(
             @PathVariable(name = "storageType", required = false) String storageType,
             @PathVariable(name = "bucketName", required = false) String bucketName,
             @RequestParam("filePath") String filePath,
             HttpServletResponse response) throws Exception {
         try {
-            StorageService storageService = null;
-            if (StringUtils.isEmpty(storageType) || StringUtils.isEmpty(bucketName)) {
-                storageService = new StorageService(StorageUtils.getPrimaryStorageBucket());
-            } else {
-                storageService = new StorageService(StorageUtils.getStorageBucket(storageType, bucketName));
+            if (StringUtils.isEmpty(bucketName)) {
+                StorageBucketKey.use(bucketName);
             }
+            StorageService storageService = new StorageService(RuoYiConfig.getGeekStorageBucket());
             filePath = URLDecoder.decode(filePath, "UTF-8");
             InputStream inputStream = storageService.downLoad(filePath);
             String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(filePath));
@@ -144,6 +144,8 @@ public class FileController {
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("预览失败: " + e.getMessage());
+        } finally {
+            StorageBucketKey.clear();
         }
     }
 
@@ -164,7 +166,7 @@ public class FileController {
             }
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, filePath);
-            FileOperateUtils.downLoad(filePath, outputStream);
+            Sb.downLoad(filePath, outputStream);
         } catch (Exception e) {
             response.reset();
             response.setContentType(MediaType.TEXT_HTML_VALUE);
@@ -191,8 +193,7 @@ public class FileController {
             String currentDate = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
             String timestamp = String.valueOf(System.currentTimeMillis());
             String objectName = String.format("%s/%s/%s_%s", "/upload", currentDate, timestamp, fileName);
-            StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
-            String uploadId = fileService.initMultipartUpload(objectName, fileSize);
+            String uploadId = Sb.initMultipartUpload(objectName, fileSize);
             return AjaxResult.success(Map.of(
                     "uploadId", uploadId,
                     "filePath", objectName,
@@ -211,20 +212,14 @@ public class FileController {
             @RequestParam("filePath") String filePath,
             @RequestParam("partNumber") int partNumber,
             @RequestParam("chunk") MultipartFile chunk) {
-        try {
-            if (chunk == null || chunk.isEmpty())
-                throw new ServiceException("分片数据不能为空");
-            StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
-            String etag = fileService.uploadPart(filePath, uploadId, partNumber, chunk.getSize(),
-                    chunk.getInputStream());
-            if (etag == null || etag.isEmpty())
-                throw new ServiceException("上传分片失败：未获取到ETag");
-            return AjaxResult.success(Map.of(
-                    "etag", etag,
-                    "partNumber", partNumber));
-        } catch (Exception e) {
-            return AjaxResult.error(e.getMessage());
-        }
+        if (chunk == null || chunk.isEmpty())
+            throw new ServiceException("分片数据不能为空");
+        String etag = Sb.uploadPart(filePath, uploadId, partNumber, chunk);
+        if (etag == null || etag.isEmpty())
+            throw new ServiceException("上传分片失败：未获取到ETag");
+        return AjaxResult.success(Map.of(
+                "etag", etag,
+                "partNumber", partNumber));
     }
 
     /**
@@ -238,24 +233,8 @@ public class FileController {
             @RequestParam("fileName") String fileName,
             @RequestBody List<SysFilePartETag> partETags) {
         try {
-            if (partETags == null || partETags.isEmpty())
-                throw new ServiceException("分片信息不能为空");
-            // 验证并排序分片信息
-            List<SysFilePartETag> validParts = partETags.stream()
-                    .filter(part -> part != null && part.getPartNumber() != null && part.getETag() != null)
-                    .peek(part -> {
-                        if (part.getPartNumber() <= 0 || StringUtils.isEmpty(part.getETag())) {
-                            throw new ServiceException("分片序号或ETag无效");
-                        }
-                    })
-                    .collect(Collectors.toList());
-            if (validParts.size() != partETags.size()) {
-                throw new ServiceException("分片信息格式不正确");
-            }
-            validParts.sort(Comparator.comparingInt(p -> p.getPartNumber()));
             // 完成分片上传并合并文件
-            StorageService fileService = new StorageService(StorageUtils.getPrimaryStorageBucket());
-            String finalPath = fileService.completeMultipartUpload(filePath, uploadId, validParts);
+            String finalPath = Sb.completeMultipartUpload(filePath, uploadId, partETags);
             if (finalPath == null || finalPath.isEmpty()) {
                 throw new ServiceException("合并分片失败：未获取到最终文件路径");
             }
@@ -267,7 +246,7 @@ public class FileController {
             fileInfo.setFilePath(finalPath);
             fileInfo.setFileSize(fileSize);
             fileInfo.setFileType(dotIndex >= 0 ? fileName.substring(dotIndex + 1) : "");
-            fileInfo.setStorageType(RuoYiConfig.getFileServer());
+            fileInfo.setStorageType(RuoYiConfig.getGeekStorageBucket().getDefaultSbType());
             fileInfo.setCreateBy(userName);
             fileInfo.setCreateTime(new Date());
             fileInfo.setUpdateBy(userName);

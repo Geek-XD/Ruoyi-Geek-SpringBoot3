@@ -3,7 +3,9 @@ package com.ruoyi.common.core.file.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +13,7 @@ import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.file.domain.SysFilePartETag;
 import com.ruoyi.common.core.file.storage.StorageBucket;
 import com.ruoyi.common.core.file.storage.StorageEntity;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.CacheUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
@@ -179,9 +182,12 @@ public class StorageService {
      * @param inputStream 分片数据流
      * @return 分片的ETag
      */
-    public String uploadPart(String filePath, String uploadId, int partNumber, long partSize, InputStream inputStream)
+    public String uploadPart(SysFilePartETag partETag, InputStream inputStream)
             throws Exception {
-        return this.storageBucket.uploadPart(filePath, uploadId, partNumber, partSize, inputStream).getETag();
+        return this.storageBucket
+                .uploadPart(partETag.getFilePath(), partETag.getTaskId(), partETag.getPartNumber(),
+                        partETag.getPartSize(), inputStream)
+                .getETag();
     }
 
     /**
@@ -197,7 +203,18 @@ public class StorageService {
         if (partETags == null || partETags.isEmpty()) {
             throw new IllegalArgumentException("分片标识列表不能为空");
         }
+        List<SysFilePartETag> validParts = partETags.stream()
+                .filter(part -> part != null && part.getPartNumber() != null && part.getETag() != null)
+                .peek(part -> {
+                    if (part.getPartNumber() <= 0 || StringUtils.isEmpty(part.getETag())) {
+                        throw new ServiceException("分片序号或ETag无效");
+                    }
+                })
+                .collect(Collectors.toList());
+        if (validParts.size() != partETags.size()) {
+            throw new ServiceException("分片信息格式不正确");
+        }
+        partETags.sort(Comparator.comparingInt(p -> p.getPartNumber()));
         return this.storageBucket.completeMultipartUpload(filePath, uploadId, partETags);
     }
-
 }

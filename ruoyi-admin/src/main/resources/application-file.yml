@@ -1,53 +1,25 @@
-# local配置
-local:
-  enable: true
-  primary: MASTER
+storage:
   buckets:
     MASTER:
+      # 指定文件服务类型(值为local代表使用本地作为文件操作服务,minio代表使用minio作为文件操作服务,oss代表使用oss作为文件操作服务)
+      type: local
       permission: public 
       path: /data/files/master
       # 建议public权限的api以 /profile开头就不需要再从SecurityConfig配置权限了
-      api: /profile/files/master
-    # SLAVE:
-    #   permission: private
-    #   path: /data/files/slave
       # private需要自己编写一个api例如FileController中的/file/resource
-    #   api: /file/resource
-
-# Minio配置
-minio:
-  enable: false
-  primary: MASTER
-  buckets:
-    MASTER:
-      permission: public
-      url: http://localhost:9000
-      accessKey: 
-      secretKey: 
-      bucketName: ruoyi
-    # SLAVE:
-    #   permission: private
+      api: /profile/files/master
+    # SLAVE1:
+    #   type: minio
+    #   permission: public
     #   url: http://localhost:9000
-    #   accessKey: minioadmin
-    #   secretKey: minioadmin
-    #   bucketName: ry
-
-# oss配置
-oss:
-  enable: false
-  primary: MASTER
-  buckets:
-    MASTER:
-      permission: public
-      accessKeyId: accessKeyId
-      accessKeySecret: accessKeySecret
-      bucketName: ruoyi
-      endpoint: oss-cn-beijing.aliyuncs.com
-    # SLAVE:
-    #   permission: private
-    #   accessKeyId: 
-    #   accessKeySecret: 
-    #   bucketName: 
-    #   endpoint:
-
+    #   accessKey: 
+    #   secretKey: 
+    #   bucketName: ruoyi
+    # SLAVE2:
+    #   type: oss
+    #   permission: public
+    #   accessKeyId: accessKeyId
+    #   accessKeySecret: accessKeySecret
+    #   bucketName: ruoyi
+    #   endpoint: oss-cn-beijing.aliyuncs.com
 

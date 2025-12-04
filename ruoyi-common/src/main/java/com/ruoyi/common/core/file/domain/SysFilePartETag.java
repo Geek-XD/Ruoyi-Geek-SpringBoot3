@@ -16,7 +16,7 @@ public class SysFilePartETag implements Serializable {
     private Long partCRC;
     private Long fileSize;
     private String filePath;
-    private Long taskId;
+    private String taskId;
 
     public void seteTag(String eTag) {
         this.eTag = eTag;

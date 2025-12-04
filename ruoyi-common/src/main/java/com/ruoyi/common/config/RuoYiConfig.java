@@ -3,6 +3,8 @@ package com.ruoyi.common.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import com.ruoyi.common.core.file.GeekStorageBucket;
+
 /**
  * 读取项目相关配置
  *
@@ -10,8 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "ruoyi")
-public class RuoYiConfig
-{
+public class RuoYiConfig {
     /** 项目名称 */
     private String name;
 
@@ -24,8 +25,6 @@ public class RuoYiConfig
     /** 上传路径 */
     private static String profile;
 
-
-
     private static String fileServer;
 
     /** 获取地址开关 */
@@ -34,54 +33,53 @@ public class RuoYiConfig
     /** 验证码类型 */
     private static String captchaType;
 
+    private static GeekStorageBucket geekStorageBucket;
 
-    public String getName()
-    {
+    public static GeekStorageBucket getGeekStorageBucket() {
+        return geekStorageBucket;
+    }
+
+    public static void setGeekStorageBucket(GeekStorageBucket geekStorageBucket) {
+        RuoYiConfig.geekStorageBucket = geekStorageBucket;
+    }
+
+    public String getName() {
         return name;
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion(String version)
-    {
+    public void setVersion(String version) {
         this.version = version;
     }
 
-    public String getCopyrightYear()
-    {
+    public String getCopyrightYear() {
         return copyrightYear;
     }
 
-    public void setCopyrightYear(String copyrightYear)
-    {
+    public void setCopyrightYear(String copyrightYear) {
         this.copyrightYear = copyrightYear;
     }
 
-    public static String getProfile()
-    {
+    public static String getProfile() {
         return profile;
     }
 
-    public void setProfile(String profile)
-    {
+    public void setProfile(String profile) {
         RuoYiConfig.profile = profile;
     }
 
-    public static boolean isAddressEnabled()
-    {
+    public static boolean isAddressEnabled() {
         return addressEnabled;
     }
 
-    public void setAddressEnabled(boolean addressEnabled)
-    {
+    public void setAddressEnabled(boolean addressEnabled) {
         RuoYiConfig.addressEnabled = addressEnabled;
     }
 
@@ -93,43 +91,31 @@ public class RuoYiConfig
         RuoYiConfig.captchaType = captchaType;
     }
 
-    public static String getFileServer() {
-        return fileServer;
-    }
-
-    public void setFileServer(String fileServer) {
-        RuoYiConfig.fileServer = fileServer;
-    }
-
     /**
      * 获取导入上传路径
      */
-    public static String getImportPath()
-    {
+    public static String getImportPath() {
         return getProfile() + "/import";
     }
 
     /**
      * 获取头像上传路径
      */
-    public static String getAvatarPath()
-    {
+    public static String getAvatarPath() {
         return getProfile() + "/avatar";
     }
 
     /**
      * 获取下载路径
      */
-    public static String getDownloadPath()
-    {
+    public static String getDownloadPath() {
         return getProfile() + "/download/";
     }
 
     /**
      * 获取上传路径
      */
-    public static String getUploadPath()
-    {
+    public static String getUploadPath() {
         return getProfile() + "/upload";
     }
 }

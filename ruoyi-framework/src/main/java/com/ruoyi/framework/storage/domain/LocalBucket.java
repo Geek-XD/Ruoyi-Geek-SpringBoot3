@@ -1,4 +1,4 @@
-package com.ruoyi.framework.file.domain;
+package com.ruoyi.framework.storage.domain;
 
 import java.io.File;
 import java.io.FileInputStream;

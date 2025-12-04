@@ -12,8 +12,6 @@ ruoyi:
   addressEnabled: false
   # 验证码类型 math 数组计算 char 字符验证
   captchaType: math
-  # 指定默认文件服务类型(值为local代表使用本地作为文件操作服务,minio代表使用minio作为文件操作服务,oss代表使用oss作为文件操作服务)
-  fileServer: local
   # 指定默认文件上传方法最大文件大小(MB)
   fileMaxSize: 50
 
@@ -63,7 +61,7 @@ spring:
   application:
     name: ruoyi
   cache:
-    # 指定缓存类型 simple 默认缓存 jcache 本地缓存 redis 缓存
+    # 指定缓存类型 simple 默认缓存 jcache 本地缓存 redis 缓存（去plugins配置链接信息）
     type: simple
   mvc:
     pathmatch:
@@ -117,30 +115,3 @@ pagehelper:
   helperDialect: mysql
   supportMethodsArguments: true
   params: count=countSql
-
-# MyBatis配置
-mybatis:
-  # 搜索指定包别名
-  typeAliasesPackage: com.ruoyi.**.domain
-  # 配置mapper的扫描，找到所有的mapper.xml映射文件
-  mapperLocations: classpath*:mapper/**/*Mapper.xml
-  # 加载全局的配置文件
-  configLocation: classpath:mybatis/mybatis-config.xml
-
-# MyBatis Plus配置
-mybatis-plus:
-  # 搜索指定包别名
-  typeAliasesPackage: com.ruoyi.**.domain
-  # 配置mapper的扫描，找到所有的mapper.xml映射文件
-  mapperLocations: classpath*:mapper/**/*Mapper.xml
-  # 加载全局的配置文件
-  configLocation: classpath:mybatis/mybatis-config.xml
-
-
-mybatis-flex:
-    # 搜索指定包别名
-  typeAliasesPackage: com.ruoyi.**.domain
-  # 配置mapper的扫描，找到所有的mapper.xml映射文件
-  mapperLocations: classpath*:mapper/**/*Mapper.xml
-  # 加载全局的配置文件
-  configLocation: classpath:mybatis/mybatis-config.xml

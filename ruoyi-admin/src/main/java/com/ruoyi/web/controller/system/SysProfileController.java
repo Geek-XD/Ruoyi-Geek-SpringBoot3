@@ -17,9 +17,9 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.Sb;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.FileOperateUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.framework.web.service.TokenService;
@@ -54,7 +54,7 @@ public class SysProfileController extends BaseController {
         SysUser user = loginUser.getUser();
         if (user.getAvatar() != null) {
             try {
-                user.setAvatar(FileOperateUtils.getURL(user.getAvatar()));
+                user.setAvatar(Sb.getURL(user.getAvatar()));
             } catch (Exception e) {
             }
         }
@@ -129,7 +129,7 @@ public class SysProfileController extends BaseController {
             String extractPath = loginUser.getUsername() + "/" + loginUser.getUserId() + "";
             String fileName = DateUtils.dateTimeNow() + "-avatar." + FileUtils.getExtension(file);
             String filePath = "avatar/" + extractPath + "/" + fileName;
-            String url = FileOperateUtils.upload(filePath, file, MimeTypeUtils.IMAGE_EXTENSION);
+            String url = Sb.upload(filePath, file, MimeTypeUtils.IMAGE_EXTENSION);
             if (userService.updateUserAvatar(loginUser.getUsername(), filePath)) {
                 AjaxResult ajax = AjaxResult.success();
                 ajax.put("imgUrl", url);

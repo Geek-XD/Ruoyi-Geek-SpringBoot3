@@ -7,7 +7,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import com.mybatisflex.core.FlexGlobalConfig;
@@ -33,7 +32,6 @@ import com.ruoyi.framework.security.context.PermissionContextHolder;
  */
 @Aspect
 @Component
-@ConditionalOnProperty(prefix = "enhance", name = "datascope", havingValue = "default", matchIfMissing = true)
 public class DataScopeAspect {
 
     // @Autowired

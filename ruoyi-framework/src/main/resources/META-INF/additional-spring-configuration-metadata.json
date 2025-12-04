@@ -1,18 +1,8 @@
 {
     "properties": [
         {
-            "name": "local.enable",
-            "type": "java.lang.Boolean",
-            "description": "是否开启local"
-        },
-        {
-            "name": "local.primary",
-            "type": "java.lang.String",
-            "description": "默认存储名称"
-        },
-        {
-            "name": "local.buckets",
-            "type": "java.util.Map<java.lang.String, com.ruoyi.file.local.config.LocalBucketProperties>",
+            "name": "storage.buckets",
+            "type": "java.util.Map<java.lang.String, java.util.Properties>",
             "description": "储存桶"
         }
     ]

@@ -1,4 +1,10 @@
 mybatis-flex:
+    # 搜索指定包别名
+    typeAliasesPackage: com.ruoyi.**.domain
+    # 配置mapper的扫描，找到所有的mapper.xml映射文件
+    mapperLocations: classpath*:mapper/**/*Mapper.xml
+    # 加载全局的配置文件
+    configLocation: classpath:mybatis/mybatis-config.xml
     datasource:
         MASTER:
             url: jdbc:mysql://127.0.0.1/ry?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
@@ -71,7 +77,3 @@ spring:
                 wall:
                     config:
                         multi-statement-allow: true
-
-# 是否开启分布式事务，如不开启，请删除atomikos插件，否则atomikos相关驱动虽不生效但仍会启动
-atomikos:
-  enabled: false
