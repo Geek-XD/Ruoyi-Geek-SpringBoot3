@@ -53,8 +53,8 @@ nbdist/
 effective-pom.xml
 
 
-./geek-models/
-!./geek-models/.gitkeep
+./geek-modules/
+!./geek-modules/.gitkeep
 ./geek-plugins/
 !./geek-plugins/.gitkeep
 ./geek-scenes/

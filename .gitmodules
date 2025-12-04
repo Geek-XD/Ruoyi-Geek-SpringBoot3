@@ -19,24 +19,24 @@
 [submodule "Geek-Plugin-Websocket"]
 	path = geek-plugins/Geek-Plugin-Websocket
 	url = https://gitee.com/geek-xd/geek-plugin-websocket.git
-[submodule "Geek-Model-Quartz"]
-	path = geek-module/Geek-Model-Quartz
-	url = https://gitee.com/geek-xd/geek-model-quartz.git
-[submodule "Geek-Model-Online"]
-	path = geek-module/Geek-Model-Online
-	url = https://gitee.com/geek-xd/geek-model-online.git
-[submodule "Geek-Model-Message"]
-	path = geek-module/Geek-Model-Message
-	url = https://gitee.com/geek-xd/geek-model-message.git
-[submodule "Geek-Model-Generator"]
-	path = geek-module/Geek-Model-Generator
-	url = https://gitee.com/geek-xd/geek-model-generator.git
-[submodule "Geek-Model-From"]
-	path = geek-module/Geek-Model-From
-	url = https://gitee.com/geek-xd/geek-model-from.git
-[submodule "Geek-Model-Flowable"]
-	path = geek-module/Geek-Model-Flowable
-	url = https://gitee.com/geek-xd/geek-model-flowable.git
+[submodule "geek-module-Quartz"]
+	path = geek-module/geek-module-Quartz
+	url = https://gitee.com/geek-xd/geek-module-quartz.git
+[submodule "geek-module-Online"]
+	path = geek-module/geek-module-Online
+	url = https://gitee.com/geek-xd/geek-module-online.git
+[submodule "geek-module-Message"]
+	path = geek-module/geek-module-Message
+	url = https://gitee.com/geek-xd/geek-module-message.git
+[submodule "geek-module-Generator"]
+	path = geek-module/geek-module-Generator
+	url = https://gitee.com/geek-xd/geek-module-generator.git
+[submodule "geek-module-From"]
+	path = geek-module/geek-module-From
+	url = https://gitee.com/geek-xd/geek-module-from.git
+[submodule "geek-module-Flowable"]
+	path = geek-module/geek-module-Flowable
+	url = https://gitee.com/geek-xd/geek-module-flowable.git
 [submodule "Geek-Scene-Pay"]
 	path = geek-scenes/Geek-Scene-Pay
 	url = https://gitee.com/geek-xd/geek-scene-pay.git
@@ -64,27 +64,45 @@
 [submodule "geek-plugins/Geek-Plugin-Websocket"]
 	path = geek-plugins/Geek-Plugin-Websocket
 	url = https://gitee.com/geek-xd/geek-plugin-websocket.git
-[submodule "geek-module/Geek-Model-Quartz"]
-	path = geek-module/Geek-Model-Quartz
-	url = https://gitee.com/geek-xd/geek-model-quartz.git
-[submodule "geek-module/Geek-Model-Online"]
-	path = geek-module/Geek-Model-Online
-	url = https://gitee.com/geek-xd/geek-model-online.git
-[submodule "geek-module/Geek-Model-Message"]
-	path = geek-module/Geek-Model-Message
-	url = https://gitee.com/geek-xd/geek-model-message.git
-[submodule "geek-module/Geek-Model-Generator"]
-	path = geek-module/Geek-Model-Generator
-	url = https://gitee.com/geek-xd/geek-model-generator.git
-[submodule "geek-module/Geek-Model-Form"]
-	path = geek-module/Geek-Model-Form
-	url = https://gitee.com/geek-xd/geek-model-form.git
-[submodule "geek-module/Geek-Model-Flowable"]
-	path = geek-module/Geek-Model-Flowable
-	url = https://gitee.com/geek-xd/geek-model-flowable.git
+[submodule "geek-module/geek-module-Quartz"]
+	path = geek-module/geek-module-Quartz
+	url = https://gitee.com/geek-xd/geek-module-quartz.git
+[submodule "geek-module/geek-module-Online"]
+	path = geek-module/geek-module-Online
+	url = https://gitee.com/geek-xd/geek-module-online.git
+[submodule "geek-module/geek-module-Message"]
+	path = geek-module/geek-module-Message
+	url = https://gitee.com/geek-xd/geek-module-message.git
+[submodule "geek-module/geek-module-Generator"]
+	path = geek-module/geek-module-Generator
+	url = https://gitee.com/geek-xd/geek-module-generator.git
+[submodule "geek-module/geek-module-Form"]
+	path = geek-module/geek-module-Form
+	url = https://gitee.com/geek-xd/geek-module-form.git
+[submodule "geek-module/geek-module-Flowable"]
+	path = geek-module/geek-module-Flowable
+	url = https://gitee.com/geek-xd/geek-module-flowable.git
 [submodule "geek-scenes/Geek-Scene-Pay"]
 	path = geek-scenes/Geek-Scene-Pay
 	url = https://gitee.com/geek-xd/geek-scene-pay.git
 [submodule "geek-scenes/Geek-Scene-Auth"]
 	path = geek-scenes/Geek-Scene-Auth
 	url = https://gitee.com/geek-xd/geek-scene-auth.git
+[submodule "Geek-Module-Quartz"]
+	path = geek-modules/Geek-Module-Quartz
+	url = https://gitee.com/geek-xd/geek-module-quartz.git
+[submodule "Geek-Module-Online"]
+	path = geek-modules/Geek-Module-Online
+	url = https://gitee.com/geek-xd/geek-module-online.git
+[submodule "Geek-Module-Message"]
+	path = geek-modules/Geek-Module-Message
+	url = https://gitee.com/geek-xd/geek-module-message.git
+[submodule "Geek-Module-Generator"]
+	path = geek-modules/Geek-Module-Generator
+	url = https://gitee.com/geek-xd/geek-module-generator.git
+[submodule "Geek-Module-Form"]
+	path = geek-modules/Geek-Module-Form
+	url = https://gitee.com/geek-xd/geek-module-form.git
+[submodule "Geek-Module-Flowable"]
+	path = geek-modules/Geek-Module-Flowable
+	url = https://gitee.com/geek-xd/geek-module-flowable.git

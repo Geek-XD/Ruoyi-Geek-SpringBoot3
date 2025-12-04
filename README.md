@@ -92,7 +92,7 @@ com.ruoyi
 │       └── manager                       // 异步处理
 │       └── security                      // 权限控制
 │       └── web                           // 前端控制
-├── geek-geek-models       // 业务模块
+├── geek-geek-modules       // 业务模块
 │       └── online                        // 在线开发模块（可移除）
 │       └── quartz                        // 定时任务（可移除）
 │       └── generator                     // 代码生成（可移除）
