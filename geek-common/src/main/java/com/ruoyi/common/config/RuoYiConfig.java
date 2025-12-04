@@ -25,8 +25,6 @@ public class RuoYiConfig {
     /** 上传路径 */
     private static String profile;
 
-    private static String fileServer;
-
     /** 获取地址开关 */
     private static boolean addressEnabled;
 
