@@ -51,3 +51,11 @@ nbdist/
 !*/build/*.xml
 
 effective-pom.xml
+
+
+./geek-models/
+!./geek-models/.gitkeep
+./geek-plugins/
+!./geek-plugins/.gitkeep
+./geek-scenes/
+!./geek-scenes/.gitkeep

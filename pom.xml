@@ -8,7 +8,7 @@
     <version>3.9.0-G</version>
 
     <name>ruoyi</name>
-    <url>https://gitee.com/geek-xd/ruoyi-geek-springboot3.git</url>
+    <url>https://gitee.com/geek-xd/geek-geek-springboot3.git</url>
     <description>若依Geek管理系统</description>
 
     <properties>
@@ -31,7 +31,6 @@
         <commons.collections.version>4.5.0</commons.collections.version>
         <poi.version>5.5.1</poi.version>
         <httpclient5.version>5.5.1</httpclient5.version>
-        <velocity.version>2.4.1</velocity.version>
         <jwt.version>0.13.0</jwt.version>
         <knife4j.version>4.5.0</knife4j.version>
         <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
@@ -124,13 +123,6 @@
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
-            </dependency>
-
-            <!-- velocity代码生成使用模板 -->
-            <dependency>
-                <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity-engine-core</artifactId>
-                <version>${velocity.version}</version>
             </dependency>
 
             <dependency>
@@ -233,55 +225,38 @@
             <!-- 核心模块-->
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-framework</artifactId>
+                <artifactId>geek-framework</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 系统模块-->
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-system</artifactId>
+                <artifactId>geek-system</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 通用工具-->
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-common</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <!-- 插件启动器 -->
-            <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-plugins-starter</artifactId>
-                <version>${ruoyi.version}</version>
-            </dependency>
-
-            <!-- 模块启动器 -->
-            <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-models-starter</artifactId>
+                <artifactId>geek-common</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
 
             <!-- 场景启动器 -->
             <dependency>
                 <groupId>com.ruoyi.geekxd</groupId>
-                <artifactId>ruoyi-scene-starter</artifactId>
+                <artifactId>geek-scene-starter</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <modules>
-        <module>ruoyi-admin</module>
-        <module>ruoyi-framework</module>
-        <module>ruoyi-system</module>
-        <module>ruoyi-common</module>
-        <module>ruoyi-geek-scenes</module>
-        <module>ruoyi-geek-plugins</module>
-        <module>ruoyi-geek-models</module>
+        <module>geek-admin</module>
+        <module>geek-framework</module>
+        <module>geek-system</module>
+        <module>geek-common</module>
     </modules>
     <packaging>pom</packaging>
 

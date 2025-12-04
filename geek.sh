@@ -88,6 +88,31 @@ cmd_status() {
   done
 }
 
+# 一键同步/拉取配置文件中列出的所有模块
+cmd_sync_all() {
+  log "根据 geek-modules.yml 同步所有模块（逐个执行 add）..."
+  local name
+  # 这里只用第 1 列 name，后续复用 cmd_add 的逻辑
+  parse_modules | while IFS=$'\t' read -r name _ _; do
+    [ -n "$name" ] || continue
+    log "[SYNC] 处理模块: $name"
+    cmd_add "$name" || err "同步模块 '$name' 时出错，可稍后单独重试。"
+  done
+  log "[SYNC] 所有模块处理完成。"
+}
+
+# 一键删除配置文件中列出的所有模块
+cmd_remove_all() {
+  log "根据 geek-modules.yml 删除所有模块（逐个执行 remove）..."
+  local name
+  parse_modules | while IFS=$'\t' read -r name _ _; do
+    [ -n "$name" ] || continue
+    log "[REMOVE] 处理模块: $name"
+    cmd_remove "$name" || err "删除模块 '$name' 时出错，可稍后单独重试。"
+  done
+  log "[REMOVE] 所有模块处理完成。"
+}
+
 # 根据 name 查找 path + url
 get_module_info() {
   local name="$1"
@@ -191,6 +216,8 @@ command:
   status               查看当前索引中的子模块（gitlink，已载入模块）
   add <name>           根据 .gitmodules 中的 name 添加一个子模块（git submodule add）
   remove <name>        根据 .gitmodules 中的 name 删除一个子模块（git rm + 清理 .git/modules）
+  sync-all             按 geek-modules.yml 中的配置，依次执行 add，同步/拉取所有模块
+  remove-all           按 geek-modules.yml 中的配置，依次执行 remove，删除所有模块
 
 示例：
   $0 list
@@ -205,6 +232,8 @@ case "$1" in
   status)  shift; cmd_status "$@";;
   add)     shift; cmd_add "$@";;
   remove)  shift; cmd_remove "$@";;
+  sync-all) shift; cmd_sync_all "$@";;
+  remove-all) shift; cmd_remove_all "$@";;
   ""|-h|--help) usage;;
   *) err "未知命令：$1"; usage; exit 1;;
 esac

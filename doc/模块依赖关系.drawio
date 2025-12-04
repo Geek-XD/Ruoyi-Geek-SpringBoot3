@@ -4,7 +4,7 @@
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="2" value="ruoyi-admin" style="html=1;" parent="1" vertex="1">
+                <mxCell id="2" value="geek-admin" style="html=1;" parent="1" vertex="1">
                     <mxGeometry x="380" y="780" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="4" style="edgeStyle=none;html=1;" parent="1" source="3" target="5" edge="1">
@@ -19,13 +19,13 @@
                 <mxCell id="34" style="edgeStyle=none;html=1;" edge="1" parent="1" source="3" target="31">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="ruoyi-common" style="html=1;" parent="1" vertex="1">
+                <mxCell id="3" value="geek-common" style="html=1;" parent="1" vertex="1">
                     <mxGeometry x="380" y="320" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="7" style="edgeStyle=none;html=1;" edge="1" parent="1" source="5" target="6">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="ruoyi-system" style="html=1;" vertex="1" parent="1">
+                <mxCell id="5" value="geek-system" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="380" y="440" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="8" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="2">
@@ -37,61 +37,61 @@
                 <mxCell id="24" style="edgeStyle=none;html=1;" edge="1" parent="1" source="6" target="20">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="6" value="ruoyi-framework" style="html=1;" vertex="1" parent="1">
+                <mxCell id="6" value="geek-framework" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="380" y="560" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="11" style="edgeStyle=none;html=1;" edge="1" parent="1" source="9" target="2">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="9" value="ruoyi-quartz" style="html=1;" vertex="1" parent="1">
+                <mxCell id="9" value="geek-quartz" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="260" y="585" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="14" style="edgeStyle=none;html=1;" edge="1" parent="1" source="12" target="2">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="12" value="ruoyi-online" style="html=1;" vertex="1" parent="1">
+                <mxCell id="12" value="geek-online" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="520" y="585" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="18" style="edgeStyle=none;html=1;" edge="1" parent="1" source="15" target="2">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="15" value="ruoyi-oauth-starter" style="html=1;" vertex="1" parent="1">
+                <mxCell id="15" value="geek-oauth-starter" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="590" y="700" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="17" style="edgeStyle=none;html=1;" edge="1" parent="1" source="16" target="2">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="16" value="ruoyi-pay-stater" style="html=1;" vertex="1" parent="1">
+                <mxCell id="16" value="geek-pay-stater" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="180" y="730" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="23" style="edgeStyle=none;html=1;" edge="1" parent="1" source="19" target="15">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="19" value="ruoyi-oauth-xx" style="html=1;" vertex="1" parent="1">
+                <mxCell id="19" value="geek-oauth-xx" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="660" y="585" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="22" style="edgeStyle=none;html=1;" edge="1" parent="1" source="20" target="19">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="20" value="ruoyi-oauth-common" style="html=1;" vertex="1" parent="1">
+                <mxCell id="20" value="geek-oauth-common" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="660" y="370" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="30" style="edgeStyle=none;html=1;" edge="1" parent="1" source="25" target="16">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="25" value="ruoyi-pay-xx" style="html=1;" vertex="1" parent="1">
+                <mxCell id="25" value="geek-pay-xx" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="20" y="585" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="29" style="edgeStyle=none;html=1;" edge="1" parent="1" source="26" target="25">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="26" value="ruoyi-pay-common" style="html=1;" vertex="1" parent="1">
+                <mxCell id="26" value="geek-pay-common" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="20" y="400" width="110" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="33" style="edgeStyle=none;html=1;" edge="1" parent="1" source="31" target="2">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="31" value="ruoyi-generator" style="html=1;" vertex="1" parent="1">
+                <mxCell id="31" value="geek-generator" style="html=1;" vertex="1" parent="1">
                     <mxGeometry x="140" y="585" width="110" height="50" as="geometry"/>
                 </mxCell>
             </root>

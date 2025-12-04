@@ -9,7 +9,7 @@
             "name": "RuoYiApplication",
             "request": "launch",
             "mainClass": "com.ruoyi.RuoYiApplication",
-            "projectName": "ruoyi-admin",
+            "projectName": "geek-admin",
             "vmArgs": "-Dfile.encoding=GBK "
         }
     ]

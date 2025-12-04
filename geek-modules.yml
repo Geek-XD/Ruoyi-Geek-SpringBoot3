@@ -29,3 +29,35 @@ modules:
   - name: Geek-Plugin-Websocket
     url: https://gitee.com/geek-xd/geek-plugin-websocket.git
     path: geek-plugins/Geek-Plugin-Websocket
+
+  - name: Geek-Model-Quartz
+    url: https://gitee.com/geek-xd/geek-model-quartz.git
+    path: geek-models/Geek-Model-Quartz
+
+  - name: Geek-Model-Online
+    url: https://gitee.com/geek-xd/geek-model-online.git
+    path: geek-models/Geek-Model-Online
+
+  - name: Geek-Model-Message
+    url: https://gitee.com/geek-xd/geek-model-message.git
+    path: geek-models/Geek-Model-Message
+
+  - name: Geek-Model-Generator
+    url: https://gitee.com/geek-xd/geek-model-generator.git
+    path: geek-models/Geek-Model-Generator
+
+  - name: Geek-Model-From
+    url: https://gitee.com/geek-xd/geek-model-from.git
+    path: geek-models/Geek-Model-From
+
+  - name: Geek-Model-Flowable
+    url: https://gitee.com/geek-xd/geek-model-flowable.git
+    path: geek-models/Geek-Model-Flowable
+
+  - name: Geek-Scene-Pay
+    url: https://gitee.com/geek-xd/geek-scene-pay.git
+    path: geek-scenes/Geek-Scene-Pay
+
+  - name: Geek-Scene-Auth
+    url: https://gitee.com/geek-xd/geek-scene-auth.git
+    path: geek-scenes/Geek-Scene-Auth
