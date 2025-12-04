@@ -1,27 +1,3 @@
 [submodule "ruoyi-geek-models"]
 	path = ruoyi-geek-models
 	url = https://gitee.com/geek-xd/geek-spring-boot-models.git
-[submodule "Geek-Plugin-RabbitMQ"]
-	path = geek-plugins/Geek-Plugin-RabbitMQ
-	url = https://gitee.com/geek-xd/geek-plugin-rabbitmq.git
-[submodule "Geek-Plugin-Netty"]
-	path = geek-plugins/Geek-Plugin-Netty
-	url = https://gitee.com/geek-xd/geek-plugin-netty.git
-[submodule "Geek-Plugin-Aliyun-OSS"]
-	path = geek-plugins/Geek-Plugin-Aliyun-OSS
-	url = https://gitee.com/geek-xd/geek-plugin-aliyun-oss.git
-[submodule "Geek-Plugin-Redis"]
-	path = geek-plugins/Geek-Plugin-Redis
-	url = https://gitee.com/geek-xd/geek-plugin-redis.git
-[submodule "Geek-Plugin-Ehcache"]
-	path = geek-plugins/Geek-Plugin-Ehcache
-	url = https://gitee.com/geek-xd/geek-plugin-ehcache.git
-[submodule "Geek-Plugin-Minio"]
-	path = geek-plugins/Geek-Plugin-Minio
-	url = https://gitee.com/geek-xd/geek-plugin-minio.git
-[submodule "Geek-Plugin-Websocket"]
-	path = geek-plugins/Geek-Plugin-Websocket
-	url = https://gitee.com/geek-xd/geek-plugin-websocket.git
-[submodule "geek-plugins/Geek-Plugin-Redis"]
-	path = geek-plugins/Geek-Plugin-Redis
-	url = https://gitee.com/geek-xd/geek-plugin-redis.git
