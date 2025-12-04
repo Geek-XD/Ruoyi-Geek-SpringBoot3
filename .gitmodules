@@ -20,26 +20,71 @@
 	path = geek-plugins/Geek-Plugin-Websocket
 	url = https://gitee.com/geek-xd/geek-plugin-websocket.git
 [submodule "Geek-Model-Quartz"]
-	path = geek-models/Geek-Model-Quartz
+	path = geek-module/Geek-Model-Quartz
 	url = https://gitee.com/geek-xd/geek-model-quartz.git
 [submodule "Geek-Model-Online"]
-	path = geek-models/Geek-Model-Online
+	path = geek-module/Geek-Model-Online
 	url = https://gitee.com/geek-xd/geek-model-online.git
 [submodule "Geek-Model-Message"]
-	path = geek-models/Geek-Model-Message
+	path = geek-module/Geek-Model-Message
 	url = https://gitee.com/geek-xd/geek-model-message.git
 [submodule "Geek-Model-Generator"]
-	path = geek-models/Geek-Model-Generator
+	path = geek-module/Geek-Model-Generator
 	url = https://gitee.com/geek-xd/geek-model-generator.git
 [submodule "Geek-Model-From"]
-	path = geek-models/Geek-Model-From
+	path = geek-module/Geek-Model-From
 	url = https://gitee.com/geek-xd/geek-model-from.git
 [submodule "Geek-Model-Flowable"]
-	path = geek-models/Geek-Model-Flowable
+	path = geek-module/Geek-Model-Flowable
 	url = https://gitee.com/geek-xd/geek-model-flowable.git
 [submodule "Geek-Scene-Pay"]
 	path = geek-scenes/Geek-Scene-Pay
 	url = https://gitee.com/geek-xd/geek-scene-pay.git
 [submodule "Geek-Scene-Auth"]
+	path = geek-scenes/Geek-Scene-Auth
+	url = https://gitee.com/geek-xd/geek-scene-auth.git
+[submodule "geek-plugins/Geek-Plugin-RabbitMQ"]
+	path = geek-plugins/Geek-Plugin-RabbitMQ
+	url = https://gitee.com/geek-xd/geek-plugin-rabbitmq.git
+[submodule "geek-plugins/Geek-Plugin-Netty"]
+	path = geek-plugins/Geek-Plugin-Netty
+	url = https://gitee.com/geek-xd/geek-plugin-netty.git
+[submodule "geek-plugins/Geek-Plugin-Aliyun-OSS"]
+	path = geek-plugins/Geek-Plugin-Aliyun-OSS
+	url = https://gitee.com/geek-xd/geek-plugin-aliyun-oss.git
+[submodule "geek-plugins/Geek-Plugin-Redis"]
+	path = geek-plugins/Geek-Plugin-Redis
+	url = https://gitee.com/geek-xd/geek-plugin-redis.git
+[submodule "geek-plugins/Geek-Plugin-Ehcache"]
+	path = geek-plugins/Geek-Plugin-Ehcache
+	url = https://gitee.com/geek-xd/geek-plugin-ehcache.git
+[submodule "geek-plugins/Geek-Plugin-Minio"]
+	path = geek-plugins/Geek-Plugin-Minio
+	url = https://gitee.com/geek-xd/geek-plugin-minio.git
+[submodule "geek-plugins/Geek-Plugin-Websocket"]
+	path = geek-plugins/Geek-Plugin-Websocket
+	url = https://gitee.com/geek-xd/geek-plugin-websocket.git
+[submodule "geek-module/Geek-Model-Quartz"]
+	path = geek-module/Geek-Model-Quartz
+	url = https://gitee.com/geek-xd/geek-model-quartz.git
+[submodule "geek-module/Geek-Model-Online"]
+	path = geek-module/Geek-Model-Online
+	url = https://gitee.com/geek-xd/geek-model-online.git
+[submodule "geek-module/Geek-Model-Message"]
+	path = geek-module/Geek-Model-Message
+	url = https://gitee.com/geek-xd/geek-model-message.git
+[submodule "geek-module/Geek-Model-Generator"]
+	path = geek-module/Geek-Model-Generator
+	url = https://gitee.com/geek-xd/geek-model-generator.git
+[submodule "geek-module/Geek-Model-Form"]
+	path = geek-module/Geek-Model-Form
+	url = https://gitee.com/geek-xd/geek-model-form.git
+[submodule "geek-module/Geek-Model-Flowable"]
+	path = geek-module/Geek-Model-Flowable
+	url = https://gitee.com/geek-xd/geek-model-flowable.git
+[submodule "geek-scenes/Geek-Scene-Pay"]
+	path = geek-scenes/Geek-Scene-Pay
+	url = https://gitee.com/geek-xd/geek-scene-pay.git
+[submodule "geek-scenes/Geek-Scene-Auth"]
 	path = geek-scenes/Geek-Scene-Auth
 	url = https://gitee.com/geek-xd/geek-scene-auth.git
