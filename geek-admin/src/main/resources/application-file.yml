@@ -1,0 +1,25 @@
+storage:
+  buckets:
+    MASTER:
+      # 指定文件服务类型(值为local代表使用本地作为文件操作服务,minio代表使用minio作为文件操作服务,oss代表使用oss作为文件操作服务)
+      type: local
+      permission: public 
+      path: /data/files/master
+      # 建议public权限的api以 /profile开头就不需要再从SecurityConfig配置权限了
+      # private需要自己编写一个api例如FileController中的/file/resource
+      api: /profile/files/master
+    # SLAVE1:
+    #   type: minio
+    #   permission: public
+    #   url: http://localhost:9000
+    #   accessKey: 
+    #   secretKey: 
+    #   bucketName: geek
+    # SLAVE2:
+    #   type: oss
+    #   permission: public
+    #   accessKeyId: accessKeyId
+    #   accessKeySecret: accessKeySecret
+    #   bucketName: geek
+    #   endpoint: oss-cn-beijing.aliyuncs.com
+
