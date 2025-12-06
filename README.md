@@ -7,7 +7,7 @@
         <img alt="logo" src="./doc/image/logo.png">
     </span>
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">geek-Geek v3.8.9-G</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Geek v3.8.9-G</h1>
 <h4 align="center">基于SpringBoot3+Vue3前后端分离的Java快速开发框架</h4>
 <p align="center">
 	<img src="https://img.shields.io/github/license/mashape/apistatus.svg">
