@@ -14,12 +14,12 @@ storage:
     #   url: http://localhost:9000
     #   accessKey: 
     #   secretKey: 
-    #   bucketName: ruoyi
+    #   bucketName: geek
     # SLAVE2:
     #   type: oss
     #   permission: public
     #   accessKeyId: accessKeyId
     #   accessKeySecret: accessKeySecret
-    #   bucketName: ruoyi
+    #   bucketName: geek
     #   endpoint: oss-cn-beijing.aliyuncs.com
 

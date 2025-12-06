@@ -13,12 +13,12 @@ springdoc:
   # 通过配置定义分组，替代代码中的硬编码分组
   group-configs:
     - group: sys系统模块
-      packages-to-scan: com.ruoyi.web.controller.system
+      packages-to-scan: com.geek.web.controller.system
     - group: 基础模块
-      packages-to-scan: com.ruoyi.web.controller.common
+      packages-to-scan: com.geek.web.controller.common
     - group: 支付模块
       paths-to-match: /pay/**
     - group: 文件模块
-      packages-to-scan: com.ruoyi.file.controller
+      packages-to-scan: com.geek.file.controller
     - group: 认证模块
-      packages-to-scan: com.ruoyi.auth.controller
+      packages-to-scan: com.geek.auth.controller

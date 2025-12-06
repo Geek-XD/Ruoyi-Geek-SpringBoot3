@@ -6,9 +6,9 @@
     "configurations": [
         {
             "type": "java",
-            "name": "RuoYiApplication",
+            "name": "GeekApplication",
             "request": "launch",
-            "mainClass": "com.ruoyi.RuoYiApplication",
+            "mainClass": "com.geek.GeekApplication",
             "projectName": "geek-admin",
             "vmArgs": "-Dfile.encoding=GBK "
         }

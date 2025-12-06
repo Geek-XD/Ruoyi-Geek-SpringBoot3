@@ -3,16 +3,16 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ruoyi.geekxd</groupId>
-    <artifactId>ruoyi</artifactId>
+    <groupId>com.geekxd</groupId>
+    <artifactId>geek</artifactId>
     <version>3.9.0-G</version>
 
-    <name>ruoyi</name>
+    <name>geek</name>
     <url>https://gitee.com/geek-xd/geek-geek-springboot3.git</url>
-    <description>若依Geek管理系统</description>
+    <description>极客管理系统</description>
 
     <properties>
-        <ruoyi.version>3.9.0-G</ruoyi.version>
+        <geek.version>3.9.0-G</geek.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
@@ -224,30 +224,30 @@
 
             <!-- 核心模块-->
             <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
+                <groupId>com.geekxd</groupId>
                 <artifactId>geek-framework</artifactId>
-                <version>${ruoyi.version}</version>
+                <version>${geek.version}</version>
             </dependency>
 
             <!-- 系统模块-->
             <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
+                <groupId>com.geekxd</groupId>
                 <artifactId>geek-system</artifactId>
-                <version>${ruoyi.version}</version>
+                <version>${geek.version}</version>
             </dependency>
 
             <!-- 通用工具-->
             <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
+                <groupId>com.geekxd</groupId>
                 <artifactId>geek-common</artifactId>
-                <version>${ruoyi.version}</version>
+                <version>${geek.version}</version>
             </dependency>
 
             <!-- 场景启动器 -->
             <dependency>
-                <groupId>com.ruoyi.geekxd</groupId>
+                <groupId>com.geekxd</groupId>
                 <artifactId>geek-scene-starter</artifactId>
-                <version>${ruoyi.version}</version>
+                <version>${geek.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

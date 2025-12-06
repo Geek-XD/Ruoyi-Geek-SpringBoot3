@@ -1,6 +1,6 @@
 mybatis-flex:
     # 搜索指定包别名
-    typeAliasesPackage: com.ruoyi.**.domain
+    typeAliasesPackage: com.geek.**.domain
     # 配置mapper的扫描，找到所有的mapper.xml映射文件
     mapperLocations: classpath*:mapper/**/*Mapper.xml
     # 加载全局的配置文件
@@ -48,7 +48,7 @@ spring:
             connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
 
             # 配置spring监控的匹配类
-            aop-patterns: com.ruoyi.*.service.*,com.ruoyi.*.mapper.*
+            aop-patterns: com.geek.*.service.*,com.geek.*.mapper.*
 
             
             # Web应用 和 URL监控 配置
@@ -63,7 +63,7 @@ spring:
                 enabled: true
                 url-pattern: /druid/*
                 reset-enable: true      # 是否可以重置日志
-                login-username: ruoyi   # 用户名
+                login-username: geek   # 用户名
                 login-password: 123456  # 密码
                 allow: ""               # IP白名单 (没有配置或者为空，则允许所有访问)
                 deny: ""                # IP黑名单 (存在共同时，deny优先于allow)

@@ -4,4 +4,4 @@ databaseChangeLog:
       path: db/changelog          # 相对于 classpath 的目录路径（你的脚本存放目录）
       relativeToChangelogFile: false  # 固定按 classpath 查找
       errorIfMissingOrEmpty: true     # 目录不存在或无文件则报错
-      filter: com.ruoyi.liquibase.ChangeLogFilter       # 只匹配以 "changelog-" 开头、.xml 结尾的文件
+      filter: com.geek.liquibase.ChangeLogFilter       # 只匹配以 "changelog-" 开头、.xml 结尾的文件

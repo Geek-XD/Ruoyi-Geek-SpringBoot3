@@ -38,7 +38,7 @@
       "command": "cmd",
       "args": [
         "/c",
-        "if exist \".m2\\repo\\com\\ruoyi\\geekxd\" (for /d %D in (\".m2\\repo\\com\\ruoyi\\geekxd\\*\") do 7z a -tzip \"dist\\%~nD.zip\" \"%~fD\\*\" -y) else (echo Base path not found: .m2\\repo\\com\\ruoyi\\geekxd & exit /b 1)"
+        "if exist \".m2\\repo\\com\\geek\\geekxd\" (for /d %D in (\".m2\\repo\\com\\geek\\geekxd\\*\") do 7z a -tzip \"dist\\%~nD.zip\" \"%~fD\\*\" -y) else (echo Base path not found: .m2\\repo\\com\\geek\\geekxd & exit /b 1)"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
