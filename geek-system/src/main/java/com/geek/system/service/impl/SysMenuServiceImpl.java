@@ -1,5 +1,8 @@
 package com.geek.system.service.impl;
 
+import static com.geek.common.core.domain.entity.table.SysMenuTableDef.*;
+import static com.geek.system.domain.table.SysRoleMenuTableDef.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,12 +23,16 @@ import com.geek.common.core.domain.entity.SysRole;
 import com.geek.common.core.domain.entity.SysUser;
 import com.geek.common.utils.SecurityUtils;
 import com.geek.common.utils.StringUtils;
+import com.geek.system.domain.SysRoleMenu;
+import com.geek.system.domain.SysUserRole;
 import com.geek.system.domain.vo.MetaVo;
 import com.geek.system.domain.vo.RouterVo;
 import com.geek.system.mapper.SysMenuMapper;
 import com.geek.system.mapper.SysRoleMapper;
-import com.geek.system.mapper.SysRoleMenuMapper;
 import com.geek.system.service.ISysMenuService;
+import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.query.QueryMethods;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 
 /**
@@ -38,13 +45,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     public static final String PREMISSION_STRING = "perms[\"{0}\"]";
 
     @Autowired
-    private SysMenuMapper menuMapper;
-
-    @Autowired
     private SysRoleMapper roleMapper;
-
-    @Autowired
-    private SysRoleMenuMapper roleMenuMapper;
 
     /**
      * 根据用户查询系统菜单列表
@@ -65,15 +66,23 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public List<SysMenu> selectMenuList(SysMenu menu, Long userId) {
-        List<SysMenu> menuList = null;
+        QueryChain<SysMenu> query = this.queryChain()
+                .like(SysMenu::getMenuName, menu.getMenuName())
+                .eq(SysMenu::getVisible, menu.getVisible())
+                .eq(SysMenu::getStatus, menu.getStatus())
+                .orderBy(SysMenu::getParentId, true)
+                .orderBy(SysMenu::getOrderNum, true);
         // 管理员显示所有菜单信息
-        if (SysUser.isAdmin(userId)) {
-            menuList = menuMapper.selectMenuList(menu);
-        } else {
-            menu.getParams().put("userId", userId);
-            menuList = menuMapper.selectMenuListByUserId(menu);
+        if (!SysUser.isAdmin(userId)) {
+            query.leftJoin(SysRoleMenu.class)
+                    .on(SysMenu::getMenuId, SysRoleMenu::getMenuId)
+                    .leftJoin(SysUserRole.class)
+                    .on(SysRoleMenu::getRoleId, SysUserRole::getRoleId)
+                    .leftJoin(SysRole.class)
+                    .on(SysUserRole::getRoleId, SysRole::getRoleId)
+                    .eq(SysUserRole::getUserId, userId);
         }
-        return menuList;
+        return query.list();
     }
 
     /**
@@ -84,7 +93,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public Set<String> selectMenuPermsByUserId(Long userId) {
-        List<String> perms = menuMapper.selectMenuPermsByUserId(userId);
+        List<String> perms = this.queryChain()
+                .select(QueryMethods.distinct(SysMenu::getPerms))
+                .leftJoin(SysRoleMenu.class)
+                .on(SysMenu::getMenuId, SysRoleMenu::getMenuId)
+                .leftJoin(SysUserRole.class)
+                .on(SysRoleMenu::getRoleId, SysUserRole::getRoleId)
+                .leftJoin(SysRole.class)
+                .on(SysUserRole::getRoleId, SysRole::getRoleId)
+                .eq(SysMenu::getStatus, QueryMethods.string("0"))
+                .eq(SysRole::getStatus, QueryMethods.string("0"))
+                .eq(SysUserRole::getUserId, userId)
+                .listAs(String.class);
+
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
             if (StringUtils.isNotEmpty(perm)) {
@@ -102,7 +123,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public Set<String> selectMenuPermsByRoleId(Long roleId) {
-        List<String> perms = menuMapper.selectMenuPermsByRoleId(roleId);
+        List<String> perms = QueryChain.of(SysMenu.class)
+                .select(QueryMethods.distinct(SysMenu::getPerms))
+                .leftJoin(SysRoleMenu.class)
+                .on(SysRoleMenu::getMenuId, SysMenu::getMenuId)
+                .eq(SysMenu::getStatus, QueryMethods.string("0"))
+                .eq(SysRoleMenu::getRoleId, roleId)
+                .listAs(String.class);
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
             if (StringUtils.isNotEmpty(perm)) {
@@ -120,12 +147,25 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public List<SysMenu> selectMenuTreeByUserId(Long userId) {
-        List<SysMenu> menus = null;
-        if (SecurityUtils.isAdmin(userId)) {
-            menus = menuMapper.selectMenuTreeAll();
-        } else {
-            menus = menuMapper.selectMenuTreeByUserId(userId);
+
+        QueryChain<SysMenu> qc = this.queryChain();
+        if (!SecurityUtils.isAdmin(userId)) {
+            qc.leftJoin(SysRoleMenu.class)
+                    .on(SysRoleMenu::getMenuId, SysMenu::getMenuId)
+                    .leftJoin(SysUserRole.class)
+                    .on(SysRoleMenu::getRoleId, SysUserRole::getRoleId)
+                    .leftJoin(SysRole.class)
+                    .on(SysUserRole::getRoleId, SysRole::getRoleId)
+                    .leftJoin(SysUser.class)
+                    .on(SysUserRole::getUserId, SysUser::getUserId)
+                    .eq(SysUser::getUserId, userId)
+                    .eq(SysRole::getStatus, "0");
         }
+        List<SysMenu> menus = qc.in(SysMenu::getMenuType, Arrays.asList("M", "C"))
+                .eq(SysMenu::getStatus, "0")
+                .orderBy(SysMenu::getParentId, true)
+                .orderBy(SysMenu::getOrderNum, true)
+                .list();
         return getChildPerms(menus, 0);
     }
 
@@ -138,7 +178,23 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public List<Long> selectMenuListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectRoleById(roleId);
-        return menuMapper.selectMenuListByRoleId(roleId, role.isMenuCheckStrictly());
+        QueryChain<SysMenu> queryChain = this.queryChain()
+                .from(SYS_MENU)
+                .select(SYS_MENU.MENU_ID)
+                .leftJoin(SYS_ROLE_MENU)
+                .on(SYS_MENU.MENU_ID.eq(SYS_ROLE_MENU.MENU_ID))
+                .where(SYS_ROLE_MENU.ROLE_ID.eq(roleId));
+        if (role.isMenuCheckStrictly()) {
+            queryChain.and(SYS_MENU.MENU_ID.notIn(
+                    QueryWrapper.create()
+                            .from(SYS_MENU)
+                            .select(SYS_MENU.PARENT_ID)
+                            .innerJoin(SYS_ROLE_MENU)
+                            .on(SYS_MENU.MENU_ID.eq(SYS_ROLE_MENU.MENU_ID)
+                                    .and(SYS_ROLE_MENU.ROLE_ID.eq(roleId)))));
+        }
+        queryChain.orderBy(SYS_MENU.PARENT_ID.asc(), SYS_MENU.ORDER_NUM.asc());
+        return queryChain.listAs(Long.class);
     }
 
     /**
@@ -231,17 +287,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 根据菜单ID查询信息
-     * 
-     * @param menuId 菜单ID
-     * @return 菜单信息
-     */
-    @Override
-    public SysMenu selectMenuById(Long menuId) {
-        return menuMapper.selectMenuById(menuId);
-    }
-
-    /**
      * 是否存在菜单子节点
      * 
      * @param menuId 菜单ID
@@ -249,8 +294,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public boolean hasChildByMenuId(Long menuId) {
-        int result = menuMapper.hasChildByMenuId(menuId);
-        return result > 0;
+        return this.queryChain()
+                .eq(SysMenu::getParentId, menuId)
+                .exists();
     }
 
     /**
@@ -261,41 +307,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public boolean checkMenuExistRole(Long menuId) {
-        int result = roleMenuMapper.checkMenuExistRole(menuId);
-        return result > 0;
-    }
-
-    /**
-     * 新增保存菜单信息
-     * 
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    @Override
-    public int insertMenu(SysMenu menu) {
-        return menuMapper.insertMenu(menu);
-    }
-
-    /**
-     * 修改保存菜单信息
-     * 
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    @Override
-    public int updateMenu(SysMenu menu) {
-        return menuMapper.updateMenu(menu);
-    }
-
-    /**
-     * 删除菜单管理信息
-     * 
-     * @param menuId 菜单ID
-     * @return 结果
-     */
-    @Override
-    public int deleteMenuById(Long menuId) {
-        return menuMapper.deleteMenuById(menuId);
+        return QueryChain.of(SysRoleMenu.class)
+                .eq(SysRoleMenu::getMenuId, menuId)
+                .exists();
     }
 
     /**
@@ -306,12 +320,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public boolean checkMenuNameUnique(SysMenu menu) {
-        Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
-        SysMenu info = menuMapper.checkMenuNameUnique(menu.getMenuName(), menu.getParentId());
-        if (StringUtils.isNotNull(info) && info.getMenuId().longValue() != menuId.longValue()) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !this.queryChain()
+                .eq(SysMenu::getMenuName, menu.getMenuName())
+                .eq(SysMenu::getParentId, menu.getParentId())
+                .ne(SysMenu::getMenuId, menu.getMenuId())
+                .exists();
     }
 
     /**

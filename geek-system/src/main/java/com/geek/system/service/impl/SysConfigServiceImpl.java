@@ -14,10 +14,12 @@ import com.geek.common.utils.StringUtils;
 import com.geek.system.domain.SysConfig;
 import com.geek.system.mapper.SysConfigMapper;
 import com.geek.system.service.ISysConfigService;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 参数配置 服务层实现
@@ -68,14 +70,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
         return Convert.toBool(captchaEnabled, true);
     }
 
-    /**
-     * 查询参数配置列表
-     * 
-     * @param config 参数配置信息
-     * @return 参数配置集合
-     */
-    @Override
-    public QueryChain<SysConfig> selectConfigList(SysConfig config) {
+    private QueryChain<SysConfig> selectConfigList(SysConfig config) {
         return this.queryChain()
                 .like(SysConfig::getConfigKey, config.getConfigKey())
                 .eq(SysConfig::getConfigType, config.getConfigType())
@@ -83,6 +78,18 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
                 .between(SysConfig::getCreateTime,
                         config.getParams().get("beginTime"),
                         config.getParams().get("endTime"));
+    }
+
+    @Override
+    public Page<SysConfig> page(SysConfig config, int pageNum, int pageSize) {
+        return this.selectConfigList(config).page(Page.of(pageNum, pageSize));
+    }
+
+    @Override
+    public void export(SysConfig config, HttpServletResponse response) {
+        List<SysConfig> list = this.selectConfigList(config).list();
+        com.geek.common.utils.poi.ExcelUtil<SysConfig> util = new com.geek.common.utils.poi.ExcelUtil<SysConfig>(SysConfig.class);
+        util.exportExcel(response, list, "参数数据");
     }
 
     /**

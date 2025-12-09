@@ -57,7 +57,7 @@ public class SysMenuController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:menu:query')")
     @GetMapping(value = "/{menuId}")
     public AjaxResult getInfo(@PathVariable(name = "menuId") Long menuId) {
-        return success(menuService.selectMenuById(menuId));
+        return success(menuService.getById(menuId));
     }
 
     /**
@@ -97,7 +97,7 @@ public class SysMenuController extends BaseController {
             return error("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
         }
         menu.setCreateBy(getUsername());
-        return toAjax(menuService.insertMenu(menu));
+        return toAjax(menuService.save(menu));
     }
 
     /**
@@ -116,7 +116,7 @@ public class SysMenuController extends BaseController {
             return error("修改菜单'" + menu.getMenuName() + "'失败，上级菜单不能选择自己");
         }
         menu.setUpdateBy(getUsername());
-        return toAjax(menuService.updateMenu(menu));
+        return toAjax(menuService.updateById(menu));
     }
 
     /**
@@ -133,6 +133,6 @@ public class SysMenuController extends BaseController {
         if (menuService.checkMenuExistRole(menuId)) {
             return warn("菜单已分配,不允许删除");
         }
-        return toAjax(menuService.deleteMenuById(menuId));
+        return toAjax(menuService.removeById(menuId));
     }
 }

@@ -85,7 +85,7 @@ public class FileController extends BaseController {
                     StorageBucketKey.clear();
                 }
             }
-            sysFileInfoService.insertSysFileInfo(sysFileInfo);
+            sysFileInfoService.save(sysFileInfo);
             ajax.put("info", sysFileInfo);
             ajax.put("fileName", sysFileInfo.getFileName());
             return ajax;
@@ -252,7 +252,7 @@ public class FileController extends BaseController {
             fileInfo.setUpdateBy(userName);
             fileInfo.setUpdateTime(new Date());
             fileInfo.setDelFlag("0");
-            sysFileInfoService.insertSysFileInfo(fileInfo);
+            sysFileInfoService.save(fileInfo);
             return AjaxResult.success(fileInfo);
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());

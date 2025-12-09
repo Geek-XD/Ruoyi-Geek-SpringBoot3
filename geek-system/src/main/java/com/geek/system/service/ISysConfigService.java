@@ -1,8 +1,10 @@
 package com.geek.system.service;
 
 import com.geek.system.domain.SysConfig;
-import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 参数配置 服务层
@@ -25,14 +27,6 @@ public interface ISysConfigService extends IService<SysConfig> {
      * @return true开启，false关闭
      */
     public boolean selectCaptchaEnabled();
-
-    /**
-     * 查询参数配置列表
-     * 
-     * @param config 参数配置信息
-     * @return 参数配置集合
-     */
-    public QueryChain<SysConfig> selectConfigList(SysConfig config);
 
     /**
      * 新增参数配置
@@ -79,4 +73,8 @@ public interface ISysConfigService extends IService<SysConfig> {
      * @return 结果
      */
     public boolean checkConfigKeyUnique(SysConfig config);
+
+    Page<SysConfig> page(SysConfig config, int pageNum, int pageSize);
+
+    void export(SysConfig config, HttpServletResponse response);
 }

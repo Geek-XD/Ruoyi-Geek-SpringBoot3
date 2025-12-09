@@ -20,11 +20,9 @@ import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
 import com.geek.common.core.page.TableSupport;
 import com.geek.common.enums.BusinessType;
-import com.geek.common.utils.poi.ExcelUtil;
 import com.geek.system.domain.SysConfig;
 import com.geek.system.service.ISysConfigService;
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryChain;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,8 +49,7 @@ public class SysConfigController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<SysConfig> list(SysConfig config) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
-        QueryChain<SysConfig> queryChain = configService.selectConfigList(config);
-        Page<SysConfig> list = queryChain.page(Page.of(pageDomain.getPageNum(), pageDomain.getPageSize()));
+        Page<SysConfig> list = configService.page(config, pageDomain.getPageNum(), pageDomain.getPageSize());
         return getDataTable(list);
     }
 
@@ -61,9 +58,7 @@ public class SysConfigController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:config:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysConfig config) {
-        QueryChain<SysConfig> queryChain = configService.selectConfigList(config);
-        ExcelUtil<SysConfig> util = new ExcelUtil<SysConfig>(SysConfig.class);
-        util.exportExcel(response, queryChain.list(), "参数数据");
+        configService.export(config, response);
     }
 
     /**

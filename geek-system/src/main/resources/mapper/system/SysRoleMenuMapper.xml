@@ -8,10 +8,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="roleId"     column="role_id"      />
 		<result property="menuId"     column="menu_id"      />
 	</resultMap>
-	
-	<select id="checkMenuExistRole" resultType="Integer">
-	    select count(1) from sys_role_menu where menu_id = #{menuId}
-	</select>
 
 	<delete id="deleteRoleMenuByRoleId" parameterType="Long">
 		delete from sys_role_menu where role_id=#{roleId}

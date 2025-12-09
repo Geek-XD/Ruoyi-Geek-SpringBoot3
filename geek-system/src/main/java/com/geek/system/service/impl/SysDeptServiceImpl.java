@@ -264,7 +264,10 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     private void updateParentDeptStatusNormal(SysDept dept) {
         String ancestors = dept.getAncestors();
         Long[] deptIds = Convert.toLongArray(ancestors);
-        deptMapper.updateDeptStatusNormal(deptIds);
+        this.updateChain()
+                .set(SysDept::getStatus, UserConstants.DEPT_NORMAL)
+                .in(SysDept::getDeptId, (Object[]) deptIds)
+                .update();
     }
 
     /**
@@ -280,7 +283,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }
         if (children.size() > 0) {
-            deptMapper.updateDeptChildren(children);
+            this.updateBatch(children);
         }
     }
 

@@ -2,8 +2,6 @@ package com.geek.system.mapper;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.geek.common.core.domain.entity.SysDept;
 import com.mybatisflex.core.BaseMapper;
 
@@ -29,19 +27,4 @@ public interface SysDeptMapper extends BaseMapper<SysDept> {
      * @return 子部门数
      */
     public int selectNormalChildrenDeptById(Long deptId);
-
-    /**
-     * 修改所在部门正常状态
-     * 
-     * @param deptIds 部门ID组
-     */
-    public void updateDeptStatusNormal(Long[] deptIds);
-
-    /**
-     * 修改子元素关系
-     * 
-     * @param depts 子元素
-     * @return 结果
-     */
-    public int updateDeptChildren(@Param("depts") List<SysDept> depts);
 }

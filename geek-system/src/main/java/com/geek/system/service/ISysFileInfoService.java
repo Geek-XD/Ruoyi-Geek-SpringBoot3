@@ -1,13 +1,15 @@
 package com.geek.system.service;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import com.geek.common.utils.sign.Md5Utils;
 import com.geek.system.domain.SysFileInfo;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 文件Service接口
@@ -16,29 +18,6 @@ import com.mybatisflex.core.service.IService;
  * @date 2025-04-25
  */
 public interface ISysFileInfoService extends IService<SysFileInfo> {
-    /**
-     * 查询文件
-     * 
-     * @param fileId 文件主键
-     * @return 文件
-     */
-    public SysFileInfo selectSysFileInfoByFileId(Long fileId);
-
-    /**
-     * 查询文件列表
-     * 
-     * @param sysFileInfo 文件
-     * @return 文件集合
-     */
-    public List<SysFileInfo> selectSysFileInfoList(SysFileInfo sysFileInfo);
-
-    /**
-     * 新增文件
-     * 
-     * @param sysFileInfo 文件
-     * @return 结果
-     */
-    public int insertSysFileInfo(SysFileInfo sysFileInfo);
 
     /**
      * 新增文件
@@ -63,27 +42,7 @@ public interface ISysFileInfoService extends IService<SysFileInfo> {
         return fileInfo;
     }
 
-    /**
-     * 修改文件
-     * 
-     * @param sysFileInfo 文件
-     * @return 结果
-     */
-    public int updateSysFileInfo(SysFileInfo sysFileInfo);
+    Page<SysFileInfo> page(SysFileInfo sysFileInfo, int pageNum, int pageSize);
 
-    /**
-     * 批量删除文件
-     * 
-     * @param fileIds 需要删除的文件主键集合
-     * @return 结果
-     */
-    public int deleteSysFileInfoByFileIds(Long[] fileIds);
-
-    /**
-     * 删除文件信息
-     * 
-     * @param fileId 文件主键
-     * @return 结果
-     */
-    public int deleteSysFileInfoByFileId(Long fileId);
+    void export(SysFileInfo sysFileInfo, HttpServletResponse response);
 }

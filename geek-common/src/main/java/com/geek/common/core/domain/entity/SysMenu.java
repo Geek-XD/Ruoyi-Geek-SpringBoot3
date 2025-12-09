@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.geek.common.core.domain.BaseEntity;
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 
@@ -39,6 +40,7 @@ public class SysMenu extends BaseEntity {
 
     /** 父菜单名称 */
     @Schema(title = "父菜单名称")
+    @Column(ignore = true)
     private String parentName;
 
     /** 父菜单ID */

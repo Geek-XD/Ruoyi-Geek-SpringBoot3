@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.geek.common.annotation.Log;
 import com.geek.common.core.controller.BaseController;
 import com.geek.common.core.domain.AjaxResult;
+import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
+import com.geek.common.core.page.TableSupport;
 import com.geek.common.enums.BusinessType;
-import com.geek.common.utils.poi.ExcelUtil;
 import com.geek.system.domain.SysFileInfo;
 import com.geek.system.service.ISysFileInfoService;
+import com.mybatisflex.core.paginate.Page;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,8 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/file/info")
 @Tag(name = "【文件】管理")
-public class SysFileInfoController extends BaseController
-{
+public class SysFileInfoController extends BaseController {
     @Autowired
     private ISysFileInfoService sysFileInfoService;
 
@@ -46,10 +47,10 @@ public class SysFileInfoController extends BaseController
     @Operation(summary = "查询文件列表")
     @PreAuthorize("@ss.hasPermi('system:file:list')")
     @GetMapping("/list")
-    public TableDataInfo<SysFileInfo> list(SysFileInfo sysFileInfo)
-    {
-        startPage();
-        List<SysFileInfo> list = sysFileInfoService.selectSysFileInfoList(sysFileInfo);
+    public TableDataInfo<SysFileInfo> list(SysFileInfo sysFileInfo) {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Page<SysFileInfo> list = sysFileInfoService.page(sysFileInfo, pageDomain.getPageNum(),
+                pageDomain.getPageSize());
         return getDataTable(list);
     }
 
@@ -60,11 +61,8 @@ public class SysFileInfoController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:file:export')")
     @Log(title = "文件", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysFileInfo sysFileInfo)
-    {
-        List<SysFileInfo> list = sysFileInfoService.selectSysFileInfoList(sysFileInfo);
-        ExcelUtil<SysFileInfo> util = new ExcelUtil<SysFileInfo>(SysFileInfo.class);
-        util.exportExcel(response, list, "文件数据");
+    public void export(HttpServletResponse response, SysFileInfo sysFileInfo) {
+        sysFileInfoService.export(sysFileInfo, response);
     }
 
     /**
@@ -73,9 +71,8 @@ public class SysFileInfoController extends BaseController
     @Operation(summary = "获取文件详细信息")
     @PreAuthorize("@ss.hasPermi('system:file:query')")
     @GetMapping(value = "/{fileId}")
-    public AjaxResult getInfo(@PathVariable("fileId") Long fileId)
-    {
-        return success(sysFileInfoService.selectSysFileInfoByFileId(fileId));
+    public AjaxResult getInfo(@PathVariable("fileId") Long fileId) {
+        return success(sysFileInfoService.getById(fileId));
     }
 
     /**
@@ -85,9 +82,8 @@ public class SysFileInfoController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:file:add')")
     @Log(title = "文件", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody SysFileInfo sysFileInfo)
-    {
-        return toAjax(sysFileInfoService.insertSysFileInfo(sysFileInfo));
+    public AjaxResult add(@RequestBody SysFileInfo sysFileInfo) {
+        return toAjax(sysFileInfoService.save(sysFileInfo));
     }
 
     /**
@@ -97,9 +93,8 @@ public class SysFileInfoController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:file:edit')")
     @Log(title = "文件", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody SysFileInfo sysFileInfo)
-    {
-        return toAjax(sysFileInfoService.updateSysFileInfo(sysFileInfo));
+    public AjaxResult edit(@RequestBody SysFileInfo sysFileInfo) {
+        return toAjax(sysFileInfoService.updateById(sysFileInfo));
     }
 
     /**
@@ -109,8 +104,7 @@ public class SysFileInfoController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:file:remove')")
     @Log(title = "文件", businessType = BusinessType.DELETE)
     @DeleteMapping("/{fileIds}")
-    public AjaxResult remove(@PathVariable( name = "fileIds" ) Long[] fileIds) 
-    {
-        return toAjax(sysFileInfoService.deleteSysFileInfoByFileIds(fileIds));
+    public AjaxResult remove(@PathVariable(name = "fileIds") List<Long> fileIds) {
+        return toAjax(sysFileInfoService.removeByIds(fileIds));
     }
 }
