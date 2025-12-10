@@ -2,6 +2,7 @@ package com.geek.framework.processor.aspectj;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -142,7 +143,9 @@ public class DataScopeAspect {
                 sqlString.append(StringUtils.format(" OR {}.dept_id = {} ", deptAlias, user.getDeptId()));
             } else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope)) {
                 FlexDataSource flexDataSource = FlexGlobalConfig.getDefaultConfig().getDataSource();
-                DbType dbType = flexDataSource.getDbType(DataSourceKey.get());
+                DbType dbType = Objects.requireNonNullElse(
+                        flexDataSource.getDbType(DataSourceKey.get()),
+                        flexDataSource.getDefaultDbType());
                 if (DbType.POSTGRE_SQL.equals(dbType)) {
                     sqlString.append(StringUtils.format(
                             " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or array_position(string_to_array(ancestors , ','), CAST( {}  AS TEXT)) IS NOT NULL )",

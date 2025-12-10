@@ -10,4 +10,5 @@ import com.mybatisflex.core.BaseMapper;
  * @date 2025-04-25
  */
 public interface SysFileInfoMapper extends BaseMapper<SysFileInfo> {
+
 }

@@ -2,13 +2,17 @@ package com.geek.system.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.geek.common.utils.poi.ExcelUtil;
 import com.geek.system.domain.SysNotice;
 import com.geek.system.mapper.SysNoticeMapper;
 import com.geek.system.service.ISysNoticeService;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 公告 服务层实现
@@ -17,19 +21,6 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
  */
 @Service
 public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice> implements ISysNoticeService {
-    @Autowired
-    private SysNoticeMapper noticeMapper;
-
-    /**
-     * 查询公告信息
-     * 
-     * @param noticeId 公告ID
-     * @return 公告信息
-     */
-    @Override
-    public SysNotice selectNoticeById(Long noticeId) {
-        return noticeMapper.selectNoticeById(noticeId);
-    }
 
     /**
      * 查询公告列表
@@ -37,52 +28,20 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
      * @param notice 公告信息
      * @return 公告集合
      */
-    @Override
-    public List<SysNotice> selectNoticeList(SysNotice notice) {
-        return noticeMapper.selectNoticeList(notice);
+    private QueryChain<SysNotice> selectNoticeList(SysNotice notice) {
+        return this.queryChain()
+                .like(SysNotice::getNoticeTitle, notice.getNoticeTitle())
+                .eq(SysNotice::getNoticeType, notice.getNoticeType())
+                .eq(SysNotice::getStatus, notice.getStatus());
     }
 
-    /**
-     * 新增公告
-     * 
-     * @param notice 公告信息
-     * @return 结果
-     */
-    @Override
-    public int insertNotice(SysNotice notice) {
-        return noticeMapper.insertNotice(notice);
+    public Page<SysNotice> page(SysNotice notice, Integer pageNum, Integer pageSize) {
+        return this.selectNoticeList(notice).page(Page.of(pageNum, pageSize));
     }
 
-    /**
-     * 修改公告
-     * 
-     * @param notice 公告信息
-     * @return 结果
-     */
-    @Override
-    public int updateNotice(SysNotice notice) {
-        return noticeMapper.updateNotice(notice);
-    }
-
-    /**
-     * 删除公告对象
-     * 
-     * @param noticeId 公告ID
-     * @return 结果
-     */
-    @Override
-    public int deleteNoticeById(Long noticeId) {
-        return noticeMapper.deleteNoticeById(noticeId);
-    }
-
-    /**
-     * 批量删除公告信息
-     * 
-     * @param noticeIds 需要删除的公告ID
-     * @return 结果
-     */
-    @Override
-    public int deleteNoticeByIds(Long[] noticeIds) {
-        return noticeMapper.deleteNoticeByIds(noticeIds);
+    public void export(SysNotice notice, HttpServletResponse response) {
+        List<SysNotice> list = this.selectNoticeList(notice).list();
+        ExcelUtil<SysNotice> util = new ExcelUtil<>(SysNotice.class);
+        util.exportExcel(response, list, "公告数据");
     }
 }

@@ -17,11 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.geek.common.annotation.Log;
 import com.geek.common.core.controller.BaseController;
 import com.geek.common.core.domain.AjaxResult;
+import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
+import com.geek.common.core.page.TableSupport;
 import com.geek.common.enums.BusinessType;
 import com.geek.common.utils.SecurityUtils;
 import com.geek.system.domain.SysNotice;
 import com.geek.system.service.ISysNoticeService;
+import com.mybatisflex.core.paginate.Page;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,12 +48,13 @@ public class SysNoticeController extends BaseController {
     @Operation(summary = "获取通知公告列表")
     @GetMapping("/list")
     public TableDataInfo<SysNotice> list(SysNotice notice) {
-        startPage();
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+
         if (!SecurityUtils.hasPermi("system:notice:list")) {
             notice.setStatus("0");
         }
-        List<SysNotice> list = noticeService.selectNoticeList(notice);
-        return getDataTable(list);
+        Page<SysNotice> page = noticeService.page(notice, pageDomain.getPageNum(), pageDomain.getPageSize());
+        return getDataTable(page);
     }
 
     /**
@@ -60,7 +64,7 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:query')")
     @GetMapping(value = "/{noticeId}")
     public AjaxResult getInfo(@PathVariable(name = "noticeId") Long noticeId) {
-        return success(noticeService.selectNoticeById(noticeId));
+        return success(noticeService.getById(noticeId));
     }
 
     /**
@@ -72,7 +76,7 @@ public class SysNoticeController extends BaseController {
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysNotice notice) {
         notice.setCreateBy(getUsername());
-        return toAjax(noticeService.insertNotice(notice));
+        return toAjax(noticeService.save(notice));
     }
 
     /**
@@ -84,7 +88,7 @@ public class SysNoticeController extends BaseController {
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysNotice notice) {
         notice.setUpdateBy(getUsername());
-        return toAjax(noticeService.updateNotice(notice));
+        return toAjax(noticeService.updateById(notice));
     }
 
     /**
@@ -94,7 +98,7 @@ public class SysNoticeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public AjaxResult remove(@PathVariable(name = "noticeIds") Long[] noticeIds) {
-        return toAjax(noticeService.deleteNoticeByIds(noticeIds));
+    public AjaxResult remove(@PathVariable(name = "noticeIds") List<Long> noticeIds) {
+        return toAjax(noticeService.removeByIds(noticeIds));
     }
 }

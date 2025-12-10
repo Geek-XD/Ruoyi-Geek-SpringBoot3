@@ -68,8 +68,8 @@ public class SysOperlogController extends BaseController {
     @Log(title = "操作日志", businessType = BusinessType.DELETE)
     @PreAuthorize("@ss.hasPermi('monitor:operlog:remove')")
     @DeleteMapping("/{operIds}")
-    public AjaxResult remove(@PathVariable(name = "operIds") Long[] operIds) {
-        return toAjax(operLogService.deleteOperLogByIds(operIds));
+    public AjaxResult remove(@PathVariable(name = "operIds") List<Long> operIds) {
+        return toAjax(operLogService.removeByIds(operIds));
     }
 
     @Operation(summary = "清除操作日志记录")

@@ -9,4 +9,5 @@ import com.mybatisflex.core.BaseMapper;
  * @author geek
  */
 public interface SysMenuMapper extends BaseMapper<SysMenu> {
+    
 }

@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.geek.common.annotation.Log;
 import com.geek.common.core.controller.BaseController;
 import com.geek.common.core.domain.AjaxResult;
+import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
+import com.geek.common.core.page.TableSupport;
 import com.geek.common.enums.BusinessType;
-import com.geek.common.utils.poi.ExcelUtil;
 import com.geek.framework.web.service.SysPasswordService;
 import com.geek.system.domain.SysLogininfor;
 import com.geek.system.service.ISysLogininforService;
+import com.mybatisflex.core.paginate.Page;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,8 +49,9 @@ public class SysLogininforController extends BaseController {
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:list')")
     @GetMapping("/list")
     public TableDataInfo<SysLogininfor> list(SysLogininfor logininfor) {
-        startPage();
-        List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Page<SysLogininfor> list = logininforService.page(logininfor, pageDomain.getPageNum(),
+                pageDomain.getPageSize());
         return getDataTable(list);
     }
 
@@ -57,9 +60,7 @@ public class SysLogininforController extends BaseController {
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysLogininfor logininfor) {
-        List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
-        ExcelUtil<SysLogininfor> util = new ExcelUtil<SysLogininfor>(SysLogininfor.class);
-        util.exportExcel(response, list, "登录日志");
+        logininforService.export(logininfor, response);
     }
 
     @Operation(summary = "删除系统访问记录")
@@ -69,8 +70,8 @@ public class SysLogininforController extends BaseController {
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
     @Log(title = "登录日志", businessType = BusinessType.DELETE)
     @DeleteMapping("/{infoIds}")
-    public AjaxResult remove(@PathVariable(name = "infoIds") Long[] infoIds) {
-        return toAjax(logininforService.deleteLogininforByIds(infoIds));
+    public AjaxResult remove(@PathVariable(name = "infoIds") List<Long> infoIds) {
+        return toAjax(logininforService.removeByIds(infoIds));
     }
 
     @Operation(summary = "清除系统访问记录")

@@ -1,9 +1,14 @@
 package com.geek.common.utils.sql;
 
 import java.io.StringReader;
+import java.util.Objects;
 
 import com.geek.common.exception.UtilException;
 import com.geek.common.utils.StringUtils;
+import com.mybatisflex.core.FlexGlobalConfig;
+import com.mybatisflex.core.datasource.DataSourceKey;
+import com.mybatisflex.core.datasource.FlexDataSource;
+import com.mybatisflex.core.dialect.DbType;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
@@ -62,5 +67,22 @@ public class SqlUtil {
 
     public static Statement parseSql(String sql) throws JSQLParserException {
         return parserManager.parse(new StringReader(sql));
+    }
+
+    public static String findInSet(String str, String columns) {
+        FlexDataSource flexDataSource = FlexGlobalConfig.getDefaultConfig().getDataSource();
+        DbType dbType = Objects.requireNonNullElse(
+                flexDataSource.getDbType(DataSourceKey.get()),
+                flexDataSource.getDefaultDbType());
+        if (dbType == DbType.OPENGAUSS) {
+            return String.format("array_position(string_to_array(%s, ','), CAST(%s AS TEXT)) IS NOT NULL", columns,
+                    str);
+        } else if (dbType.postgresqlSameType()) {
+            return String.format("CAST(%s AS TEXT) = ANY (string_to_array(%s, ','))", str, columns);
+        } else if (dbType.oracleSameType()) {
+            return "FIND_IN_SET(" + str + "," + columns + ")";
+        } else {
+            return "FIND_IN_SET(" + str + "," + columns + ")";
+        }
     }
 }

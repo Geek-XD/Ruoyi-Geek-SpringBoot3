@@ -15,7 +15,7 @@ public class BaseEntityListener implements InsertListener, UpdateListener {
         }
         BaseEntity entity = (BaseEntity) arg0;
         entity.setUpdateTime(DateUtils.getNowDate());
-        if (!SecurityUtils.isAnonymous()) {
+        if (SecurityUtils.isAnonymous()) {
             entity.setUpdateBy(null);
         } else {
             entity.setUpdateBy(SecurityUtils.getUsername());

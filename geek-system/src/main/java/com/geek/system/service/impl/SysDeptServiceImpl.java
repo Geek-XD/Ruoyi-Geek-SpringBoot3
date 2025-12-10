@@ -23,10 +23,12 @@ import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.SecurityUtils;
 import com.geek.common.utils.StringUtils;
 import com.geek.common.utils.spring.SpringUtils;
+import com.geek.common.utils.sql.SqlUtil;
 import com.geek.system.domain.table.SysRoleDeptTableDef;
 import com.geek.system.mapper.SysDeptMapper;
 import com.geek.system.mapper.SysRoleMapper;
 import com.geek.system.service.ISysDeptService;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 
@@ -37,8 +39,6 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
  */
 @Service
 public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> implements ISysDeptService {
-    @Autowired
-    private SysDeptMapper deptMapper;
 
     @Autowired
     private SysRoleMapper roleMapper;
@@ -153,8 +153,11 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      * @return 子部门数
      */
     @Override
-    public int selectNormalChildrenDeptById(Long deptId) {
-        return deptMapper.selectNormalChildrenDeptById(deptId);
+    public long selectNormalChildrenDeptById(Long deptId) {
+        return this.queryChain()
+                .eq(SysDept::getStatus, UserConstants.DEPT_NORMAL)
+                .and(SqlUtil.findInSet(deptId.toString(), SYS_DEPT.ANCESTORS.getName()))
+                .count();
     }
 
     /**
@@ -278,13 +281,18 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      * @param oldAncestors 旧的父ID集合
      */
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
-        List<SysDept> children = deptMapper.selectChildrenDeptById(deptId);
-        for (SysDept child : children) {
-            child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
-        }
-        if (children.size() > 0) {
-            this.updateBatch(children);
-        }
+        LogicDeleteManager.execWithoutLogicDelete(() -> {
+            List<SysDept> children = this.queryChain()
+                    .where(SqlUtil.findInSet(deptId.toString(), SYS_DEPT.ANCESTORS.getName()))
+                    .list();
+
+            for (SysDept child : children) {
+                child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
+            }
+            if (children.size() > 0) {
+                this.updateBatch(children);
+            }
+        });
     }
 
     /**

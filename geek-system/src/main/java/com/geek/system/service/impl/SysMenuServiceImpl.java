@@ -42,7 +42,6 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
  */
 @Service
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements ISysMenuService {
-    public static final String PREMISSION_STRING = "perms[\"{0}\"]";
 
     @Autowired
     private SysRoleMapper roleMapper;

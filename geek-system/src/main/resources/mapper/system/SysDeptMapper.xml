@@ -22,44 +22,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="updateTime" column="update_time" />
 	</resultMap>
 
-	<sql id="selectDeptVo">
-        select d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.phone, d.email, d.status, d.del_flag, d.create_by, d.create_time 
-        from sys_dept d
-	</sql>
-
-	<select id="selectChildrenDeptById" parameterType="Long" resultMap="SysDeptResult">
-		select * from sys_dept where 
-		<choose>
-			<!-- PostgreSQL：使用 array_position 判断数组包含 -->
-			<when test="_databaseId == 'postgresql'">
-				array_position(string_to_array(ancestors, ','), CAST(#{deptId} AS TEXT)) IS NOT NULL
-			</when>
-			<!-- openGauss：使用 ANY 替代 array_position（兼容文本数组） -->
-			<when test="_databaseId == 'openGauss'">
-				CAST(#{deptId} AS TEXT) = ANY(string_to_array(ancestors, ','))
-			</when>
-			<!-- 其他数据库（如 MySQL）：使用 find_in_set 判断字符串包含 -->
-			<otherwise>
-				find_in_set(#{deptId}, ancestors)
-			</otherwise>
-		</choose>
-	</select>
-
-	<select id="selectNormalChildrenDeptById" parameterType="Long" resultType="int">
-		select count(*) from sys_dept where status = 0 and del_flag = '0' and
-		<choose>
-			<!-- PostgreSQL：保留 array_position 逻辑 -->
-			<when test="_databaseId == 'postgresql'">
-				array_position(string_to_array(ancestors, ','), CAST(#{deptId} AS TEXT)) IS NOT NULL
-			</when>
-			<!-- openGauss：用 ANY 实现等效逻辑 -->
-			<when test="_databaseId == 'openGauss'">
-				CAST(#{deptId} AS TEXT) = ANY(string_to_array(ancestors, ','))
-			</when>
-			<!-- 其他数据库（如 MySQL）：用 find_in_set 匹配 -->
-			<otherwise>
-				find_in_set(#{deptId}, ancestors)
-			</otherwise>
-		</choose>
-	</select>
 </mapper> 

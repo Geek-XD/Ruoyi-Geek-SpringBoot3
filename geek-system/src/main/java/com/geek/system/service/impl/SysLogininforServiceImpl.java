@@ -2,13 +2,18 @@ package com.geek.system.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.geek.common.utils.DateUtils;
+import com.geek.common.utils.poi.ExcelUtil;
 import com.geek.system.domain.SysLogininfor;
 import com.geek.system.mapper.SysLogininforMapper;
 import com.geek.system.service.ISysLogininforService;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 系统访问日志情况信息 服务层处理
@@ -18,18 +23,15 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 @Service
 public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, SysLogininfor>
         implements ISysLogininforService {
-
-    @Autowired
-    private SysLogininforMapper logininforMapper;
-
     /**
      * 新增系统登录日志
      * 
      * @param logininfor 访问日志对象
      */
     @Override
-    public void insertLogininfor(SysLogininfor logininfor) {
-        logininforMapper.insertLogininfor(logininfor);
+    public boolean save(SysLogininfor logininfor) {
+        logininfor.setLoginTime(DateUtils.getNowDate());
+        return super.save(logininfor);
     }
 
     /**
@@ -38,20 +40,26 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
      * @param logininfor 访问日志对象
      * @return 登录记录集合
      */
-    @Override
-    public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor) {
-        return logininforMapper.selectLogininforList(logininfor);
+    public QueryChain<SysLogininfor> selectLogininforList(SysLogininfor logininfor) {
+        return this.queryChain()
+                .like(SysLogininfor::getIpaddr, logininfor.getIpaddr())
+                .eq(SysLogininfor::getStatus, logininfor.getStatus())
+                .like(SysLogininfor::getUserName, logininfor.getUserName())
+                .ge(SysLogininfor::getLoginTime, logininfor.getLoginTime())
+                .le(SysLogininfor::getLoginTime, logininfor.getLoginTime())
+                .orderBy(SysLogininfor::getInfoId, false);
     }
 
-    /**
-     * 批量删除系统登录日志
-     * 
-     * @param infoIds 需要删除的登录日志ID
-     * @return 结果
-     */
     @Override
-    public int deleteLogininforByIds(Long[] infoIds) {
-        return logininforMapper.deleteLogininforByIds(infoIds);
+    public Page<SysLogininfor> page(SysLogininfor logininfor, int pageNum, int pageSize) {
+        return this.selectLogininforList(logininfor).page(Page.of(pageNum, pageSize));
+    }
+
+    @Override
+    public void export(SysLogininfor logininfor, HttpServletResponse response) {
+        List<SysLogininfor> list = this.selectLogininforList(logininfor).list();
+        ExcelUtil<SysLogininfor> util = new ExcelUtil<SysLogininfor>(SysLogininfor.class);
+        util.exportExcel(response, list, "登录日志");
     }
 
     /**
@@ -59,6 +67,6 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
      */
     @Override
     public void cleanLogininfor() {
-        logininforMapper.cleanLogininfor();
+        mapper.cleanLogininfor();
     }
 }
