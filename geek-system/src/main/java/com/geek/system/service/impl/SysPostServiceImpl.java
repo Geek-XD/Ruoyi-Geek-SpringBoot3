@@ -1,18 +1,23 @@
 package com.geek.system.service.impl;
 
+import static com.geek.system.domain.table.SysPostTableDef.*;
+
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.geek.common.constant.UserConstants;
+import com.geek.common.core.domain.entity.SysUser;
 import com.geek.common.exception.ServiceException;
-import com.geek.common.utils.StringUtils;
+import com.geek.common.utils.poi.ExcelUtil;
 import com.geek.system.domain.SysPost;
+import com.geek.system.domain.SysUserPost;
 import com.geek.system.mapper.SysPostMapper;
-import com.geek.system.mapper.SysUserPostMapper;
 import com.geek.system.service.ISysPostService;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 岗位信息 服务层处理
@@ -21,42 +26,29 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
  */
 @Service
 public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> implements ISysPostService {
-    @Autowired
-    private SysPostMapper postMapper;
-
-    @Autowired
-    private SysUserPostMapper userPostMapper;
-
     /**
      * 查询岗位信息集合
      * 
      * @param post 岗位信息
      * @return 岗位信息集合
      */
-    @Override
-    public List<SysPost> selectPostList(SysPost post) {
-        return postMapper.selectPostList(post);
+    private QueryChain<SysPost> selectPostList(SysPost post) {
+        return this.queryChain()
+                .like(SysPost::getPostCode, post.getPostCode())
+                .eq(SysPost::getStatus, post.getStatus())
+                .like(SysPost::getPostName, post.getPostName());
     }
 
-    /**
-     * 查询所有岗位
-     * 
-     * @return 岗位列表
-     */
     @Override
-    public List<SysPost> selectPostAll() {
-        return postMapper.selectPostAll();
+    public Page<SysPost> page(SysPost post, Integer pageNum, Integer pageSize) {
+        return selectPostList(post).page(Page.of(pageNum, pageSize));
     }
 
-    /**
-     * 通过岗位ID查询岗位信息
-     * 
-     * @param postId 岗位ID
-     * @return 角色对象信息
-     */
     @Override
-    public SysPost selectPostById(Long postId) {
-        return postMapper.selectPostById(postId);
+    public void export(SysPost post, HttpServletResponse response) {
+        List<SysPost> list = selectPostList(post).list();
+        ExcelUtil<SysPost> util = new ExcelUtil<SysPost>(SysPost.class);
+        util.exportExcel(response, list, "岗位数据");
     }
 
     /**
@@ -67,7 +59,14 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
      */
     @Override
     public List<Long> selectPostListByUserId(Long userId) {
-        return postMapper.selectPostListByUserId(userId);
+        return this.queryChain()
+                .select(SYS_POST.POST_ID)
+                .leftJoin(SysUserPost.class)
+                .on(SysPost::getPostId, SysUserPost::getPostId)
+                .leftJoin(SysUser.class)
+                .on(SysUser::getUserId, SysUserPost::getUserId)
+                .eq(SysUser::getUserId, userId)
+                .listAs(Long.class);
     }
 
     /**
@@ -78,12 +77,10 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
      */
     @Override
     public boolean checkPostNameUnique(SysPost post) {
-        Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
-        SysPost info = postMapper.checkPostNameUnique(post.getPostName());
-        if (StringUtils.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !this.queryChain()
+                .eq(SysPost::getPostName, post.getPostName())
+                .ne(SysPost::getPostId, post.getPostId())
+                .exists();
     }
 
     /**
@@ -94,12 +91,10 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
      */
     @Override
     public boolean checkPostCodeUnique(SysPost post) {
-        Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
-        SysPost info = postMapper.checkPostCodeUnique(post.getPostCode());
-        if (StringUtils.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
-            return UserConstants.NOT_UNIQUE;
-        }
-        return UserConstants.UNIQUE;
+        return !this.queryChain()
+                .eq(SysPost::getPostCode, post.getPostCode())
+                .ne(SysPost::getPostId, post.getPostId())
+                .exists();
     }
 
     /**
@@ -109,19 +104,10 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
      * @return 结果
      */
     @Override
-    public int countUserPostById(Long postId) {
-        return userPostMapper.countUserPostById(postId);
-    }
-
-    /**
-     * 删除岗位信息
-     * 
-     * @param postId 岗位ID
-     * @return 结果
-     */
-    @Override
-    public int deletePostById(Long postId) {
-        return postMapper.deletePostById(postId);
+    public long countUserPostById(Long postId) {
+        return QueryChain.of(SysUserPost.class)
+                .eq(SysUserPost::getPostId, postId)
+                .count();
     }
 
     /**
@@ -131,35 +117,13 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
      * @return 结果
      */
     @Override
-    public int deletePostByIds(Long[] postIds) {
+    public boolean deletePostByIds(List<Long> postIds) {
         for (Long postId : postIds) {
-            SysPost post = selectPostById(postId);
+            SysPost post = getById(postId);
             if (countUserPostById(postId) > 0) {
                 throw new ServiceException("%1$s已分配,不能删除".formatted(post.getPostName()));
             }
         }
-        return postMapper.deletePostByIds(postIds);
-    }
-
-    /**
-     * 新增保存岗位信息
-     * 
-     * @param post 岗位信息
-     * @return 结果
-     */
-    @Override
-    public int insertPost(SysPost post) {
-        return postMapper.insertPost(post);
-    }
-
-    /**
-     * 修改保存岗位信息
-     * 
-     * @param post 岗位信息
-     * @return 结果
-     */
-    @Override
-    public int updatePost(SysPost post) {
-        return postMapper.updatePost(post);
+        return super.removeByIds(postIds);
     }
 }

@@ -3,6 +3,8 @@ package com.geek.system.mapper;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Update;
+
 import com.geek.system.domain.SysOperLog;
 import com.mybatisflex.core.BaseMapper;
 
@@ -24,6 +26,7 @@ public interface SysOperLogMapper extends BaseMapper<SysOperLog> {
     /**
      * 清空操作日志
      */
+    @Update("truncate table sys_oper_log")
     public void cleanOperLog();
 
     /**

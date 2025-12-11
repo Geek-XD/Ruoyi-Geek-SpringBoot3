@@ -165,10 +165,11 @@ public class Sb {
     }
 
     /**
-     * 获取文件的访问链接
+     * 初始化文件分片上传任务
      *
      * @param filePath 文件路径
-     * @return 访问链接
+     * @param fileSize 文件大小
+     * @return 任务ID
      * @throws Exception
      */
     public static String initMultipartUpload(String filePath, Long fileSize) {
@@ -181,10 +182,13 @@ public class Sb {
     }
 
     /**
-     * 获取文件的访问链接
+     * 上传文件分片
      *
      * @param filePath 文件路径
-     * @return 访问链接
+     * @param uploadId 上传任务ID
+     * @param partNumber 分片序号
+     * @param chunk    分片文件
+     * @return 分片的ETag
      * @throws Exception
      */
     public static String uploadPart(String filePath, String uploadId, int partNumber, MultipartFile chunk) {
@@ -204,10 +208,12 @@ public class Sb {
     }
 
     /**
-     * 获取文件的访问链接
+     * 合并文件分片
      *
      * @param filePath 文件路径
-     * @return 访问链接
+     * @param uploadId 上传任务ID
+     * @param partETags 分片信息
+     * @return 文件地址
      * @throws Exception
      */
     public static String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags) {

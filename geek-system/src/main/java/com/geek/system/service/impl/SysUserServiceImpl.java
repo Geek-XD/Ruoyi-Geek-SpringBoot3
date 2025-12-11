@@ -1,5 +1,7 @@
 package com.geek.system.service.impl;
 
+import static com.geek.system.domain.table.SysPostTableDef.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,13 +25,13 @@ import com.geek.common.utils.spring.SpringUtils;
 import com.geek.system.domain.SysPost;
 import com.geek.system.domain.SysUserPost;
 import com.geek.system.domain.SysUserRole;
-import com.geek.system.mapper.SysPostMapper;
 import com.geek.system.mapper.SysRoleMapper;
 import com.geek.system.mapper.SysUserMapper;
 import com.geek.system.mapper.SysUserPostMapper;
 import com.geek.system.mapper.SysUserRoleMapper;
 import com.geek.system.service.ISysConfigService;
 import com.geek.system.service.ISysUserService;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 
 import jakarta.validation.Validator;
@@ -48,9 +50,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Autowired
     private SysRoleMapper roleMapper;
-
-    @Autowired
-    private SysPostMapper postMapper;
 
     @Autowired
     private SysUserRoleMapper userRoleMapper;
@@ -167,7 +166,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public String selectUserPostGroup(String userName) {
-        List<SysPost> list = postMapper.selectPostsByUserName(userName);
+        List<SysPost> list = QueryChain.of(SysPost.class)
+                .select(SYS_POST.POST_ID,SYS_POST.POST_NAME,SYS_POST.POST_CODE)
+                .leftJoin(SysUserPost.class)
+                .on(SysUserPost::getPostId, SysPost::getPostId)
+                .leftJoin(SysUser.class)
+                .on(SysUser::getUserId, SysUserPost::getUserId)
+                .eq(SysUser::getUserName, userName)
+                .list();
         if (CollectionUtils.isEmpty(list)) {
             return StringUtils.EMPTY;
         }

@@ -28,14 +28,6 @@ public interface SysRoleDeptMapper extends BaseMapper<SysRoleDept> {
     public int deleteRoleDept(Long[] ids);
 
     /**
-     * 查询部门使用数量
-     * 
-     * @param deptId 部门ID
-     * @return 结果
-     */
-    public int selectCountRoleDeptByDeptId(Long deptId);
-
-    /**
      * 批量新增角色部门信息
      * 
      * @param roleDeptList 角色部门列表

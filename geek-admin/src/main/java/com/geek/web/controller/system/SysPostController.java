@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.geek.common.annotation.Log;
 import com.geek.common.core.controller.BaseController;
 import com.geek.common.core.domain.AjaxResult;
+import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
+import com.geek.common.core.page.TableSupport;
 import com.geek.common.enums.BusinessType;
-import com.geek.common.utils.poi.ExcelUtil;
 import com.geek.system.domain.SysPost;
 import com.geek.system.service.ISysPostService;
+import com.mybatisflex.core.paginate.Page;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,8 +49,8 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:list')")
     @GetMapping("/list")
     public TableDataInfo<SysPost> list(SysPost post) {
-        startPage();
-        List<SysPost> list = postService.selectPostList(post);
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Page<SysPost> list = postService.page(post, pageDomain.getPageNum(), pageDomain.getPageSize());
         return getDataTable(list);
     }
 
@@ -57,9 +59,7 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysPost post) {
-        List<SysPost> list = postService.selectPostList(post);
-        ExcelUtil<SysPost> util = new ExcelUtil<SysPost>(SysPost.class);
-        util.exportExcel(response, list, "岗位数据");
+        postService.export(post, response);
     }
 
     /**
@@ -69,7 +69,7 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:query')")
     @GetMapping(value = "/{postId}")
     public AjaxResult getInfo(@PathVariable(name = "postId") Long postId) {
-        return success(postService.selectPostById(postId));
+        return success(postService.getById(postId));
     }
 
     /**
@@ -86,7 +86,7 @@ public class SysPostController extends BaseController {
             return error("新增岗位'" + post.getPostName() + "'失败，岗位编码已存在");
         }
         post.setCreateBy(getUsername());
-        return toAjax(postService.insertPost(post));
+        return toAjax(postService.save(post));
     }
 
     /**
@@ -103,7 +103,7 @@ public class SysPostController extends BaseController {
             return error("修改岗位'" + post.getPostName() + "'失败，岗位编码已存在");
         }
         post.setUpdateBy(getUsername());
-        return toAjax(postService.updatePost(post));
+        return toAjax(postService.updateById(post));
     }
 
     /**
@@ -113,7 +113,7 @@ public class SysPostController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:post:remove')")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{postIds}")
-    public AjaxResult remove(@PathVariable(name = "postIds") Long[] postIds) {
+    public AjaxResult remove(@PathVariable(name = "postIds") List<Long> postIds) {
         return toAjax(postService.deletePostByIds(postIds));
     }
 
@@ -123,7 +123,7 @@ public class SysPostController extends BaseController {
     @Operation(summary = "获取岗位选择框列表")
     @GetMapping("/optionselect")
     public AjaxResult optionselect() {
-        List<SysPost> posts = postService.selectPostAll();
+        List<SysPost> posts = postService.list();
         return success(posts);
     }
 }

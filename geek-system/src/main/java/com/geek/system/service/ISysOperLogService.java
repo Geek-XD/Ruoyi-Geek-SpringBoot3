@@ -3,10 +3,11 @@ package com.geek.system.service;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Update;
-
 import com.geek.system.domain.SysOperLog;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 操作日志 服务层
@@ -16,17 +17,8 @@ import com.mybatisflex.core.service.IService;
 public interface ISysOperLogService extends IService<SysOperLog> {
 
     /**
-     * 查询系统操作日志集合
-     * 
-     * @param operLog 操作日志对象
-     * @return 操作日志集合
-     */
-    public List<SysOperLog> selectOperLogList(SysOperLog operLog);
-
-    /**
      * 清空操作日志
      */
-    @Update("truncate table sys_oper_log")
     public void cleanOperLog();
 
     /**
@@ -48,4 +40,8 @@ public interface ISysOperLogService extends IService<SysOperLog> {
      * 获取按模块和操作类型分类的操作统计信息
      */
     List<Map<String, Object>> getModuleOperationStats(SysOperLog operLog);
+
+    Page<SysOperLog> page(SysOperLog operLog, int pageNum, int pageSize);
+
+    void export(SysOperLog operLog, HttpServletResponse response);
 }

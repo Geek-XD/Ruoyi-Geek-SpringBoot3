@@ -17,11 +17,13 @@ import com.geek.common.annotation.Log;
 import com.geek.common.core.controller.BaseController;
 import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.core.domain.R;
+import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
+import com.geek.common.core.page.TableSupport;
 import com.geek.common.enums.BusinessType;
-import com.geek.common.utils.poi.ExcelUtil;
 import com.geek.system.domain.SysOperLog;
 import com.geek.system.service.ISysOperLogService;
+import com.mybatisflex.core.paginate.Page;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,8 +48,8 @@ public class SysOperlogController extends BaseController {
     @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
     @GetMapping("/list")
     public TableDataInfo<SysOperLog> list(SysOperLog operLog) {
-        startPage();
-        List<SysOperLog> list = operLogService.selectOperLogList(operLog);
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Page<SysOperLog> list = operLogService.page(operLog, pageDomain.getPageNum(), pageDomain.getPageSize());
         return getDataTable(list);
     }
 
@@ -56,9 +58,7 @@ public class SysOperlogController extends BaseController {
     @PreAuthorize("@ss.hasPermi('monitor:operlog:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysOperLog operLog) {
-        List<SysOperLog> list = operLogService.selectOperLogList(operLog);
-        ExcelUtil<SysOperLog> util = new ExcelUtil<SysOperLog>(SysOperLog.class);
-        util.exportExcel(response, list, "操作日志");
+        operLogService.export(operLog, response);
     }
 
     @Operation(summary = "删除操作日志记录")

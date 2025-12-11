@@ -3,6 +3,7 @@ package com.geek.system.domain;
 import com.geek.common.annotation.Excel;
 import com.geek.common.annotation.Excel.ColumnType;
 import com.geek.common.core.domain.BaseEntity;
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 
@@ -57,6 +58,7 @@ public class SysPost extends BaseEntity {
 
     /** 用户是否存在此岗位标识 默认不存在 */
     @Schema(title = "用户是否存在此岗位标识")
+    @Column(ignore = true)
     private boolean flag = false;
 
 }
