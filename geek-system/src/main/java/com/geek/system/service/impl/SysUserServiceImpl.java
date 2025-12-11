@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.geek.common.annotation.DataScope;
 import com.geek.common.constant.UserConstants;
+import com.geek.common.core.domain.entity.SysDept;
 import com.geek.common.core.domain.entity.SysRole;
 import com.geek.common.core.domain.entity.SysUser;
 import com.geek.common.exception.ServiceException;
@@ -151,7 +152,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public String selectUserRoleGroup(String userName) {
-        List<SysRole> list = roleMapper.selectRolesByUserName(userName);
+        List<SysRole> list = roleMapper.baseQueryChain().eq(SysUser::getUserName, userName).list();
+        QueryChain.of(SysRole.class)
+                .leftJoin(SysUserRole.class)
+                .on(SysUserRole::getRoleId, SysRole::getRoleId)
+                .leftJoin(SysUser.class)
+                .on(SysUser::getUserId, SysUserRole::getUserId)
+                .leftJoin(SysDept.class)
+                .on(SysUser::getDeptId, SysDept::getDeptId)
+                .eq(SysUser::getUserName, userName)
+                .list();
         if (CollectionUtils.isEmpty(list)) {
             return StringUtils.EMPTY;
         }
@@ -167,7 +177,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public String selectUserPostGroup(String userName) {
         List<SysPost> list = QueryChain.of(SysPost.class)
-                .select(SYS_POST.POST_ID,SYS_POST.POST_NAME,SYS_POST.POST_CODE)
+                .select(SYS_POST.POST_ID, SYS_POST.POST_NAME, SYS_POST.POST_CODE)
                 .leftJoin(SysUserPost.class)
                 .on(SysUserPost::getPostId, SysPost::getPostId)
                 .leftJoin(SysUser.class)

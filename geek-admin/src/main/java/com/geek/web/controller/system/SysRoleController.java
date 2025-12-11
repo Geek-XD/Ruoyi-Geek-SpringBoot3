@@ -21,16 +21,18 @@ import com.geek.common.core.domain.entity.SysDept;
 import com.geek.common.core.domain.entity.SysRole;
 import com.geek.common.core.domain.entity.SysUser;
 import com.geek.common.core.domain.model.LoginUser;
+import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
+import com.geek.common.core.page.TableSupport;
 import com.geek.common.enums.BusinessType;
 import com.geek.common.utils.StringUtils;
-import com.geek.common.utils.poi.ExcelUtil;
 import com.geek.framework.web.service.SysPermissionService;
 import com.geek.framework.web.service.TokenService;
 import com.geek.system.domain.SysUserRole;
 import com.geek.system.service.ISysDeptService;
 import com.geek.system.service.ISysRoleService;
 import com.geek.system.service.ISysUserService;
+import com.mybatisflex.core.paginate.Page;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -65,8 +67,8 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/list")
     public TableDataInfo<SysRole> list(SysRole role) {
-        startPage();
-        List<SysRole> list = roleService.selectRoleList(role);
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Page<SysRole> list = roleService.page(role, pageDomain.getPageNum(), pageDomain.getPageSize());
         return getDataTable(list);
     }
 
@@ -75,9 +77,7 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysRole role) {
-        List<SysRole> list = roleService.selectRoleList(role);
-        ExcelUtil<SysRole> util = new ExcelUtil<SysRole>(SysRole.class);
-        util.exportExcel(response, list, "角色数据");
+        roleService.export(role, response);
     }
 
     /**
@@ -173,7 +173,7 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:remove')")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
-    public AjaxResult remove(@PathVariable(name = "roleIds") Long[] roleIds) {
+    public AjaxResult remove(@PathVariable(name = "roleIds") List<Long> roleIds) {
         return toAjax(roleService.deleteRoleByIds(roleIds));
     }
 

@@ -5,6 +5,7 @@ import java.util.Set;
 import com.geek.common.annotation.Excel;
 import com.geek.common.annotation.Excel.ColumnType;
 import com.geek.common.core.domain.BaseEntity;
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 
@@ -77,6 +78,7 @@ public class SysRole extends BaseEntity {
 
     /** 用户是否存在此角色标识 默认不存在 */
     @Schema(title = "用户是否存在此角色标识", description = "默认不存在")
+    @Column(ignore = true)
     private boolean flag = false;
 
     /** 菜单组 */

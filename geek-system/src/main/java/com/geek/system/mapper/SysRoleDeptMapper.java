@@ -19,13 +19,6 @@ public interface SysRoleDeptMapper extends BaseMapper<SysRoleDept> {
      */
     public int deleteRoleDeptByRoleId(Long roleId);
 
-    /**
-     * 批量删除角色部门关联信息
-     * 
-     * @param ids 需要删除的数据ID
-     * @return 结果
-     */
-    public int deleteRoleDept(Long[] ids);
 
     /**
      * 批量新增角色部门信息

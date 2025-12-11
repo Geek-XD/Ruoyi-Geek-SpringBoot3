@@ -30,6 +30,7 @@ import com.geek.system.domain.vo.RouterVo;
 import com.geek.system.mapper.SysMenuMapper;
 import com.geek.system.mapper.SysRoleMapper;
 import com.geek.system.service.ISysMenuService;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryMethods;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -176,7 +177,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public List<Long> selectMenuListByRoleId(Long roleId) {
-        SysRole role = roleMapper.selectRoleById(roleId);
+        SysRole role = LogicDeleteManager.execWithoutLogicDelete(() -> roleMapper.baseQueryChain()
+                .eq(SysRole::getRoleId, roleId)
+                .one());
         QueryChain<SysMenu> queryChain = this.queryChain()
                 .from(SYS_MENU)
                 .select(SYS_MENU.MENU_ID)
