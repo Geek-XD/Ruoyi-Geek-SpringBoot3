@@ -179,7 +179,7 @@ public class SysLoginService
     {
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userId);
-        sysUser.setDeptId(0L);
+        sysUser.setDeptId(null);
         sysUser.setLoginIp(IpUtils.getIpAddr());
         sysUser.setLoginDate(DateUtils.getNowDate());
         userService.updateUserProfile(sysUser);

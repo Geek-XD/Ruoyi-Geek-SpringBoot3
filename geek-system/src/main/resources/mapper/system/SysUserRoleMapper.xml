@@ -17,12 +17,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	    select count(1) from sys_user_role where role_id=#{roleId}  
 	</select>
 	
-	<delete id="deleteUserRole" parameterType="Long">
- 		delete from sys_user_role where user_id in
- 		<foreach collection="array" item="userId" open="(" separator="," close=")">
- 			#{userId}
-        </foreach> 
- 	</delete>
 	
 	<insert id="batchUserRole">
 		insert into sys_user_role(user_id, role_id) values

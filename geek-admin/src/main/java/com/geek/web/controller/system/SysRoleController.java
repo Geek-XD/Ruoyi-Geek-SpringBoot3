@@ -194,8 +194,8 @@ public class SysRoleController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/allocatedList")
     public TableDataInfo<SysUser> allocatedList(SysUser user) {
-        startPage();
-        List<SysUser> list = userService.selectAllocatedList(user);
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Page<SysUser> list = userService.selectAllocatedList(user, pageDomain.getPageNum(), pageDomain.getPageSize());
         return getDataTable(list);
     }
 

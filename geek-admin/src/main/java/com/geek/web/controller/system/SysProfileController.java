@@ -83,7 +83,7 @@ public class SysProfileController extends BaseController {
         if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
             return error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-        if (userService.updateUserProfile(user) > 0) {
+        if (userService.updateUserProfile(user)) {
             tokenService.setLoginUser(loginUser);
             return success();
         }
@@ -107,7 +107,7 @@ public class SysProfileController extends BaseController {
             return error("新密码不能与旧密码相同");
         }
         newPassword = SecurityUtils.encryptPassword(newPassword);
-        if (userService.resetUserPwd(userName, newPassword) > 0) {
+        if (userService.resetUserPwd(userName, newPassword)) {
             // 更新缓存用户密码
             loginUser.getUser().setPwdUpdateDate(DateUtils.getNowDate());
             loginUser.getUser().setPassword(newPassword);

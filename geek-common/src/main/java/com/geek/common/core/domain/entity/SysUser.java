@@ -4,12 +4,15 @@ import java.util.Date;
 import java.util.List;
 
 import com.geek.common.annotation.Excel;
-import com.geek.common.annotation.Excels;
-import com.geek.common.annotation.Xss;
 import com.geek.common.annotation.Excel.ColumnType;
 import com.geek.common.annotation.Excel.Type;
+import com.geek.common.annotation.Excels;
+import com.geek.common.annotation.Xss;
 import com.geek.common.core.domain.BaseEntity;
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.RelationManyToMany;
+import com.mybatisflex.annotation.RelationManyToOne;
 import com.mybatisflex.annotation.Table;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -111,22 +114,27 @@ public class SysUser extends BaseEntity {
             @Excel(name = "部门名称", targetAttr = "deptName", type = Type.EXPORT),
             @Excel(name = "部门负责人", targetAttr = "leader", type = Type.EXPORT)
     })
+    @RelationManyToOne(selfField = "deptId", targetField = "deptId")
     private SysDept dept;
 
     /** 角色对象 */
     @Schema(title = "角色对象")
+    @RelationManyToMany(joinTable = "sys_user_role", selfField = "userId", joinSelfColumn = "user_id", targetField = "roleId", joinTargetColumn = "role_id")
     private List<SysRole> roles;
 
     /** 角色组 */
     @Schema(title = "角色组")
+    @Column(ignore = true)
     private Long[] roleIds;
 
     /** 岗位组 */
     @Schema(title = "岗位组")
+    @Column(ignore = true)
     private Long[] postIds;
 
     /** 角色ID */
     @Schema(title = "角色ID")
+    @Column(ignore = true)
     private Long roleId;
 
     public boolean isAdmin() {

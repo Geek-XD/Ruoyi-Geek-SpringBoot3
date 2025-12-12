@@ -23,7 +23,9 @@ import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.core.domain.entity.SysDept;
 import com.geek.common.core.domain.entity.SysRole;
 import com.geek.common.core.domain.entity.SysUser;
+import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
+import com.geek.common.core.page.TableSupport;
 import com.geek.common.enums.BusinessType;
 import com.geek.common.utils.SecurityUtils;
 import com.geek.common.utils.StringUtils;
@@ -32,6 +34,7 @@ import com.geek.system.service.ISysDeptService;
 import com.geek.system.service.ISysPostService;
 import com.geek.system.service.ISysRoleService;
 import com.geek.system.service.ISysUserService;
+import com.mybatisflex.core.paginate.Page;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,8 +69,8 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/list")
     public TableDataInfo<SysUser> list(SysUser user) {
-        startPage();
-        List<SysUser> list = userService.selectUserList(user);
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Page<SysUser> list = userService.page(user, pageDomain.getPageNum(), pageDomain.getPageSize());
         return getDataTable(list);
     }
 
@@ -76,9 +79,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysUser user) {
-        List<SysUser> list = userService.selectUserList(user);
-        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-        util.exportExcel(response, list, "用户数据");
+        userService.export(user, response);
     }
 
     @Operation(summary = "导入用户列表")
@@ -170,8 +171,8 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:remove')")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
-    public AjaxResult remove(@PathVariable(name = "userIds") Long[] userIds) {
-        if (ArrayUtils.contains(userIds, getUserId())) {
+    public AjaxResult remove(@PathVariable(name = "userIds") List<Long> userIds) {
+        if (ArrayUtils.contains(userIds.toArray(), getUserId())) {
             return error("当前用户不能删除");
         }
         return toAjax(userService.deleteUserByIds(userIds));

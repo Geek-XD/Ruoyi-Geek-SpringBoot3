@@ -18,9 +18,9 @@ public interface SysRoleMapper extends BaseMapper<SysRole> {
         return QueryChain.of(SysRole.class)
                 .leftJoin(SysUserRole.class)
                 .on(SysUserRole::getRoleId, SysRole::getRoleId)
-                .leftJoin(SysUser.class)
+                .leftJoin(SysUser.class).as("u")
                 .on(SysUser::getUserId, SysUserRole::getUserId)
-                .leftJoin(SysDept.class)
+                .leftJoin(SysDept.class).as("d")
                 .on(SysUser::getDeptId, SysDept::getDeptId);
     }
 }

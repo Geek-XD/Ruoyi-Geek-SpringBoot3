@@ -176,12 +176,14 @@ public class DataScopeAspect {
         }
 
         if (StringUtils.isNotBlank(sqlString.toString())) {
-            Object params = joinPoint.getArgs()[0];
-            if (StringUtils.isNotNull(params) && params instanceof BaseEntity) {
-                BaseEntity baseEntity = (BaseEntity) params;
-                baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
-                DataScopeContextHolder.use("(" + sqlString.substring(4) + ")");
+            if (joinPoint.getArgs().length != 0) {
+                Object params = joinPoint.getArgs()[0];
+                if (StringUtils.isNotNull(params) && params instanceof BaseEntity) {
+                    BaseEntity baseEntity = (BaseEntity) params;
+                    baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
+                }
             }
+            DataScopeContextHolder.use("(" + sqlString.substring(4) + ")");
         }
     }
 
@@ -189,10 +191,12 @@ public class DataScopeAspect {
      * 拼接权限sql前先清空params.dataScope参数防止注入
      */
     private void clearDataScope(final JoinPoint joinPoint) {
-        Object params = joinPoint.getArgs()[0];
-        if (StringUtils.isNotNull(params) && params instanceof BaseEntity) {
-            BaseEntity baseEntity = (BaseEntity) params;
-            baseEntity.getParams().put(DATA_SCOPE, "");
+        if (joinPoint.getArgs().length != 0) {
+            Object params = joinPoint.getArgs()[0];
+            if (StringUtils.isNotNull(params) && params instanceof BaseEntity) {
+                BaseEntity baseEntity = (BaseEntity) params;
+                baseEntity.getParams().put(DATA_SCOPE, "");
+            }
         }
     }
 }

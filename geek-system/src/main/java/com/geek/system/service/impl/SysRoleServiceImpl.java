@@ -1,6 +1,7 @@
 package com.geek.system.service.impl;
 
 import static com.geek.common.core.domain.entity.table.SysRoleTableDef.*;
+import static com.geek.common.core.domain.entity.table.SysUserTableDef.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +53,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Autowired
     private SysRoleDeptMapper roleDeptMapper;
 
-
     /**
      * 根据条件分页查询角色数据
      * 
@@ -60,19 +60,22 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      * @return 角色数据集合信息
      */
     public QueryChain<SysRole> selectRoleList(SysRole role) {
-        return mapper.baseQueryChain()
+        QueryChain<SysRole> q = mapper.baseQueryChain()
                 .eq(SysRole::getRoleId, role.getRoleId())
                 .like(SysRole::getRoleName, role.getRoleName())
                 .eq(SysRole::getStatus, role.getStatus())
                 .like(SysRole::getRoleKey, role.getRoleKey())
                 .le(SysRole::getCreateTime, role.getParams().get("beginTime"))
                 .ge(SysRole::getCreateTime, role.getParams().get("endTime"));
+        q.and(SYS_USER.USER_ID.ne(-1L)); // 目前mybatisflex查询不使用and拼接条件时会出现错误，已经提iussues了
+        return q;
     }
 
     @Override
     @DataScope(deptAlias = "d")
     public Page<SysRole> page(SysRole role, int pageNum, int pageSize) {
-        return selectRoleList(role).page(Page.of(pageNum, pageSize));
+        QueryChain<SysRole> q = selectRoleList(role);
+        return q.page(Page.of(pageNum, pageSize));
     }
 
     @Override
@@ -285,7 +288,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         // 修改角色信息
         this.updateById(role);
         // 删除角色与部门关联
-        roleDeptMapper.deleteRoleDeptByRoleId(role.getRoleId());
+        UpdateChain.of(SysRoleDept.class)
+                .eq(SysRoleDept::getRoleId, role.getRoleId())
+                .remove();
         // 新增角色和部门信息（数据权限）
         return insertRoleDept(role);
     }
@@ -327,7 +332,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             list.add(rd);
         }
         if (list.size() > 0) {
-            rows = roleDeptMapper.batchRoleDept(list);
+            rows = roleDeptMapper.insertBatch(list);
         }
         return rows;
     }
@@ -346,7 +351,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
                 .eq(SysRoleMenu::getRoleId, roleId)
                 .remove();
         // 删除角色与部门关联
-        roleDeptMapper.deleteRoleDeptByRoleId(roleId);
+        UpdateChain.of(SysRoleDept.class)
+                .eq(SysRoleDept::getRoleId, roleId)
+                .remove();
         return super.removeById(roleId);
     }
 
@@ -374,7 +381,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         // 删除角色与部门关联
         UpdateChain.of(SysRoleDept.class)
                 .in(SysRoleDept::getRoleId, roleIds)
-                .remove(); 
+                .remove();
 
         return super.removeByIds(roleIds);
     }
