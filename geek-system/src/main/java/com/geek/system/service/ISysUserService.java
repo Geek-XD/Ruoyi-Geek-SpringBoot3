@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.geek.common.core.domain.entity.SysUser;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.service.IService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +15,9 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author geek
  */
 public interface ISysUserService extends IService<SysUser> {
+
+
+    public QueryChain<SysUser> selectUserList(SysUser user);
 
     /**
      * 根据条件分页查询未分配用户角色列表

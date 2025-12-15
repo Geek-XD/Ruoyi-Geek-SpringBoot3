@@ -6,6 +6,7 @@ import java.util.Set;
 import com.geek.common.core.domain.entity.SysRole;
 import com.geek.system.domain.SysUserRole;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.service.IService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author geek
  */
 public interface ISysRoleService extends IService<SysRole> {
+
+    public QueryChain<SysRole> selectRoleList(SysRole role);
 
     /**
      * 根据用户ID查询角色列表
@@ -170,5 +173,5 @@ public interface ISysRoleService extends IService<SysRole> {
 
     void export(SysRole role, HttpServletResponse response);
 
-	Page<SysRole> page(SysRole role, int pageNum, int pageSize);
+    Page<SysRole> page(SysRole role, int pageNum, int pageSize);
 }
