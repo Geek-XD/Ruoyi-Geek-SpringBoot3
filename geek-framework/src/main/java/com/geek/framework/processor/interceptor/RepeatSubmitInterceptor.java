@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.alibaba.fastjson2.JSON;
 import com.geek.common.annotation.RepeatSubmit;
 import com.geek.common.constant.CacheConstants;
 import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.utils.CacheUtils;
+import com.geek.common.utils.JSON;
 import com.geek.common.utils.ServletUtils;
 import com.geek.common.utils.StringUtils;
 import com.geek.common.utils.http.HttpHelper;

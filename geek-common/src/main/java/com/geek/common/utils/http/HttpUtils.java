@@ -33,8 +33,8 @@ import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.fastjson2.JSON;
 import com.geek.common.constant.Constants;
+import com.geek.common.utils.JSON;
 import com.geek.common.utils.StringUtils;
 
 /**

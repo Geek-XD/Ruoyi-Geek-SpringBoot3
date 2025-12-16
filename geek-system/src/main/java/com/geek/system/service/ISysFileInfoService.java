@@ -38,7 +38,7 @@ public interface ISysFileInfoService extends IService<SysFileInfo> {
         fileInfo.setMd5(md5);
         fileInfo.setCreateTime(new Date());
         fileInfo.setUpdateTime(new Date());
-        fileInfo.setDelFlag("0");
+        fileInfo.setDelFlag(0);
         return fileInfo;
     }
 

@@ -12,6 +12,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  * 启动程序
  * 
@@ -21,6 +23,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableMethodSecurity
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 @MapperScan(basePackages = "com.geek.**.mapper")
+@Log4j2
 public class GeekApplication {
     public static void main(String[] args) throws UnknownHostException {
         // System.setProperty("spring.devtools.restart.enabled", "false");

@@ -16,8 +16,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.filter.SimplePropertyPreFilter;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.geek.common.annotation.Log;
 import com.geek.common.core.domain.entity.SysUser;
 import com.geek.common.core.domain.model.LoginUser;
@@ -25,6 +26,7 @@ import com.geek.common.core.text.Convert;
 import com.geek.common.enums.BusinessStatus;
 import com.geek.common.enums.HttpMethod;
 import com.geek.common.utils.ExceptionUtil;
+import com.geek.common.utils.JSON;
 import com.geek.common.utils.SecurityUtils;
 import com.geek.common.utils.ServletUtils;
 import com.geek.common.utils.StringUtils;
@@ -194,13 +196,12 @@ public class LogAspect {
     /**
      * 忽略敏感属性
      */
-    public SimplePropertyPreFilter excludePropertyPreFilter(String[] excludeParamNames) {
-        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+    public FilterProvider excludePropertyPreFilter(String[] excludeParamNames) {
         String[] all = ArrayUtils.addAll(EXCLUDE_PROPERTIES, excludeParamNames);
-        for (String excludeProperty : all) {
-            filter.getExcludes().add(excludeProperty);
-        }
-        return filter;
+        SimpleBeanPropertyFilter sensitiveFilter = SimpleBeanPropertyFilter
+                .serializeAllExcept(all);
+        return new SimpleFilterProvider()
+                .addFilter("sensitivePropertyFilter", sensitiveFilter);
     }
 
     /**

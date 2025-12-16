@@ -11,13 +11,14 @@ mybatis-flex:
             username: root
             password: 123456
         # SLAVE:
-        #     url: jdbc:postgresql://127.0.0.1/ry
-        #     username: postgres
-        #     password: 123456
+            # url: jdbc:postgresql://127.0.0.1/ry
+            # username: postgres
+            # password: 123456
 
 # 数据源配置
 spring:
     datasource:
+        type:  com.alibaba.druid.pool.DruidDataSource
         druid:
             # 初始连接数
             initialSize: 5

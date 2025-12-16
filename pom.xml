@@ -18,28 +18,25 @@
         <java.version>21</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <spring-boot.version>3.5.8</spring-boot.version>
+        <springdoc.version>2.8.14</springdoc.version>
+        <knife4j.version>4.5.0</knife4j.version>
         <druid.version>1.2.27</druid.version>
-        <jta.version>1.1</jta.version>
-        <!-- bitwalker目前处于准废弃状态:最近一次更新2018.1.24 -->
-        <bitwalker.version>1.21</bitwalker.version>
-        <!-- kaptcha目前处于准废弃状态:最近一次更新2015.5.18 -->
-        <kaptcha.version>2.3.3</kaptcha.version>
-        <fastjson.version>2.0.60</fastjson.version>
-        <jackson.version>2.19.2</jackson.version>
-        <oshi.version>6.8.3</oshi.version>
-        <commons-io.version>2.20.0</commons-io.version>
+        <!-- druid 的 xa暂时不支持 mysql 9.0.0+ 连接速度:8.3.0>8.2.0>8.4.0 -->
+        <mysql.version>8.3.0</mysql.version>
+        <postgresql.version>42.7.7</postgresql.version>
+        <jackson.version>3.0.0-rc2</jackson.version>
+        <oshi.version>6.9.1</oshi.version>
+        <commons-io.version>2.21.0</commons-io.version>
         <commons.collections.version>4.5.0</commons.collections.version>
         <poi.version>5.5.1</poi.version>
         <httpclient5.version>5.5.1</httpclient5.version>
         <jwt.version>0.13.0</jwt.version>
-        <knife4j.version>4.5.0</knife4j.version>
-        <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
-        <!-- druid 的 xa暂时不支持 mysql 9.0.0+ 连接速度:8.3.0>8.2.0>8.4.0 -->
-        <mysql.version>8.3.0</mysql.version>
-        <postgresql.version>42.7.7</postgresql.version>
-        <jaxb-api.version>4.0.2</jaxb-api.version>
-        <jaxb.version>4.0.5</jaxb.version>
-        <springdoc.version>2.8.9</springdoc.version>
+        <jaxb-api.version>4.0.4</jaxb-api.version>
+        <jaxb.version>4.0.6</jaxb.version>
+        <!-- bitwalker目前处于准废弃状态:最近一次更新2018.1.24 -->
+        <bitwalker.version>1.21</bitwalker.version>
+        <!-- kaptcha目前处于准废弃状态:最近一次更新2015.5.18 -->
+        <kaptcha.version>2.3.3</kaptcha.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -52,6 +49,40 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- springdoc -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <!-- knife4j -->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springdoc</groupId>
+                        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- mybatis-flex -->
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
+                <version>1.11.4</version>
+            </dependency>
+
+            <!-- 阿里数据库连接池 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-3-starter</artifactId>
+                <version>${druid.version}</version>
             </dependency>
 
             <!-- Mysql驱动包 -->
@@ -68,33 +99,6 @@
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
                 <scope>runtime</scope>
-            </dependency>
-
-            <!-- 阿里数据库连接池 -->
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid-spring-boot-3-starter</artifactId>
-                <version>${druid.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.transaction</groupId>
-                <artifactId>jta</artifactId>
-                <version>${jta.version}</version>
-            </dependency>
-
-            <!-- mybatis -->
-            <dependency>
-                <groupId>org.mybatis.spring.boot</groupId>
-                <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis-spring-boot.version}</version>
-            </dependency>
-
-            <!-- mybatis-flex -->
-            <dependency>
-                <groupId>com.mybatis-flex</groupId>
-                <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
-                <version>1.11.4</version>
             </dependency>
 
             <!-- pagehelper 分页插件 -->
@@ -118,19 +122,6 @@
                 <version>${commons-io.version}</version>
             </dependency>
 
-            <!-- excel工具 -->
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${poi.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.httpcomponents.client5</groupId>
-                <artifactId>httpclient5</artifactId>
-                <version>${httpclient5.version}</version>
-            </dependency>
-
             <!-- collections工具类 -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -138,16 +129,23 @@
                 <version>${commons.collections.version}</version>
             </dependency>
 
-            <!-- 阿里JSON解析器 -->
+            <!-- excel工具类 -->
             <dependency>
-                <groupId>com.alibaba.fastjson2</groupId>
-                <artifactId>fastjson2</artifactId>
-                <version>${fastjson.version}</version>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
             </dependency>
 
-            <!--引入jsr310模块 支持java8的时间序列化 -->
+            <!-- httpclient5 工具类 -->
             <dependency>
-                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${httpclient5.version}</version>
+            </dependency>
+
+            <!--Jackson JSON解析器 -->
+            <dependency>
+                <groupId>tools.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
@@ -158,13 +156,11 @@
                 <artifactId>jjwt-api</artifactId>
                 <version>${jwt.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-impl</artifactId>
                 <version>${jwt.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-jackson</artifactId>
@@ -179,12 +175,12 @@
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
+                <artifactId>jaxb-core</artifactId>
                 <version>${jaxb.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-core</artifactId>
+                <artifactId>jaxb-impl</artifactId>
                 <version>${jaxb.version}</version>
             </dependency>
 
@@ -202,24 +198,11 @@
                 <version>${kaptcha.version}</version>
             </dependency>
 
-            <!-- springdoc -->
+            <!-- 通用工具-->
             <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-                <version>${springdoc.version}</version>
-            </dependency>
-
-            <!-- knife4j -->
-            <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-                <version>${knife4j.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springdoc</groupId>
-                        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-                    </exclusion>
-                </exclusions>
+                <groupId>com.geekxd</groupId>
+                <artifactId>geek-common</artifactId>
+                <version>${geek.version}</version>
             </dependency>
 
             <!-- 核心模块-->
@@ -233,20 +216,6 @@
             <dependency>
                 <groupId>com.geekxd</groupId>
                 <artifactId>geek-system</artifactId>
-                <version>${geek.version}</version>
-            </dependency>
-
-            <!-- 通用工具-->
-            <dependency>
-                <groupId>com.geekxd</groupId>
-                <artifactId>geek-common</artifactId>
-                <version>${geek.version}</version>
-            </dependency>
-
-            <!-- 场景启动器 -->
-            <dependency>
-                <groupId>com.geekxd</groupId>
-                <artifactId>geek-scene-starter</artifactId>
                 <version>${geek.version}</version>
             </dependency>
         </dependencies>

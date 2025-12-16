@@ -34,11 +34,6 @@
             <artifactId>druid-spring-boot-3-starter</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-        </dependency>
-
         <!-- 验证码 -->
         <dependency>
             <groupId>pro.fessional</groupId>

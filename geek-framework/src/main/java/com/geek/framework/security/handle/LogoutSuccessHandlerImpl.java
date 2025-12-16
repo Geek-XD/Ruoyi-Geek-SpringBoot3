@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
-import com.alibaba.fastjson2.JSON;
 import com.geek.common.constant.Constants;
 import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.core.domain.model.LoginUser;
+import com.geek.common.utils.JSON;
 import com.geek.common.utils.MessageUtils;
 import com.geek.common.utils.ServletUtils;
 import com.geek.common.utils.StringUtils;

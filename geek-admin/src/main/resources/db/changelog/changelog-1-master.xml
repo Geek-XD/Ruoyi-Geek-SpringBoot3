@@ -34,7 +34,7 @@
             <column name="phone" remarks="联系电话" type="VARCHAR(11)"/>
             <column name="email" remarks="邮箱" type="VARCHAR(50)"/>
             <column defaultValue="0" name="status" remarks="部门状态（0正常 1停用）" type="CHAR(1)"/>
-            <column defaultValue="0" name="del_flag" remarks="删除标志（0代表存在 2代表删除）" type="CHAR(1)"/>
+            <column defaultValue="0" name="del_flag" remarks="删除标志（0代表存在 1代表删除）" type="SMALLINT"/>
             <column defaultValue="" name="create_by" remarks="创建者" type="VARCHAR(64)"/>
             <column name="create_time" remarks="创建时间" type="datetime(0)"/>
             <column defaultValue="" name="update_by" remarks="更新者" type="VARCHAR(64)"/>
@@ -109,7 +109,7 @@
             <column defaultValue="" name="update_by" remarks="更新者" type="VARCHAR(64)"/>
             <column name="update_time" remarks="更新时间" type="datetime(0)"/>
             <column name="remark" remarks="备注" type="VARCHAR(255)"/>
-            <column defaultValue="0" name="del_flag" remarks="删除标志（0代表存在 2代表删除）" type="CHAR(1)"/>
+            <column defaultValue="0" name="del_flag" remarks="删除标志（0代表存在 1代表删除）" type="SMALLINT"/>
         </createTable>
     </changeSet>
     <changeSet author="Administrator (generated)" id="1764223194862-34">
@@ -245,7 +245,7 @@
             <column name="status" remarks="角色状态（0正常 1停用）" type="CHAR(1)">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValue="0" name="del_flag" remarks="删除标志（0代表存在 2代表删除）" type="CHAR(1)"/>
+            <column defaultValue="0" name="del_flag" remarks="删除标志（0代表存在 1代表删除）" type="SMALLINT"/>
             <column defaultValue="" name="create_by" remarks="创建者" type="VARCHAR(64)"/>
             <column name="create_time" remarks="创建时间" type="datetime(0)"/>
             <column defaultValue="" name="update_by" remarks="更新者" type="VARCHAR(64)"/>
@@ -298,7 +298,7 @@
             <column defaultValue="" name="avatar" remarks="头像地址" type="VARCHAR(100)"/>
             <column defaultValue="" name="password" remarks="密码" type="VARCHAR(100)"/>
             <column defaultValue="0" name="status" remarks="账号状态（0正常 1停用）" type="CHAR(1)"/>
-            <column defaultValue="0" name="del_flag" remarks="删除标志（0代表存在 2代表删除）" type="CHAR(1)"/>
+            <column defaultValue="0" name="del_flag" remarks="删除标志（0代表存在 1代表删除）" type="SMALLINT"/>
             <column defaultValue="" name="login_ip" remarks="最后登录IP" type="VARCHAR(128)"/>
             <column name="login_date" remarks="最后登录时间" type="datetime(0)"/>
             <column name="pwd_update_date" remarks="密码最后更新时间" type="datetime(0)"/>

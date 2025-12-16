@@ -251,7 +251,7 @@ public class FileController extends BaseController {
             fileInfo.setCreateTime(new Date());
             fileInfo.setUpdateBy(userName);
             fileInfo.setUpdateTime(new Date());
-            fileInfo.setDelFlag("0");
+            fileInfo.setDelFlag(0);
             sysFileInfoService.save(fileInfo);
             return AjaxResult.success(fileInfo);
         } catch (Exception e) {

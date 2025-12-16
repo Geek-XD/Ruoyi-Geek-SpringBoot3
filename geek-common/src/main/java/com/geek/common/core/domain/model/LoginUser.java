@@ -8,15 +8,18 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.alibaba.fastjson2.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.geek.common.core.domain.entity.SysRole;
 import com.geek.common.core.domain.entity.SysUser;
+
+import lombok.Data;
 
 /**
  * 登录用户身份权限
  * 
  * @author geek
  */
+@Data
 public class LoginUser implements UserDetails {
     private static final long serialVersionUID = 1L;
 
@@ -75,30 +78,6 @@ public class LoginUser implements UserDetails {
      */
     private SysUser user;
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getDeptId() {
-        return deptId;
-    }
-
-    public void setDeptId(Long deptId) {
-        this.deptId = deptId;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
     public LoginUser() {
     }
 
@@ -114,7 +93,7 @@ public class LoginUser implements UserDetails {
         this.permissions = permissions;
     }
 
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public String getPassword() {
         return user.getPassword();
@@ -128,7 +107,7 @@ public class LoginUser implements UserDetails {
     /**
      * 账户是否未过期,过期无法验证
      */
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -139,7 +118,7 @@ public class LoginUser implements UserDetails {
      * 
      * @return
      */
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
@@ -150,7 +129,7 @@ public class LoginUser implements UserDetails {
      * 
      * @return
      */
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
@@ -161,77 +140,13 @@ public class LoginUser implements UserDetails {
      * 
      * @return
      */
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;
     }
 
-    public Long getLoginTime() {
-        return loginTime;
-    }
-
-    public void setLoginTime(Long loginTime) {
-        this.loginTime = loginTime;
-    }
-
-    public String getIpaddr() {
-        return ipaddr;
-    }
-
-    public void setIpaddr(String ipaddr) {
-        this.ipaddr = ipaddr;
-    }
-
-    public String getLoginLocation() {
-        return loginLocation;
-    }
-
-    public void setLoginLocation(String loginLocation) {
-        this.loginLocation = loginLocation;
-    }
-
-    public String getBrowser() {
-        return browser;
-    }
-
-    public void setBrowser(String browser) {
-        this.browser = browser;
-    }
-
-    public String getOs() {
-        return os;
-    }
-
-    public void setOs(String os) {
-        this.os = os;
-    }
-
-    public Long getExpireTime() {
-        return expireTime;
-    }
-
-    public void setExpireTime(Long expireTime) {
-        this.expireTime = expireTime;
-    }
-
-    public Set<String> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(Set<String> permissions) {
-        this.permissions = permissions;
-    }
-
-    public SysUser getUser() {
-        return user;
-    }
-
-    public void setUser(SysUser user) {
-        this.user = user;
-    }
-
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();

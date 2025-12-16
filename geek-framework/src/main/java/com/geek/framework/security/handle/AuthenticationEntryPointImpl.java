@@ -7,9 +7,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson2.JSON;
 import com.geek.common.constant.HttpStatus;
 import com.geek.common.core.domain.AjaxResult;
+import com.geek.common.utils.JSON;
 import com.geek.common.utils.ServletUtils;
 import com.geek.common.utils.StringUtils;
 

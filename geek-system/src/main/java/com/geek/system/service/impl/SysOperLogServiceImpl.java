@@ -3,6 +3,7 @@ package com.geek.system.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,16 +34,19 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
      * @return 操作日志集合
      */
     private QueryChain<SysOperLog> selectOperLogList(SysOperLog operLog) {
-        return this.queryChain()
+        QueryChain<SysOperLog> queryChain = this.queryChain()
                 .like(SysOperLog::getTitle, operLog.getTitle())
                 .eq(SysOperLog::getBusinessType, operLog.getBusinessType())
-                .eq(SysOperLog::getRequestMethod, operLog.getRequestMethod())
-                .in(SysOperLog::getBusinessType, (Object[]) operLog.getBusinessTypes())
-                .eq(SysOperLog::getStatus, operLog.getStatus())
+                .eq(SysOperLog::getRequestMethod, operLog.getRequestMethod());
+        if (ArrayUtils.isNotEmpty(operLog.getBusinessTypes())) {
+            queryChain.in(SysOperLog::getBusinessType, (Object[]) operLog.getBusinessTypes());
+        }
+        queryChain.eq(SysOperLog::getStatus, operLog.getStatus())
                 .like(SysOperLog::getOperName, operLog.getOperName())
                 .ge(SysOperLog::getOperTime, operLog.getParams().get("beginTime"))
                 .le(SysOperLog::getOperTime, operLog.getParams().get("endTime"))
                 .orderBy(SysOperLog::getOperId, false);
+        return queryChain;
     }
 
     @Override
