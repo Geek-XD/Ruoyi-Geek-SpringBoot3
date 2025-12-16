@@ -68,13 +68,9 @@ RuoYi-Geek不仅仅是一个简单的升级版本，更是对于RuoYi生态的�
 
 ## 模块介绍（简单开发必看）
 
-* 最简单的开发就是删除所有的可移除模块，按需添加模块。
-* 测试中的模块请自己使用的时候一定要测试一下。
-* 对于小白，开发中的模块请直接删除。
-
 ```plaintext
-com.ruoyi   
-├── ruoyi-admin             // 后台服务
+com.geek   
+├── admin             // 后台服务
 ├── common                  // 工具类
 │       └── annotation                    // 自定义注解
 │       └── config                        // 全局配置
@@ -92,45 +88,90 @@ com.ruoyi
 │       └── manager                       // 异步处理
 │       └── security                      // 权限控制
 │       └── web                           // 前端控制
-├── ruoyi-geek-models       // 业务模块
-│       └── online                        // 在线开发模块（可移除）
-│       └── quartz                        // 定时任务（可移除）
-│       └── generator                     // 代码生成（可移除）
-│       └── form                          // 自定义在线表单（可移除）
-│       └── flowable                      // 流程管理（可移除）（依赖于form模块）
-│       └── message                       // 消息模块（可移除）（可以与phone、email模块协同）
-│       └── starter                       // 业务场景启动器
-├── ruoyi-geek-plugins      // 插件
-│       └── ehcache                       // ehcache缓存插件（与redis模块同类，两者二选一） 
-│       └── mybatis-jpa                   // mybatis-jpa插件（可移除）（简化CRUD，以数据模型为基础开发）
-│       └── mybatis-plus                  // mybatis-plus插件（可移除）（简化CRUD）
-│       └── mybatis-interceptor           // mybatis-interceptor插件（可移除）（简化数据鉴权和分页，扩展性强）
-│       └── atomikos                      // atomikos分布式事务插件（可移除）
-│       └── netty                         // netty插件（可移除）
-│       └── rabbitmq                      // rabbitmq队列服务模块 
-│       └── redis                         // redis缓存服务模块（与ehcache插件同类，两者二选一） 
-│       └── websocket                     // websocket插件（可移除）
-│       └── starter                       // 插件整合模块
-├── ruoyi-geek-scenes        // 业务场景
-│       ├── ruoyi-scenes-pay              // 支付场景（基本业务完成）
-│       │       └── common                      // 支付框架基础模块（基础框架搭建完成）
-│       │       └── sqb                         // 收钱吧支付模块（功能可用，业务需要开发）
-│       │       └── wx                          // 微信支付模块（基础业务完成）
-│       │       └── alipay                      // 支付宝支付模块（基础业务完成）
-│       │       └── starter                     // 支付场景启动器
-│       ├── ruoyi-scenes-auth              // 第三方认证场景（基础框架搭建完成）
-│       │       └── common                      // 第三方认证基础模块（开发中）
-│       │       └── justauth                    // 网站第三方认证模块（测试中，参照若依扩展改进，因没有这么多场景的code，请大家测试出问题后help解决一下发出来）
-│       │       └── wx                          // 微信小程序认证模块（测试中）
-│       │       └── phone                       // 手机认证模块（基础业务完成）
-│       │       └── email                       // 邮箱认证模块（基础业务完成）
-│       │       └── starter                     // 第三方认证启动器
-│       ├── ruoyi-scenes-file              // 文件服务系统（支持公开访问、临时凭证、分片上传等常见功能）
-│       │       └── common                      // 基础模块和本地磁盘方式
-│       │       └── minio                       // minio分布式文件服务
-│       │       └── oss-alibaba                 // alibaba的oss云储存服务
-│       │       └── starter                     // 第三方认证启动器
-├── ruoyi-system             // 系统代码
+├── system             // 系统代码
+```
+
+```plaintext
+用法：./geek.sh <command> [args...]
+
+command:
+  list                 列出 .gitmodules 中的所有子模块 (name / path / url)
+  status               查看当前索引中的子模块（gitlink，已载入模块）
+  add <name>           根据 .gitmodules 中的 name 添加一个子模块（git submodule add）
+  remove <name>        根据 .gitmodules 中的 name 删除一个子模块（git rm + 清理 .git/modules）
+  sync-all             按 geek-modules.yml 中的配置，依次执行 add，同步/拉取所有模块
+  remove-all           按 geek-modules.yml 中的配置，依次执行 remove，删除所有模块
+
+示例：
+  ./geek.sh list
+  ./geek.sh status
+  ./geek.sh add Geek-Plugin-Ehcache
+  ./geek.sh remove Geek-Plugin-Ehcache
+```
+
+修改项目根pom
+
+```xml
+        <module>geek-modules/geek-module-flowable</module>
+        <module>geek-modules/geek-module-form</module>
+        <module>geek-modules/geek-module-generator</module>
+        <module>geek-modules/geek-module-message</module>
+        <module>geek-modules/geek-module-online</module>
+        <module>geek-modules/geek-module-quartz</module>
+        <module>geek-scenes/Geek-Scene-Auth</module>
+        <module>geek-scenes/Geek-Scene-Pay</module>
+```
+
+修改admin的pom
+
+```xml
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-module-flowable</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-module-form</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-module-generator</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-module-message</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-module-online</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-module-quartz</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-auth-starter</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-pay-starter</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
 ```
 
 ## 内置功能
@@ -147,15 +188,37 @@ com.ruoyi
 10. 登录日志：系统登录日志记录查询包含登录异常。
 11. 在线用户：当前系统中活跃用户状态监控。
 12. 定时任务：在线（添加、修改、删除)任务调度包含执行结果日志。
-13. 代码生成：前后端代码的生成（java、html、xml、sql）支持CRUD下载 。
-14. 系统接口：根据业务代码自动生成相关的api接口文档。
-15. 服务监控：监视当前系统CPU、内存、磁盘、堆栈等相关信息。
-16. 缓存监控：对系统的缓存信息查询，命令统计等。
-17. 在线构建器：拖动表单元素生成相应的HTML代码。
-18. 连接池监视：监视当前系统数据库连接池状态，可进行分析SQL找出系统性能瓶颈。
-19. 支付场景
-20. 第三方登录场景
-21. 中间件场景
+13. 系统接口：根据业务代码自动生成相关的api接口文档。
+14. 服务监控：监视当前系统CPU、内存、磁盘、堆栈等相关信息。
+15. 缓存监控：对系统的缓存信息查询，命令统计等。
+16. 在线构建器：拖动表单元素生成相应的HTML代码。
+17. 连接池监视：监视当前系统数据库连接池状态，可进行分析SQL找出系统性能瓶颈。
+
+## 扩展
+
+### 插件
+
+* Geek-Plugin-Websocket （ws长连接支持）
+* Geek-Plugin-RabbitMQ（rabbitmq支持：提供事件监听能力-暂未统一）
+* Geek-Plugin-Minio（minio分布式存储：提供存储支持-可共存）
+* Geek-Plugin-Aliyun-OSS（阿里云OSS对象存储：提供存储支持-可共存）
+* Geek-Plugin-Ehcache（Ehcache持久化缓存：提供缓存支持-可替换）
+* Geek-Plugin-Redis（Redis分布式缓存：提供缓存支持-可替换）
+
+### 模块
+
+* Geek-Module-Flowable（工作流模块）
+* Geek-Module-Form（动态表单模块）
+* Geek-Module-Message（消息模块）
+* Geek-Module-Online（在线api模块）
+* Geek-Module-Quartz（定时任务模块）
+* Geek-Module-Generator（代码生成器模块）
+
+### 场景
+
+* Geek-Scene-Auth（扩展认证场景）
+* Geek-Scene-Pay（扩展支付场景）
+
 
 ## 演示图
 

@@ -1,7 +1,10 @@
 package com.geek.common.utils;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.geek.common.utils.spring.SpringUtils;
 
@@ -36,6 +39,9 @@ public class JSON {
     }
 
     public static JsonNode parseObject(String text) {
+        if (StringUtils.isEmpty(text)) {
+            return null;
+        }
         try {
             return getObjectMapper().readTree(text);
         } catch (Exception e) {
@@ -44,10 +50,21 @@ public class JSON {
     }
 
     public static <T> T parseObject(String text, Class<T> clazz) {
+        if (StringUtils.isEmpty(text)) {
+            return null;
+        }
         try {
             return getObjectMapper().readValue(text, clazz);
         } catch (Exception e) {
             throw new RuntimeException("JSON字符串转对象异常", e);
         }
+    }
+
+    public static ObjectNode createObjectNode() {
+        return getObjectMapper().createObjectNode();
+    }
+
+    public static ObjectNode createObjectNode(Map<String, ?> map) {
+        return getObjectMapper().convertValue(map, ObjectNode.class);
     }
 }

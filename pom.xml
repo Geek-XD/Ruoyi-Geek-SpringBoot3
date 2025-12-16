@@ -226,6 +226,14 @@
         <module>geek-framework</module>
         <module>geek-system</module>
         <module>geek-common</module>
+        <module>geek-modules/geek-module-flowable</module>
+        <module>geek-modules/geek-module-form</module>
+        <module>geek-modules/geek-module-generator</module>
+        <module>geek-modules/geek-module-message</module>
+        <module>geek-modules/geek-module-online</module>
+        <module>geek-modules/geek-module-quartz</module>
+        <module>geek-scenes/Geek-Scene-Auth</module>
+        <module>geek-scenes/Geek-Scene-Pay</module>
     </modules>
     <packaging>pom</packaging>
 
