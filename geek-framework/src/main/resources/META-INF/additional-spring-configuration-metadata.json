@@ -1,9 +1,0 @@
-{
-    "properties": [
-        {
-            "name": "storage.buckets",
-            "type": "java.util.Map<java.lang.String, java.util.Properties>",
-            "description": "储存桶"
-        }
-    ]
-}

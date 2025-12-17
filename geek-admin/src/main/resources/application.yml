@@ -71,7 +71,7 @@ spring:
     # 国际化资源文件路径
     basename: i18n/messages
   profiles:
-    active: druid,file,auth,pay,plugins,model,apidoc
+    active: data,auth,pay,plugins,model,apidoc
   # 文件上传
   servlet:
     multipart:
@@ -115,3 +115,12 @@ pagehelper:
   helperDialect: mysql
   supportMethodsArguments: true
   params: count=countSql
+
+# 配置数据源和mybatis-flex
+mybatis-flex:
+  # 搜索指定包别名
+  typeAliasesPackage: com.geek.**.domain
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  # 加载全局的配置文件
+  configLocation: classpath:mybatis/mybatis-config.xml

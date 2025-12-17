@@ -1,21 +1,15 @@
 package com.geek.framework.datasource.config;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot3.autoconfigure.properties.DruidStatProperties;
 import com.alibaba.druid.util.Utils;
 
-import jakarta.annotation.PreDestroy;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,14 +23,7 @@ import jakarta.servlet.ServletResponse;
  */
 @Configuration
 public class DruidConfig {
-
-    // @Autowired
-    // DynamicDataSourceProperties dataSourceProperties;
-
-    private List<DruidDataSource> druidDataSources = new ArrayList<>();
-
-    Logger logger = LoggerFactory.getLogger(DruidConfig.class);
-
+    
     /**
      * 去除监控页面底部的广告
      */
@@ -53,10 +40,6 @@ public class DruidConfig {
         // 创建filter进行过滤
         Filter filter = new Filter() {
             @Override
-            public void init(jakarta.servlet.FilterConfig filterConfig) throws ServletException {
-            }
-
-            @Override
             public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
                     throws IOException, ServletException {
                 chain.doFilter(request, response);
@@ -69,25 +52,10 @@ public class DruidConfig {
                 text = text.replaceAll("powered.*?shrek.wang</a>", "");
                 response.getWriter().write(text);
             }
-
-            @Override
-            public void destroy() {
-            }
         };
         FilterRegistrationBean registrationBean = new FilterRegistrationBean();
         registrationBean.setFilter(filter);
         registrationBean.addUrlPatterns(commonJsPattern);
         return registrationBean;
-    }
-
-    public List<DruidDataSource> getDruidDataSources() {
-        return druidDataSources;
-    }
-
-    @PreDestroy
-    public void destroy() {
-        for (DruidDataSource druidDataSource : druidDataSources) {
-            druidDataSource.close();
-        }
     }
 }

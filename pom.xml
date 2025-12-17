@@ -20,6 +20,7 @@
         <spring-boot.version>3.5.8</spring-boot.version>
         <springdoc.version>2.8.14</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
+        <mybatis-flex.version>1.11.4</mybatis-flex.version>
         <druid.version>1.2.27</druid.version>
         <!-- druid 的 xa暂时不支持 mysql 9.0.0+ 连接速度:8.3.0>8.2.0>8.4.0 -->
         <mysql.version>8.3.0</mysql.version>
@@ -75,7 +76,7 @@
             <dependency>
                 <groupId>com.mybatis-flex</groupId>
                 <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
-                <version>1.11.4</version>
+                <version>${mybatis-flex.version}</version>
             </dependency>
 
             <!-- 阿里数据库连接池 -->
@@ -246,6 +247,21 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                        </path>
+                        <path>
+                            <groupId>com.mybatis-flex</groupId>
+                            <artifactId>mybatis-flex-processor</artifactId>
+                            <version>${mybatis-flex.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>

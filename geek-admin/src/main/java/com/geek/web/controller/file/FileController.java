@@ -145,7 +145,9 @@ public class FileController extends BaseController {
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("预览失败: " + e.getMessage());
         } finally {
-            StorageBucketKey.clear();
+            if(StorageBucketKey.get() != null){
+                StorageBucketKey.clear();
+            }
         }
     }
 
