@@ -80,6 +80,7 @@ public class TokenService {
                 LoginUser user = CacheUtils.get(CacheConstants.LOGIN_TOKEN_KEY, uuid, LoginUser.class);
                 return user;
             } catch (Exception e) {
+                throw new RuntimeException("获取用户信息异常", e);
             }
         }
         return null;

@@ -1,4 +1,4 @@
-package com.geek.common.core.file.storage;
+package com.geek.common.core.storage.base;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.geek.common.core.file.domain.SysFilePartETag;
+import com.geek.common.core.storage.domain.SysFilePartETag;
 
 /** 存储桶 */
 public interface StorageBucket {

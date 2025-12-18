@@ -11,7 +11,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
 
 import com.geek.common.annotation.UseStorageBucket;
-import com.geek.common.core.file.StorageBucketKey;
+import com.geek.common.core.storage.StorageBucketKey;
 import com.geek.common.utils.StringUtils;
 
 @Aspect

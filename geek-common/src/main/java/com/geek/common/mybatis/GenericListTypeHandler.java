@@ -1,4 +1,4 @@
-package com.geek.common.core.orm;
+package com.geek.common.mybatis;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

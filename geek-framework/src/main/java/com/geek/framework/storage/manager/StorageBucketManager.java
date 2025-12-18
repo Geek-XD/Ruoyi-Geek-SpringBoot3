@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.geek.common.config.GeekConfig;
-import com.geek.common.core.file.GeekStorageBucket;
-import com.geek.common.core.file.storage.StorageBucket;
-import com.geek.common.core.file.storage.StorageFactory;
+import com.geek.common.core.storage.GeekStorageBucket;
+import com.geek.common.core.storage.base.StorageBucket;
+import com.geek.common.core.storage.base.StorageFactory;
 import com.geek.framework.storage.properties.DynamicStorageBootProperties;
 
 @Configuration

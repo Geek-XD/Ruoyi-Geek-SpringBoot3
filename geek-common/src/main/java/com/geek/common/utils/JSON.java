@@ -15,7 +15,7 @@ public class JSON {
     private JSON() {
     }
 
-    private static ObjectMapper getObjectMapper() {
+    public static ObjectMapper getObjectMapper() {
         if (OBJECT_MAPPER == null) {
             OBJECT_MAPPER = SpringUtils.getBean(ObjectMapper.class);
         }

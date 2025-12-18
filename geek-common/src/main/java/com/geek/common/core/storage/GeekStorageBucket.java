@@ -1,4 +1,4 @@
-package com.geek.common.core.file;
+package com.geek.common.core.storage;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -9,9 +9,9 @@ import java.util.Objects;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.geek.common.core.file.domain.SysFilePartETag;
-import com.geek.common.core.file.storage.StorageBucket;
-import com.geek.common.core.file.storage.StorageEntity;
+import com.geek.common.core.storage.base.StorageBucket;
+import com.geek.common.core.storage.base.StorageEntity;
+import com.geek.common.core.storage.domain.SysFilePartETag;
 import com.geek.common.utils.StringUtils;
 
 import lombok.Getter;

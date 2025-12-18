@@ -3,7 +3,7 @@ package com.geek.common.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import com.geek.common.core.file.GeekStorageBucket;
+import com.geek.common.core.storage.GeekStorageBucket;
 
 /**
  * 读取项目相关配置

@@ -50,7 +50,7 @@ public class CacheUtils {
      * @param value
      * @param <T>
      */
-    public static <T> void put(String cacheName, String key, T value) {
+    public static void put(String cacheName, String key, Object value) {
         put(cacheName, key, value, 0, null);
     }
 
@@ -62,7 +62,7 @@ public class CacheUtils {
      * @param value
      * @param <T>
      */
-    public static <T> void putIfAbsent(String cacheName, String key, T value) {
+    public static void putIfAbsent(String cacheName, String key, Object value) {
         if (ObjectUtils.isEmpty(get(cacheName, key))) {
             put(cacheName, key, value, 0, null);
         }
@@ -82,7 +82,7 @@ public class CacheUtils {
      * @param unit
      * @param <T>
      */
-    public static <T> void put(String cacheName, String key, T value, long timeout, TimeUnit unit) {
+    public static void put(String cacheName, String key, Object value, long timeout, TimeUnit unit) {
         if (timeout != 0 && unit != null) {
             getCacheManager().setCacheObject(cacheName, key, value, timeout, unit);
         } else {

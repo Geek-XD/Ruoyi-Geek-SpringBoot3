@@ -1,4 +1,4 @@
-package com.geek.common.core.file.service;
+package com.geek.common.core.storage.service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.geek.common.constant.CacheConstants;
-import com.geek.common.core.file.domain.SysFilePartETag;
-import com.geek.common.core.file.storage.StorageBucket;
-import com.geek.common.core.file.storage.StorageEntity;
+import com.geek.common.core.storage.base.StorageBucket;
+import com.geek.common.core.storage.base.StorageEntity;
+import com.geek.common.core.storage.domain.SysFilePartETag;
 import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.CacheUtils;
 import com.geek.common.utils.StringUtils;

@@ -11,8 +11,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.geek.common.annotation.FilePath;
 import com.geek.common.config.GeekConfig;
-import com.geek.common.core.file.GeekStorageBucket;
-import com.geek.common.core.file.service.StorageService;
+import com.geek.common.core.storage.GeekStorageBucket;
+import com.geek.common.core.storage.service.StorageService;
 import com.geek.common.utils.StringUtils;
 
 public class FilePathJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {

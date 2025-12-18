@@ -22,9 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.geek.common.core.file.domain.SysFilePartETag;
-import com.geek.common.core.file.storage.StorageBucket;
-import com.geek.common.core.file.storage.StorageEntity;
+import com.geek.common.core.storage.base.StorageBucket;
+import com.geek.common.core.storage.base.StorageEntity;
+import com.geek.common.core.storage.domain.SysFilePartETag;
 import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.ServletUtils;
 import com.geek.common.utils.sign.Md5Utils;

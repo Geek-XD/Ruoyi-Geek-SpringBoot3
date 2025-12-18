@@ -4,16 +4,14 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.geek.common.core.file.storage.StorageFactory;
+import com.geek.common.core.storage.base.StorageFactory;
 import com.geek.framework.storage.domain.LocalBucket;
 
 @Configuration("local")
-@ConfigurationProperties("local")
 public class LocalBucketFactory extends StorageFactory<LocalBucket> implements WebMvcConfigurer {
     private static final Logger logger = LoggerFactory.getLogger(LocalBucketFactory.class);
 

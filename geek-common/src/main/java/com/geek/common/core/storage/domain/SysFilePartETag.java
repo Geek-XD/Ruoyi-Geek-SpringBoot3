@@ -1,4 +1,4 @@
-package com.geek.common.core.file.domain;
+package com.geek.common.core.storage.domain;
 
 import java.io.Serializable;
 

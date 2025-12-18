@@ -11,9 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.geek.common.config.GeekConfig;
-import com.geek.common.core.file.domain.SysFilePartETag;
-import com.geek.common.core.file.service.StorageService;
-import com.geek.common.core.file.storage.StorageEntity;
+import com.geek.common.core.storage.base.StorageEntity;
+import com.geek.common.core.storage.domain.SysFilePartETag;
+import com.geek.common.core.storage.service.StorageService;
 import com.geek.common.utils.file.FileUtils;
 import com.geek.common.utils.file.MimeTypeUtils;
 
