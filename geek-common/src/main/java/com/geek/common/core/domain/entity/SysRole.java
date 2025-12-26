@@ -83,14 +83,17 @@ public class SysRole extends BaseEntity {
 
     /** 菜单组 */
     @Schema(title = "菜单组")
+    @Column(ignore = true)
     private Long[] menuIds;
 
     /** 部门组（数据权限） */
     @Schema(title = "部门组", description = "数据权限")
+    @Column(ignore = true)
     private Long[] deptIds;
 
     /** 角色菜单权限 */
     @Schema(title = "角色菜单权限")
+    @Column(ignore = true)
     private Set<String> permissions;
 
     public boolean isAdmin() {

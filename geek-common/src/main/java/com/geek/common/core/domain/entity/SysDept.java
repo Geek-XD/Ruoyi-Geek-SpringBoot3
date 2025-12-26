@@ -6,6 +6,8 @@ import java.util.List;
 import com.geek.common.core.domain.BaseEntity;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.RelationManyToOne;
+import com.mybatisflex.annotation.RelationOneToMany;
 import com.mybatisflex.annotation.Table;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -78,10 +80,12 @@ public class SysDept extends BaseEntity {
     /** 父部门名称 */
     @Schema(title = "父部门名称")
     @Column(ignore = true)
+    @RelationManyToOne(selfField = "parentId", targetTable = "sys_dept", targetField = "deptId", valueField = "deptName")
     private String parentName;
 
     /** 子部门 */
     @Schema(title = "子部门")
     @Column(ignore = true)
+    @RelationOneToMany(selfField = "deptId", targetTable = "sys_dept", targetField = "parentId")
     private List<SysDept> children = new ArrayList<SysDept>();
 }

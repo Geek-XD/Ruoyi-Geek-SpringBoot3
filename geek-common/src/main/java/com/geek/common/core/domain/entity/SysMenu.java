@@ -6,6 +6,7 @@ import java.util.List;
 import com.geek.common.core.domain.BaseEntity;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.RelationOneToMany;
 import com.mybatisflex.annotation.Table;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -67,6 +68,7 @@ public class SysMenu extends BaseEntity {
     private String query;
 
     /** 路由名称，默认和路由地址相同的驼峰格式（注意：因为vue3版本的router会删除名称相同路由，为避免名字的冲突，特殊情况可以自定义） */
+    @Schema(title = "路由名称")
     private String routeName;
 
     /** 是否为外链（0是 1否） */
@@ -101,6 +103,8 @@ public class SysMenu extends BaseEntity {
 
     /** 子菜单 */
     @Schema(title = "子菜单")
+    @Column(ignore = true)
+    @RelationOneToMany(selfField = "menuId", targetTable = "sys_menu", targetField = "parentId")
     private List<SysMenu> children = new ArrayList<SysMenu>();
 
 }

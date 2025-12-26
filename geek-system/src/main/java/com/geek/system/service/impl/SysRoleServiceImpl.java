@@ -1,7 +1,6 @@
 package com.geek.system.service.impl;
 
 import static com.geek.common.core.domain.entity.table.SysRoleTableDef.*;
-import static com.geek.common.core.domain.entity.table.SysUserTableDef.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +66,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
                 .like(SysRole::getRoleKey, role.getRoleKey())
                 .le(SysRole::getCreateTime, role.getParams().get("beginTime"))
                 .ge(SysRole::getCreateTime, role.getParams().get("endTime"));
-        q.and(SYS_USER.USER_ID.ne(-1L)); // 目前mybatisflex查询不使用and拼接条件时会出现错误，已经提iussues了
         return q;
     }
 

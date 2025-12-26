@@ -10,6 +10,7 @@ import com.mybatisflex.core.FlexGlobalConfig;
 import com.mybatisflex.core.FlexGlobalConfig.KeyConfig;
 import com.mybatisflex.core.dialect.DbType;
 import com.mybatisflex.core.dialect.DialectFactory;
+import com.mybatisflex.core.keygen.KeyGenerators;
 import com.mybatisflex.spring.boot.MyBatisFlexCustomizer;
 
 @Configuration
@@ -26,7 +27,9 @@ public class MybatisFlexConfig implements MyBatisFlexCustomizer {
         flexGlobalConfig.registerUpdateListener(baseEntityListener, BaseEntity.class);
         flexGlobalConfig.setLogicDeleteColumn("del_flag");
         KeyConfig keyConfig = new KeyConfig();
-        keyConfig.setKeyType(KeyType.Auto);
+        keyConfig.setKeyType(KeyType.Generator);
+        keyConfig.setValue(KeyGenerators.flexId);
+        keyConfig.setBefore(true);
         flexGlobalConfig.setKeyConfig(keyConfig);
     }
 }

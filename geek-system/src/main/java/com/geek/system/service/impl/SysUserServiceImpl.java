@@ -94,8 +94,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     .or(SYS_USER.DEPT_ID.in(QueryWrapper.create().from(SYS_DEPT)
                             .select(SYS_DEPT.DEPT_ID)
                             .where(SqlUtil.findInSet(user.getDeptId().toString(), "ancestors")))));
-        }else{
-            queryChain.and(SYS_DEPT.DEPT_ID.ne(-1L)); // 目前mybatisflex查询不使用and拼接条件时会出现错误，已经提iussues了
         }
         return queryChain;
     }
@@ -131,7 +129,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 .on(SysUser::getUserId, SysUserRole::getUserId)
                 .leftJoin(SysRole.class)
                 .on(SysRole::getRoleId, SysUserRole::getRoleId)
-                .and(SYS_DEPT.DEPT_ID.ne(-1L)) // 目前mybatisflex查询不使用and拼接条件时会出现错误，已经提iussues了
                 .eq(SysRole::getRoleId, user.getRoleId())
                 .like(SysUser::getUserName, user.getUserName())
                 .like(SysUser::getPhonenumber, user.getPhonenumber())
