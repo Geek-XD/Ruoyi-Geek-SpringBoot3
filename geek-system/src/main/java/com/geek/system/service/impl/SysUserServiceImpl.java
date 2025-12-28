@@ -370,7 +370,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     @Transactional
-    public void insertUserAuth(Long userId, Long[] roleIds) {
+    public void insertUserAuth(Long userId, List<Long> roleIds) {
         userRoleMapper.deleteUserRoleByUserId(userId);
         insertUserRole(userId, roleIds);
     }
@@ -454,10 +454,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @param user 用户对象
      */
     public void insertUserPost(SysUser user) {
-        Long[] posts = user.getPostIds();
+        List<Long> posts = user.getPostIds();
         if (StringUtils.isNotEmpty(posts)) {
             // 新增用户与岗位管理
-            List<SysUserPost> list = new ArrayList<SysUserPost>(posts.length);
+            List<SysUserPost> list = new ArrayList<SysUserPost>(posts.size());
             for (Long postId : posts) {
                 SysUserPost up = new SysUserPost();
                 up.setUserId(user.getUserId());
@@ -474,10 +474,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @param userId  用户ID
      * @param roleIds 角色组
      */
-    public void insertUserRole(Long userId, Long[] roleIds) {
+    public void insertUserRole(Long userId, List<Long> roleIds) {
         if (StringUtils.isNotEmpty(roleIds)) {
             // 新增用户与角色管理
-            List<SysUserRole> list = new ArrayList<SysUserRole>(roleIds.length);
+            List<SysUserRole> list = new ArrayList<SysUserRole>(roleIds.size());
             for (Long roleId : roleIds) {
                 SysUserRole ur = new SysUserRole();
                 ur.setUserId(userId);

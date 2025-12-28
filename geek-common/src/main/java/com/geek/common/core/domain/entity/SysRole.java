@@ -1,5 +1,6 @@
 package com.geek.common.core.domain.entity;
 
+import java.util.List;
 import java.util.Set;
 
 import com.geek.common.annotation.Excel;
@@ -7,6 +8,7 @@ import com.geek.common.annotation.Excel.ColumnType;
 import com.geek.common.core.domain.BaseEntity;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.RelationManyToMany;
 import com.mybatisflex.annotation.Table;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -83,13 +85,13 @@ public class SysRole extends BaseEntity {
 
     /** 菜单组 */
     @Schema(title = "菜单组")
-    @Column(ignore = true)
-    private Long[] menuIds;
+    @RelationManyToMany(joinTable = "sys_role_menu", selfField = "roleId", joinSelfColumn = "role_id", targetField = "menuId", joinTargetColumn = "menu_id", targetTable = "sys_menu", valueField = "menuId")
+    private List<Long> menuIds;
 
     /** 部门组（数据权限） */
     @Schema(title = "部门组", description = "数据权限")
-    @Column(ignore = true)
-    private Long[] deptIds;
+    @RelationManyToMany(joinTable = "sys_role_dept", selfField = "roleId", joinSelfColumn = "role_id", targetField = "deptId", joinTargetColumn = "dept_id", targetTable = "sys_dept", valueField = "deptId")
+    private List<Long> deptIds;
 
     /** 角色菜单权限 */
     @Schema(title = "角色菜单权限")

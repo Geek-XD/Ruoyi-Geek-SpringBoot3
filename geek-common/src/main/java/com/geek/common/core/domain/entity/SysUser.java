@@ -124,13 +124,13 @@ public class SysUser extends BaseEntity {
 
     /** 角色组 */
     @Schema(title = "角色组")
-    @Column(ignore = true)
-    private Long[] roleIds;
+    @RelationManyToMany(joinTable = "sys_user_role", selfField = "userId", joinSelfColumn = "user_id", targetField = "roleId", joinTargetColumn = "role_id", targetTable = "sys_role", valueField = "roleId")
+    private List<Long> roleIds;
 
     /** 岗位组 */
     @Schema(title = "岗位组")
-    @Column(ignore = true)
-    private Long[] postIds;
+    @RelationManyToMany(joinTable = "sys_user_post", selfField = "userId", joinSelfColumn = "user_id", targetField = "postId", joinTargetColumn = "post_id", targetTable = "sys_post", valueField = "postId")
+    private List<Long> postIds;
 
     /** 角色ID */
     @Schema(title = "角色ID")

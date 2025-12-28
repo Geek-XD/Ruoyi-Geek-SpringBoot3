@@ -230,7 +230,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
     @Log(title = "用户管理", businessType = BusinessType.GRANT)
     @PutMapping("/authRole")
-    public AjaxResult insertAuthRole(Long userId, Long[] roleIds) {
+    public AjaxResult insertAuthRole(Long userId, List<Long> roleIds) {
         userService.checkUserDataScope(userId);
         userService.insertUserAuth(userId, roleIds);
         return success();

@@ -143,7 +143,7 @@ public interface ISysUserService extends IService<SysUser> {
      * @param userId  用户ID
      * @param roleIds 角色组
      */
-    public void insertUserAuth(Long userId, Long[] roleIds);
+    public void insertUserAuth(Long userId, List<Long> roleIds);
 
     /**
      * 修改用户状态
