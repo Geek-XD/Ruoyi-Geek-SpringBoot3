@@ -1,5 +1,7 @@
 package com.geek.framework.mybatis;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -15,21 +17,33 @@ import com.mybatisflex.spring.boot.MyBatisFlexCustomizer;
 
 @Configuration
 @Import(PageInterceptor.class)
-public class MybatisFlexConfig implements MyBatisFlexCustomizer {
+public class MybatisFlexConfig {
 
-    @Override
-    public void customize(FlexGlobalConfig flexGlobalConfig) {
-        DbType.all().forEach(dbtype -> {
-            DialectFactory.registerDialect(dbtype, DataScopeDialectImpl.createDialect(dbtype));
-        });
-        BaseEntityListener baseEntityListener = new BaseEntityListener();
-        flexGlobalConfig.registerInsertListener(baseEntityListener, BaseEntity.class);
-        flexGlobalConfig.registerUpdateListener(baseEntityListener, BaseEntity.class);
-        flexGlobalConfig.setLogicDeleteColumn("del_flag");
-        KeyConfig keyConfig = new KeyConfig();
+    @Bean
+    @ConditionalOnMissingBean(FlexGlobalConfig.KeyConfig.class)
+    public FlexGlobalConfig.KeyConfig keyConfig() {
+        FlexGlobalConfig.KeyConfig keyConfig = new FlexGlobalConfig.KeyConfig();
         keyConfig.setKeyType(KeyType.Generator);
         keyConfig.setValue(KeyGenerators.flexId);
         keyConfig.setBefore(true);
-        flexGlobalConfig.setKeyConfig(keyConfig);
+        return keyConfig;
+    }
+
+    @Bean
+    public MyBatisFlexCustomizer myBatisFlexCustomizer(KeyConfig keyConfig) {
+        return new MyBatisFlexCustomizer() {
+            @Override
+            public void customize(FlexGlobalConfig flexGlobalConfig) {
+                DbType.all().forEach(dbtype -> {
+                    DialectFactory.registerDialect(dbtype, DataScopeDialectImpl.createDialect(dbtype));
+                });
+                BaseEntityListener baseEntityListener = new BaseEntityListener();
+                flexGlobalConfig.registerInsertListener(baseEntityListener, BaseEntity.class);
+                flexGlobalConfig.registerUpdateListener(baseEntityListener, BaseEntity.class);
+                flexGlobalConfig.setLogicDeleteColumn("del_flag");
+                flexGlobalConfig.setTenantColumn("tenant_id");
+                flexGlobalConfig.setKeyConfig(keyConfig);
+            }
+        };
     }
 }
