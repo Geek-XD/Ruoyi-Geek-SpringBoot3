@@ -12,7 +12,7 @@ import com.geek.common.core.storage.domain.SysFilePartETag;
 public interface StorageBucket {
 
     /**
-     * 获取文件实例
+     * 获取文件实体
      * 
      * @param filePath
      * @return
@@ -23,8 +23,8 @@ public interface StorageBucket {
     /**
      * 上传文件
      * 
-     * @param filePath
-     * @param file
+     * @param filePath 文件路径
+     * @param file  文件
      * @throws Exception
      */
     void put(String filePath, MultipartFile file) throws Exception;
@@ -32,7 +32,7 @@ public interface StorageBucket {
     /**
      * 删除文件
      * 
-     * @param filePath
+     * @param filePath 文件路径
      * @throws Exception
      */
     void remove(String filePath) throws Exception;
@@ -40,7 +40,7 @@ public interface StorageBucket {
     /**
      * 生成预签名URL
      * 
-     * @param filePath
+     * @param filePath 文件路径
      * @param expireTime 过期时间（秒）
      * @return
      * @throws Exception
@@ -48,7 +48,7 @@ public interface StorageBucket {
     URL generatePresignedUrl(String filePath, int expireTime) throws Exception;
 
     /**
-     * 获取文件的公开访问方式的URL
+     * 生成公开访问URL
      *
      * @param filePath 文件路径
      * @return 公开访问URL
@@ -56,16 +56,16 @@ public interface StorageBucket {
     URL generatePublicUrl(String filePath) throws Exception;
 
     /**
-     * 获取存储渠道权限
+     * 获取存储桶权限
      * 
      * @return public/private
      */
     String getPermission();
 
     /**
-     * 获取文件的默认访问方式的URL
+     * 获取基于权限生成的URL
      * 
-     * @param filePath
+     * @param filePath 文件路径
      * @return
      * @throws Exception
      */

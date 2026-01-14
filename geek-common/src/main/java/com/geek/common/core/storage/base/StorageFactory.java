@@ -13,7 +13,7 @@ public abstract class StorageFactory<S extends StorageBucket> {
 
     protected abstract void validateBucket(S bucket);
 
-    public S buildBucket(String name, Properties props) {
+    final public S buildBucket(String name, Properties props) {
         S bucket = createBucket(name, props);
         validateBucket(bucket);
         storageBucketMap.put(name, bucket);
