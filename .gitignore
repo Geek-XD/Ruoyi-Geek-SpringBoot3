@@ -59,3 +59,6 @@ effective-pom.xml
 !./geek-plugins/.gitkeep
 ./geek-scenes/
 !./geek-scenes/.gitkeep
+
+!dependency-list.txt
+!dependency-tree.txt
