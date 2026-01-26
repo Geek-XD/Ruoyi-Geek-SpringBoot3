@@ -3,6 +3,8 @@ package com.geek.common.core.page;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonRawValue;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -17,6 +19,7 @@ public class TableDataInfo<T> implements Serializable
 
     /** 总记录数 */
     @Schema(title = "总记录数")
+    @JsonRawValue
     private long total;
 
     /** 列表数据 */
