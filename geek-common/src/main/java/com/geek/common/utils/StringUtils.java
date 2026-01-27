@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.Strings;
 import org.springframework.util.AntPathMatcher;
 
 import com.geek.common.constant.Constants;
@@ -300,7 +301,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return 结果
      */
     public static boolean ishttp(String link) {
-        return StringUtils.startsWithAny(link, Constants.HTTP, Constants.HTTPS);
+        return Strings.CS.startsWithAny(link, Constants.HTTP, Constants.HTTPS);
     }
 
     /**
@@ -590,6 +591,62 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             }
         }
         return sb.toString();
+    }
+
+    public static boolean equals(CharSequence cs1, CharSequence cs2) {
+        return Strings.CS.equals(cs1, cs2);
+    }
+
+    public static boolean endsWithIgnoreCase(CharSequence str, CharSequence suffix) {
+        return Strings.CI.endsWith(str, suffix);
+    }
+
+    public static boolean contains(CharSequence seq, CharSequence searchSeq) {
+        return Strings.CS.contains(seq, searchSeq);
+    }
+
+    public static boolean startsWith(CharSequence str, CharSequence prefix) {
+        return Strings.CS.startsWith(str, prefix);
+    }
+
+    public static boolean containsIgnoreCase(CharSequence str, CharSequence searchStr) {
+        return Strings.CI.contains(str, searchStr);
+    }
+
+    public static boolean startsWithAny(CharSequence sequence, CharSequence... searchStrings) {
+        return Strings.CS.startsWithAny(sequence, searchStrings);
+    }
+
+    public static boolean startsWithIgnoreCase(CharSequence str, CharSequence prefix) {
+        return Strings.CI.startsWith(str, prefix);
+    }
+
+    public static boolean endsWith(CharSequence str, CharSequence suffix) {
+        return Strings.CS.endsWith(str, suffix);
+    }
+
+    public static boolean equalsAny(CharSequence string, CharSequence... searchStrings) {
+        return Strings.CS.equalsAny(string, searchStrings);
+    }
+
+    public static boolean equalsAnyIgnoreCase(CharSequence string, CharSequence... searchStrings) {
+        return Strings.CI.equalsAny(string, searchStrings);
+    }
+
+    public static String removeStart(String str, String remove) {
+        return Strings.CS.removeStart(str, remove);
+    }
+
+    public static String replace(String text, String searchString, String replacement) {
+        return Strings.CS.replace(text, searchString, replacement);
+    }
+
+    public static int indexOf(CharSequence seq, CharSequence searchSeq) {
+        return Strings.CS.indexOf(seq, searchSeq);
+    }
+
+    public static int indexOfIgnoreCase(CharSequence str, CharSequence searchStr) {
+        return Strings.CI.indexOf(str, searchStr);
     }
 
     /** @deprecated */

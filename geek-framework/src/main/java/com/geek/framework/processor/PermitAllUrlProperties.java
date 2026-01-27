@@ -60,7 +60,7 @@ public class PermitAllUrlProperties implements InitializingBean, ApplicationCont
                     default -> pair.getKey().getPatternsCondition().getPatterns();
                 })
                 .flatMap(patterns -> Objects.requireNonNull(patterns).stream())
-                .map(url -> RegExUtils.replaceAll(url, PATTERN, ASTERISK))
+                .map(url -> RegExUtils.replaceAll((CharSequence)url, PATTERN, ASTERISK))
                 .forEach(urls::add);
     }
 

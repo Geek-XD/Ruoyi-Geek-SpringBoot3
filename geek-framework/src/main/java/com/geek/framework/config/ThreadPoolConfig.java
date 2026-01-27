@@ -17,8 +17,7 @@ import com.geek.common.utils.Threads;
  * @author geek
  **/
 @Configuration
-public class ThreadPoolConfig
-{
+public class ThreadPoolConfig {
     // 核心线程池大小
     private int corePoolSize = 50;
 
@@ -32,8 +31,7 @@ public class ThreadPoolConfig
     private int keepAliveSeconds = 300;
 
     @Bean(name = "threadPoolTaskExecutor")
-    public ThreadPoolTaskExecutor threadPoolTaskExecutor()
-    {
+    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setMaxPoolSize(maxPoolSize);
         executor.setCorePoolSize(corePoolSize);
@@ -48,15 +46,12 @@ public class ThreadPoolConfig
      * 执行周期性或定时任务
      */
     @Bean(name = "scheduledExecutorService")
-    protected ScheduledExecutorService scheduledExecutorService()
-    {
+    protected ScheduledExecutorService scheduledExecutorService() {
         return new ScheduledThreadPoolExecutor(corePoolSize,
-                new BasicThreadFactory.Builder().namingPattern("schedule-pool-%d").daemon(true).build(),
-                new ThreadPoolExecutor.CallerRunsPolicy())
-        {
+                BasicThreadFactory.builder().namingPattern("schedule-pool-%d").daemon(true).build(),
+                new ThreadPoolExecutor.CallerRunsPolicy()) {
             @Override
-            protected void afterExecute(Runnable r, Throwable t)
-            {
+            protected void afterExecute(Runnable r, Throwable t) {
                 super.afterExecute(r, t);
                 Threads.printException(r, t);
             }
