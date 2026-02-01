@@ -1,4 +1,4 @@
-package com.geek.framework.config;
+package com.geek.framework.captcha.config;
 
 import java.security.SecureRandom;
 

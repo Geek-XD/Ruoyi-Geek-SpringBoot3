@@ -7,6 +7,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.anji.captcha.model.common.ResponseModel;
+import com.anji.captcha.model.vo.CaptchaVO;
+import com.anji.captcha.service.CaptchaService;
 import com.geek.common.constant.CacheConstants;
 import com.geek.common.constant.Constants;
 import com.geek.common.constant.UserConstants;
@@ -54,6 +57,9 @@ public class SysLoginService
     @Autowired
     private SysPasswordService passwordService;
 
+    @Autowired
+    private CaptchaService captchaService;
+
     /**
      * 登录验证
      *
@@ -63,10 +69,14 @@ public class SysLoginService
      * @param uuid 唯一标识
      * @return 结果
      */
-    public String login(String username, String password, String code, String uuid)
+    public String login(String username, String password, CaptchaVO captchaVO)
     {
         // 验证码校验
-        validateCaptcha(username, code, uuid);
+        // validateCaptcha(username, code, uuid);
+        ResponseModel rm = captchaService.check(captchaVO);
+        if(!rm.isSuccess()){
+            throw new CaptchaException();
+        }
         // 登录前置校验
         loginPreCheck(username, password);
         String ip = IpUtils.getIpAddr();

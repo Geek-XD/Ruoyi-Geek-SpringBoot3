@@ -68,8 +68,7 @@ public class SysLoginController {
         String token = loginService.login(
                 loginBody.getUsername(),
                 loginBody.getPassword(),
-                loginBody.getCode(),
-                loginBody.getUuid());
+                loginBody.getCaptcha());
         ajax.put(Constants.TOKEN, token);
         return ajax;
     }

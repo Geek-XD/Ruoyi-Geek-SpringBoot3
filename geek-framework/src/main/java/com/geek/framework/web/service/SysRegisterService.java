@@ -3,6 +3,8 @@ package com.geek.framework.web.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.anji.captcha.model.common.ResponseModel;
+import com.anji.captcha.service.CaptchaService;
 import com.geek.common.constant.CacheConstants;
 import com.geek.common.constant.Constants;
 import com.geek.common.constant.UserConstants;
@@ -33,6 +35,9 @@ public class SysRegisterService
     @Autowired
     private ISysConfigService configService;
 
+    @Autowired
+    private CaptchaService captchaService;
+
     /**
      * 注册
      */
@@ -45,7 +50,10 @@ public class SysRegisterService
         boolean captchaEnabled = configService.selectCaptchaEnabled();
         if (captchaEnabled)
         {
-            validateCaptcha(username, registerBody.getCode(), registerBody.getUuid());
+            ResponseModel rm = captchaService.check(registerBody.getCaptcha());
+            if(!rm.isSuccess()){
+                throw new CaptchaException();
+            }
         }
         if (StringUtils.isEmpty(username))
         {

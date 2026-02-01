@@ -1,5 +1,6 @@
 package com.geek.common.core.domain.model;
 
+import com.anji.captcha.model.vo.CaptchaVO;
 import com.geek.common.core.domain.BaseEntity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,4 +39,8 @@ public class LoginBody extends BaseEntity {
     /** 唯一标识 */
     @Schema(title = "唯一标识")
     private String uuid;
+
+    /** 验证码 */
+    @Schema(title = "验证码")
+    private CaptchaVO captcha;
 }

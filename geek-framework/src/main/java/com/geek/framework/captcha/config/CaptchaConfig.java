@@ -1,11 +1,16 @@
-package com.geek.framework.config;
+package com.geek.framework.captcha.config;
+
+import static com.google.code.kaptcha.Constants.*;
 
 import java.util.Properties;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import com.google.code.kaptcha.impl.DefaultKaptcha;
+import com.google.code.kaptcha.impl.NoNoise;
+import com.google.code.kaptcha.impl.ShadowGimpy;
 import com.google.code.kaptcha.util.Config;
-import static com.google.code.kaptcha.Constants.*;
 
 /**
  * 验证码配置
@@ -37,7 +42,7 @@ public class CaptchaConfig
         // 验证码文本字体样式 默认为new Font("Arial", 1, fontSize), new Font("Courier", 1, fontSize)
         properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_NAMES, "Arial,Courier");
         // 图片样式 水纹com.google.code.kaptcha.impl.WaterRipple 鱼眼com.google.code.kaptcha.impl.FishEyeGimpy 阴影com.google.code.kaptcha.impl.ShadowGimpy
-        properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, "com.google.code.kaptcha.impl.ShadowGimpy");
+        properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, ShadowGimpy.class.getName());
         Config config = new Config(properties);
         defaultKaptcha.setConfig(config);
         return defaultKaptcha;
@@ -63,7 +68,7 @@ public class CaptchaConfig
         // KAPTCHA_SESSION_KEY
         properties.setProperty(KAPTCHA_SESSION_CONFIG_KEY, "kaptchaCodeMath");
         // 验证码文本生成器
-        properties.setProperty(KAPTCHA_TEXTPRODUCER_IMPL, "com.geek.framework.config.KaptchaTextCreator");
+        properties.setProperty(KAPTCHA_TEXTPRODUCER_IMPL, KaptchaTextCreator.class.getName());
         // 验证码文本字符间距 默认为2
         properties.setProperty(KAPTCHA_TEXTPRODUCER_CHAR_SPACE, "3");
         // 验证码文本字符长度 默认为5
@@ -73,9 +78,9 @@ public class CaptchaConfig
         // 验证码噪点颜色 默认为Color.BLACK
         properties.setProperty(KAPTCHA_NOISE_COLOR, "white");
         // 干扰实现类
-        properties.setProperty(KAPTCHA_NOISE_IMPL, "com.google.code.kaptcha.impl.NoNoise");
+        properties.setProperty(KAPTCHA_NOISE_IMPL, NoNoise.class.getName());
         // 图片样式 水纹com.google.code.kaptcha.impl.WaterRipple 鱼眼com.google.code.kaptcha.impl.FishEyeGimpy 阴影com.google.code.kaptcha.impl.ShadowGimpy
-        properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, "com.google.code.kaptcha.impl.ShadowGimpy");
+        properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, ShadowGimpy.class.getName());
         Config config = new Config(properties);
         defaultKaptcha.setConfig(config);
         return defaultKaptcha;
