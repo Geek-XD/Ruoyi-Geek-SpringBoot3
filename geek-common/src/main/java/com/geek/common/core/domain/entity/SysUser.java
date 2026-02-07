@@ -3,6 +3,7 @@ package com.geek.common.core.domain.entity;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.geek.common.annotation.Excel;
 import com.geek.common.annotation.Excel.ColumnType;
 import com.geek.common.annotation.Excel.Type;
@@ -85,6 +86,7 @@ public class SysUser extends BaseEntity {
 
     /** 密码 */
     @Schema(title = "密码")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     /** 账号状态（0正常 1停用） */
