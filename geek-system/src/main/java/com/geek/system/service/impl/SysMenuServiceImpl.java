@@ -36,13 +36,18 @@ import com.mybatisflex.core.query.QueryMethods;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  * 菜单 业务层处理
  * 
  * @author geek
  */
+@Log4j2
 @Service
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements ISysMenuService {
+
+    public static final Long MENU_ROOT_ID = 0L;
 
     @Autowired
     private SysRoleMapper roleMapper;
@@ -166,7 +171,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 .orderBy(SysMenu::getParentId, true)
                 .orderBy(SysMenu::getOrderNum, true)
                 .list();
-        return getChildPerms(menus, 0);
+        return getChildPerms(menus, MENU_ROOT_ID);
     }
 
     /**
@@ -234,7 +239,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 children.setQuery(menu.getQuery());
                 childrenList.add(children);
                 router.setChildren(childrenList);
-            } else if (menu.getParentId().intValue() == 0 && isInnerLink(menu)) {
+            } else if (menu.getParentId().intValue() == MENU_ROOT_ID && isInnerLink(menu)) {
                 router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
                 router.setPath("/");
                 List<RouterVo> childrenList = new ArrayList<RouterVo>();
@@ -330,6 +335,48 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
+     * 校验路由名称是否唯一
+     *
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    @Override
+    public boolean checkRouteConfigUnique(SysMenu menu) {
+        Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
+        Long parentId = menu.getParentId();
+        String path = menu.getPath();
+        String routeName = StringUtils.isEmpty(menu.getRouteName()) ? path : menu.getRouteName();
+
+        List<SysMenu> sysMenuList = this.queryChain()
+                .in(SysMenu::getMenuType, Arrays.asList(UserConstants.TYPE_DIR, UserConstants.TYPE_MENU))
+                .and(i -> {
+                    i.or(SysMenu::getPath).eq(path)
+                            .or(SysMenu::getPath).eq(routeName)
+                            .or(SysMenu::getRouteName).eq(path)
+                            .or(SysMenu::getRouteName).eq(routeName);
+                })
+                .list();
+        for (SysMenu sysMenu : sysMenuList) {
+            if (sysMenu.getMenuId().longValue() != menuId.longValue()) {
+                Long dbParentId = sysMenu.getParentId();
+                String dbPath = sysMenu.getPath();
+                String dbRouteName = StringUtils.isEmpty(sysMenu.getRouteName()) ? dbPath : sysMenu.getRouteName();
+                if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.longValue() == dbParentId.longValue()) {
+                    log.warn("[同级路由冲突] 同级下已存在相同路由路径 '{}'，冲突菜单：{}", dbPath, sysMenu.getMenuName());
+                    return UserConstants.NOT_UNIQUE;
+                } else if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.longValue() == MENU_ROOT_ID) {
+                    log.warn("[根目录路由冲突] 根目录下路由 '{}' 必须唯一，已被菜单 '{}' 占用", path, sysMenu.getMenuName());
+                    return UserConstants.NOT_UNIQUE;
+                } else if (StringUtils.equalsAnyIgnoreCase(routeName, dbRouteName)) {
+                    log.warn("[路由名称冲突] 路由名称 '{}' 需全局唯一，已被菜单 '{}' 使用", routeName, sysMenu.getMenuName());
+                    return UserConstants.NOT_UNIQUE;
+                }
+            }
+        }
+        return UserConstants.UNIQUE;
+    }
+
+    /**
      * 获取路由名称
      * 
      * @param menu 菜单信息
@@ -364,11 +411,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     public String getRouterPath(SysMenu menu) {
         String routerPath = menu.getPath();
         // 内链打开外网方式
-        if (menu.getParentId().intValue() != 0 && isInnerLink(menu)) {
+        if (menu.getParentId().intValue() != MENU_ROOT_ID  && isInnerLink(menu)) {
             routerPath = innerLinkReplaceEach(routerPath);
         }
         // 非外链并且是一级目录（类型为目录）
-        if (0 == menu.getParentId().intValue() && UserConstants.TYPE_DIR.equals(menu.getMenuType())
+        if (MENU_ROOT_ID == menu.getParentId().intValue() && UserConstants.TYPE_DIR.equals(menu.getMenuType())
                 && UserConstants.NO_FRAME.equals(menu.getIsFrame())) {
             routerPath = "/" + menu.getPath();
         }
@@ -405,7 +452,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      * @return 结果
      */
     public boolean isMenuFrame(SysMenu menu) {
-        return menu.getParentId().intValue() == 0 && UserConstants.TYPE_MENU.equals(menu.getMenuType())
+        return menu.getParentId().intValue() == MENU_ROOT_ID && UserConstants.TYPE_MENU.equals(menu.getMenuType())
                 && menu.getIsFrame().equals(UserConstants.NO_FRAME);
     }
 
@@ -426,7 +473,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      * @return 结果
      */
     public boolean isParentView(SysMenu menu) {
-        return menu.getParentId().intValue() != 0 && UserConstants.TYPE_DIR.equals(menu.getMenuType());
+        return menu.getParentId().intValue() != MENU_ROOT_ID  && UserConstants.TYPE_DIR.equals(menu.getMenuType());
     }
 
     /**
@@ -436,7 +483,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      * @param parentId 传入的父节点ID
      * @return String
      */
-    public List<SysMenu> getChildPerms(List<SysMenu> list, int parentId) {
+    public List<SysMenu> getChildPerms(List<SysMenu> list, long parentId) {
         List<SysMenu> returnList = new ArrayList<SysMenu>();
         for (Iterator<SysMenu> iterator = list.iterator(); iterator.hasNext();) {
             SysMenu t = (SysMenu) iterator.next();
