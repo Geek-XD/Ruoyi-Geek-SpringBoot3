@@ -10,6 +10,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
  * 程序注解配置
@@ -31,7 +32,7 @@ public class ApplicationConfig {
             longToStringModule.addSerializer(Long.class, ToStringSerializer.instance);
             longToStringModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
             longToStringModule.addSerializer(BigInteger.class, ToStringSerializer.instance);
-            builder.modules(longToStringModule);
+            builder.modules(longToStringModule, new JavaTimeModule());
         };
     }
 }
