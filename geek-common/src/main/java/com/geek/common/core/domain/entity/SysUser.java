@@ -9,6 +9,7 @@ import com.geek.common.annotation.Excel.Type;
 import com.geek.common.annotation.Excels;
 import com.geek.common.annotation.Xss;
 import com.geek.common.core.domain.BaseEntity;
+import com.geek.common.utils.SecurityUtils;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.RelationManyToMany;
@@ -138,11 +139,7 @@ public class SysUser extends BaseEntity {
     private Long roleId;
 
     public boolean isAdmin() {
-        return isAdmin(this.userId);
-    }
-
-    public static boolean isAdmin(Long userId) {
-        return userId != null && 1L == userId;
+        return SecurityUtils.isAdmin(this.userId);
     }
 
     public SysUser() {

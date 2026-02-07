@@ -302,7 +302,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     @DataScope(deptAlias = "d", userAlias = "u")
     public void checkUserDataScope(Long userId) {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
+        if (!SecurityUtils.isAdmin()) {
             SysUser user = new SysUser();
             user.setUserId(userId);
             List<SysUser> users = selectUserList(user).list();

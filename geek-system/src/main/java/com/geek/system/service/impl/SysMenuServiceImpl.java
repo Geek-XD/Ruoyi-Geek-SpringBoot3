@@ -78,7 +78,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 .orderBy(SysMenu::getParentId, true)
                 .orderBy(SysMenu::getOrderNum, true);
         // 管理员显示所有菜单信息
-        if (!SysUser.isAdmin(userId)) {
+        if (!SecurityUtils.isAdmin(userId)) {
             query.leftJoin(SysRoleMenu.class)
                     .on(SysMenu::getMenuId, SysRoleMenu::getMenuId)
                     .leftJoin(SysUserRole.class)

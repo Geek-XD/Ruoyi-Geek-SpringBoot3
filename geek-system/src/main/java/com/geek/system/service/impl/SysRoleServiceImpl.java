@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.geek.common.annotation.DataScope;
 import com.geek.common.core.domain.entity.SysRole;
-import com.geek.common.core.domain.entity.SysUser;
 import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.SecurityUtils;
 import com.geek.common.utils.StringUtils;
@@ -210,7 +209,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Override
     @DataScope(deptAlias = "d")
     public void checkRoleDataScope(Long roleId) {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
+        if (!SecurityUtils.isAdmin()) {
             SysRole role = new SysRole();
             role.setRoleId(roleId);
             List<SysRole> roles = selectRoleList(role).list();
