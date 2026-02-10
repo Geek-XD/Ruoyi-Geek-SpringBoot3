@@ -109,6 +109,8 @@ public class SysUser extends BaseEntity {
     private Date loginDate;
 
     /** 密码最后更新时间 */
+    @Schema(title = "密码最后更新时间")
+    @Excel(name = "密码最后更新时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Type.EXPORT)
     private Date pwdUpdateDate;
 
     /** 部门对象 */
