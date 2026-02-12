@@ -5,7 +5,7 @@ geek:
   # 版本
   version: 3.8.5
   # 版权年份
-  copyrightYear: 2024
+  copyrightYear: 2026
   # 文件路径 示例（ Windows配置D:/geek/uploadPath，Linux配置 /home/geek/uploadPath）
   profile: D:/geek/uploadPath
   # 获取ip地址开关
@@ -22,6 +22,10 @@ server:
   servlet:
     # 应用的访问路径
     context-path: /
+    encoding:
+      enabled: true
+      force: true
+      charset: UTF-8
   tomcat:
     # tomcat的URI编码
     uri-encoding: UTF-8
