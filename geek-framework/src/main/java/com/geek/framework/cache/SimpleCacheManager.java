@@ -20,13 +20,22 @@ import org.springframework.lang.Nullable;
 import com.geek.common.core.cache.TimedValue;
 import com.geek.common.core.cache.TtlCacheManager;
 
-@SuppressWarnings({"rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SimpleCacheManager extends AbstractTransactionSupportingCacheManager implements TtlCacheManager {
 
+    @Nullable
+    private SerializationDelegate serialization;
     private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap(16);
     private volatile boolean dynamic = true;
     private boolean allowNullValues = true;
     private boolean storeByValue = false;
+
+    public SimpleCacheManager() {
+    }
+
+    public SimpleCacheManager(String... cacheNames) {
+        this.setCacheNames(Arrays.asList(cacheNames));
+    }
 
     @Override
     public <T> void setCacheObject(String cacheName, String key, T value) {
@@ -64,23 +73,29 @@ public class SimpleCacheManager extends AbstractTransactionSupportingCacheManage
     }
 
     @Override
+    public Cache getCache(String name) {
+        Cache cache = (Cache) this.cacheMap.get(name);
+        if (cache == null && this.dynamic) {
+            cache = (Cache) this.cacheMap.computeIfAbsent(name, this::createConcurrentMapCache);
+        }
+
+        return cache;
+    }
+
+    @Override
+    public Collection<String> getCacheNames() {
+        return Collections.unmodifiableSet(this.cacheMap.keySet());
+    }
+
+    @Override
     protected Collection<? extends Cache> loadCaches() {
         return this.cacheMap.values();
     }
 
     @Nullable
+    @Override
     protected Cache getMissingCache(String name) {
         return this.dynamic ? this.createConcurrentMapCache(name) : null;
-    }
-
-    @Nullable
-    private SerializationDelegate serialization;
-
-    public SimpleCacheManager() {
-    }
-
-    public SimpleCacheManager(String... cacheNames) {
-        this.setCacheNames(Arrays.asList(cacheNames));
     }
 
     public void setCacheNames(@Nullable Collection<String> cacheNames) {
@@ -129,20 +144,6 @@ public class SimpleCacheManager extends AbstractTransactionSupportingCacheManage
             this.recreateCaches();
         }
 
-    }
-
-    @Nullable
-    public Cache getCache(String name) {
-        Cache cache = (Cache) this.cacheMap.get(name);
-        if (cache == null && this.dynamic) {
-            cache = (Cache) this.cacheMap.computeIfAbsent(name, this::createConcurrentMapCache);
-        }
-
-        return cache;
-    }
-
-    public Collection<String> getCacheNames() {
-        return Collections.unmodifiableSet(this.cacheMap.keySet());
     }
 
     public void resetCaches() {
