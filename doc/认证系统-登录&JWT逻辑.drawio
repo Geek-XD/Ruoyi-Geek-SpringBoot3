@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="IyeDk-cAWrKOq7F3gyWb" name="第 1 页">
-        <mxGraphModel dx="344" dy="766" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="#FFFFFF" math="0" shadow="0">
+        <mxGraphModel dx="1246" dy="779" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="#FFFFFF" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -41,7 +41,7 @@
                 <mxCell id="23" value="&lt;font style=&quot;color: rgb(0, 204, 0);&quot;&gt;通过new UsernamePasswordAuthenticationToken生成一个认证信息&lt;br&gt;通过AuthenticationContextHolder.setContext将认证信息设置到上下文&lt;/font&gt;&lt;br&gt;通过AuthenticationManager.authenticate()对认证信息进行认证，这个方法&lt;br&gt;会去调用UserDetailsServiceImpl.loadUserByUsername()方法进行认证" style="html=1;" parent="20" vertex="1">
                     <mxGeometry x="43.39" y="295" width="406.13" height="70" as="geometry"/>
                 </mxCell>
-                <mxCell id="68" style="edgeStyle=none;html=1;" edge="1" parent="20" source="25" target="40">
+                <mxCell id="68" style="edgeStyle=none;html=1;" parent="20" source="25" target="40" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="25" value="&lt;span style=&quot;font-weight: 400;&quot;&gt;loadUserByUsername&lt;/span&gt;" style="swimlane;whiteSpace=wrap;html=1;" parent="20" vertex="1">

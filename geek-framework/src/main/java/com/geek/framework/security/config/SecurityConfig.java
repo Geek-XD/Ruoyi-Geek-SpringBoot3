@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -31,52 +32,29 @@ import com.geek.framework.security.handle.LogoutSuccessHandlerImpl;
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Configuration
 public class SecurityConfig {
-    /**
-     * 自定义用户认证逻辑
-     */
-    @Autowired
-    private UserDetailsService userDetailsService;
 
-    /**
-     * 认证失败处理类
-     */
+    /** 认证失败处理类 */
     @Autowired
     private AuthenticationEntryPointImpl unauthorizedHandler;
 
-    /**
-     * 退出处理类
-     */
+    /** 退出处理类 */
     @Autowired
     private LogoutSuccessHandlerImpl logoutSuccessHandler;
 
-    /**
-     * token认证过滤器
-     */
+    /** token认证过滤器 */
     @Autowired
     private JwtAuthenticationTokenFilter authenticationTokenFilter;
 
-    /**
-     * 跨域过滤器
-     */
+    /** 跨域过滤器 */
     @Autowired
     private CorsFilter corsFilter;
 
-    /**
-     * 允许匿名访问的地址
-     */
+    /** 允许匿名访问的地址 */
     @Autowired
     private PermitAllUrlProperties permitAllUrl;
 
-    /**
-     * @return
-     * @throws Exception
-     */
-    @Bean
-    AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
-        return new ProviderManager(daoAuthenticationProvider);
-    }
+    final String[] WHIT_LIST = { "/login", "/register", "/captchaImage", "/swagger-ui/**", "/swagger-resources/**",
+            "/webjars/**", "/druid/**", "/*/api-docs/**" };
 
     /**
      * anyRequest | 匹配所有请求路径
@@ -99,29 +77,22 @@ public class SecurityConfig {
                 // CSRF禁用，因为不使用session
                 .csrf(csrf -> csrf.disable())
                 // 禁用HTTP响应标头
-                .headers((headersCustomizer) -> {
-                    headersCustomizer.cacheControl(cache -> cache.disable())
-                            .frameOptions(options -> options.sameOrigin());
-                })
+                .headers(headersCustomizer -> headersCustomizer
+                        .cacheControl(cache -> cache.disable())
+                        .frameOptions(options -> options.sameOrigin()))
                 // 认证失败处理类
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 // 基于token，所以不需要session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 注解标记允许匿名访问的url
-                .authorizeHttpRequests((requests) -> {
-                    permitAllUrl.getUrls().forEach(url -> requests.requestMatchers(url).permitAll());
-                    // 对于登录login 注册register 验证码captchaImage 允许匿名访问
-                    requests.requestMatchers("/login", "/register", "/captchaImage").permitAll()
-                            // 静态资源，可匿名访问
-                            .requestMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js",
-                                    "/profile/**")
-                            .permitAll()
-                            .requestMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/*/api-docs",
-                                    "/druid/**", "/*/api-docs/**")
-                            .permitAll()
-                            // 除上面外的所有请求全部需要鉴权认证
-                            .anyRequest().authenticated();
-                })
+                .authorizeHttpRequests((requests) -> requests
+                        // 白名单允许匿名访问的url
+                        .requestMatchers(WHIT_LIST).permitAll()
+                        // 注解标记允许匿名访问的url
+                        .requestMatchers(permitAllUrl.getUrls().toArray(String[]::new)).permitAll()
+                        // 静态资源，可匿名访问
+                        .requestMatchers(HttpMethod.GET, "/", "/**/*.{html,css,js}", "/profile/**").permitAll()
+                        // 除上面外的所有请求全部需要鉴权认证
+                        .anyRequest().authenticated())
                 // 添加Logout filter
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
                 // 添加JWT filter
@@ -131,6 +102,7 @@ public class SecurityConfig {
                 .addFilterBefore(corsFilter, LogoutFilter.class)
                 .build();
     }
+
     /**
      * 忽略web安全配置
      * 主要是忽略websocket的安全配置
@@ -138,7 +110,7 @@ public class SecurityConfig {
      * @return WebSecurityCustomizer
      */
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
+    WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/websocket/**");
     }
 
@@ -146,7 +118,16 @@ public class SecurityConfig {
      * 强散列哈希加密实现
      */
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+    PasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(
+            PasswordEncoder passwordEncoder,
+            UserDetailsService userDetailsService) {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(daoAuthenticationProvider);
     }
 }

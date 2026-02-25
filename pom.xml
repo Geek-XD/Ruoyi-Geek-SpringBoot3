@@ -17,14 +17,13 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
-        <spring-boot.version>3.5.10</spring-boot.version>
+        <spring-boot.version>3.5.11</spring-boot.version>
         <springdoc.version>2.8.14</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
         <mybatis-flex.version>1.11.5</mybatis-flex.version>
         <druid.version>1.2.27</druid.version>
         <!-- druid 的 xa暂时不支持 mysql 9.0.0+ 连接速度:8.3.0>8.2.0>8.4.0 -->
         <mysql.version>8.3.0</mysql.version>
-        <postgresql.version>42.7.7</postgresql.version>
         <jackson.version>3.0.0-rc2</jackson.version>
         <oshi.version>6.9.1</oshi.version>
         <commons-io.version>2.21.0</commons-io.version>
@@ -92,14 +91,6 @@
                 <groupId>com.mysql</groupId>
                 <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-
-            <!-- postgresql驱动包 -->
-            <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>${postgresql.version}</version>
                 <scope>runtime</scope>
             </dependency>
 

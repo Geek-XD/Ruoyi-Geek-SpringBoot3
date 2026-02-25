@@ -126,6 +126,12 @@
             <column defaultValue="" name="msg" remarks="提示消息" type="VARCHAR(255)"/>
             <column name="login_time" remarks="访问时间" type="datetime(0)"/>
         </createTable>
+        <createIndex associatedWith="" indexName="idx_sys_logininfor_lt" tableName="sys_logininfor">
+            <column name="login_time"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="idx_sys_logininfor_s" tableName="sys_logininfor">
+            <column name="status"/>
+        </createIndex>
     </changeSet>
     <changeSet author="Administrator (generated)" id="1764223194862-35">
         <createTable remarks="菜单权限表" tableName="sys_menu">
@@ -167,7 +173,7 @@
             <column name="notice_type" remarks="公告类型（1通知 2公告）" type="CHAR(1)">
                 <constraints nullable="false"/>
             </column>
-            <column name="notice_content" remarks="公告内容" type="LONGBLOB"/>
+            <column name="notice_content" remarks="公告内容" type="TEXT"/>
             <column defaultValue="0" name="status" remarks="公告状态（0正常 1关闭）" type="CHAR(1)"/>
             <column defaultValue="" name="create_by" remarks="创建者" type="VARCHAR(64)"/>
             <column name="create_time" remarks="创建时间" type="datetime(0)"/>
@@ -199,6 +205,15 @@
             <column name="oper_time" remarks="操作时间" type="datetime(0)"/>
             <column defaultValueNumeric="0" name="cost_time" remarks="消耗时间" type="BIGINT"/>
         </createTable>
+        <createIndex associatedWith="" indexName="idx_sys_oper_log_bt" tableName="sys_oper_log">
+            <column defaultValueNumeric="0" name="business_type"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="idx_sys_oper_log_ot" tableName="sys_oper_log">
+            <column name="oper_time"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="idx_sys_oper_log_s" tableName="sys_oper_log">
+            <column defaultValueNumeric="0" name="status"/>
+        </createIndex>
     </changeSet>
     <changeSet author="Administrator (generated)" id="1764223194862-38">
         <createTable remarks="岗位信息表" tableName="sys_post">
@@ -332,30 +347,5 @@
         </createTable>
         <loadData tableName="sys_user_role" file="../../db/data/sys_user_role.csv" separator="," encoding="UTF-8" relativeToChangelogFile="true"/>
 
-    </changeSet>
-    <changeSet author="Administrator (generated)" id="1764223194862-45">
-        <createIndex associatedWith="" indexName="idx_sys_logininfor_lt" tableName="sys_logininfor">
-            <column name="login_time"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="Administrator (generated)" id="1764223194862-46">
-        <createIndex associatedWith="" indexName="idx_sys_logininfor_s" tableName="sys_logininfor">
-            <column name="status"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="Administrator (generated)" id="1764223194862-47">
-        <createIndex associatedWith="" indexName="idx_sys_oper_log_bt" tableName="sys_oper_log">
-            <column defaultValueNumeric="0" name="business_type"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="Administrator (generated)" id="1764223194862-48">
-        <createIndex associatedWith="" indexName="idx_sys_oper_log_ot" tableName="sys_oper_log">
-            <column name="oper_time"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="Administrator (generated)" id="1764223194862-49">
-        <createIndex associatedWith="" indexName="idx_sys_oper_log_s" tableName="sys_oper_log">
-            <column defaultValueNumeric="0" name="status"/>
-        </createIndex>
     </changeSet>
 </databaseChangeLog>

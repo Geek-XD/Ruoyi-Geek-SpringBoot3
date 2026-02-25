@@ -41,11 +41,6 @@
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
 
-        <!-- Pgsql驱动包 -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
 
         <!-- knife4j -->
         <dependency>
