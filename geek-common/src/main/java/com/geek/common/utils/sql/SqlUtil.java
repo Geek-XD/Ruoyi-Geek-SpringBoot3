@@ -75,11 +75,13 @@ public class SqlUtil {
                 flexDataSource.getDbType(DataSourceKey.get()),
                 flexDataSource.getDefaultDbType());
         if (dbType == DbType.OPENGAUSS) {
-            return String.format("array_position(string_to_array(%s, ','), CAST(%s AS TEXT)) IS NOT NULL", columns,
-                    str);
+            return String.format("array_position(string_to_array(%s, ','), CAST(%s AS TEXT)) IS NOT NULL",
+                    columns, str);
         } else if (dbType.postgresqlSameType()) {
             return String.format("CAST(%s AS TEXT) = ANY (string_to_array(%s, ','))", str, columns);
         } else if (dbType.oracleSameType()) {
+            return String.format("INSTR(',' || %s || ',', ',' || %s || ',') > 0", columns, str);
+        } else if (dbType.mysqlSameType()) {
             return "FIND_IN_SET(" + str + "," + columns + ")";
         } else {
             return "FIND_IN_SET(" + str + "," + columns + ")";
