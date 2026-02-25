@@ -114,6 +114,10 @@ xss:
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
 
+security:
+  # 白名单配置，多个用逗号分隔
+  whitList: /login,/register,/captchaImage,/swagger-ui/**,/swagger-resources/**,/webjars/**,/druid/**,/*/api-docs/**,/websocket/**
+
 # PageHelper分页插件
 pagehelper:
   helperDialect: mysql

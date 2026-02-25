@@ -1,6 +1,7 @@
 package com.geek.framework.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,7 +10,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -53,8 +53,8 @@ public class SecurityConfig {
     @Autowired
     private PermitAllUrlProperties permitAllUrl;
 
-    final String[] WHIT_LIST = { "/login", "/register", "/captchaImage", "/swagger-ui/**", "/swagger-resources/**",
-            "/webjars/**", "/druid/**", "/*/api-docs/**" };
+    @Value("${security.whitList}")
+    private String WHIT_LIST;
 
     /**
      * anyRequest | 匹配所有请求路径
@@ -86,7 +86,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         // 白名单允许匿名访问的url
-                        .requestMatchers(WHIT_LIST).permitAll()
+                        .requestMatchers(WHIT_LIST.split(",")).permitAll()
                         // 注解标记允许匿名访问的url
                         .requestMatchers(permitAllUrl.getUrls().toArray(String[]::new)).permitAll()
                         // 静态资源，可匿名访问
@@ -101,17 +101,6 @@ public class SecurityConfig {
                 .addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class)
                 .addFilterBefore(corsFilter, LogoutFilter.class)
                 .build();
-    }
-
-    /**
-     * 忽略web安全配置
-     * 主要是忽略websocket的安全配置
-     *
-     * @return WebSecurityCustomizer
-     */
-    @Bean
-    WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/websocket/**");
     }
 
     /**
