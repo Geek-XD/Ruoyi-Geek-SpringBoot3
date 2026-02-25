@@ -6,11 +6,15 @@ import java.util.UUID;
 
 import com.geek.common.enums.MessageType;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Message {
 
     /** 消息唯一标识符 */
