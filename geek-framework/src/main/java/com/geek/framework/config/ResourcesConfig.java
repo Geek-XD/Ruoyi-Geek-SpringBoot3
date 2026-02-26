@@ -31,12 +31,12 @@ public class ResourcesConfig implements WebMvcConfigurer {
     @Resource
     private RepeatSubmitInterceptor repeatSubmitInterceptor;
 
-    @Resource(name = "threadPoolTaskExecutor")
-    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Resource(name = "taskExecutor")
+    private ThreadPoolTaskExecutor taskExecutor;
 
     @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
-        configurer.setTaskExecutor(threadPoolTaskExecutor);
+        configurer.setTaskExecutor(taskExecutor);
     }
 
     @Override

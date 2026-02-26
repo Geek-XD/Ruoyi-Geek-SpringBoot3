@@ -30,7 +30,7 @@ public class ThreadPoolConfig {
     // 线程池维护线程所允许的空闲时间
     private int keepAliveSeconds = 300;
 
-    @Bean(name = "threadPoolTaskExecutor")
+    @Bean(name = "taskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setMaxPoolSize(maxPoolSize);

@@ -10,15 +10,15 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * 启动程序
  * 
  * @author geek
  */
+@EnableAsync
 @EnableCaching
-@EnableMethodSecurity
 @MapperScan(basePackages = { "com.geek.**.mapper" })
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class }, scanBasePackages = { "com.geek", "com.anji.captcha" })
 public class GeekApplication {
