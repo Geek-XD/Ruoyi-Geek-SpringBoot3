@@ -198,27 +198,27 @@ command:
 
 ### 插件
 
-* Geek-Plugin-Websocket （ws长连接支持）
-* Geek-Plugin-RabbitMQ（rabbitmq支持：提供事件监听能力-暂未统一）
-* Geek-Plugin-Minio（minio分布式存储：提供存储支持-可共存）
-* Geek-Plugin-Aliyun-OSS（阿里云OSS对象存储：提供存储支持-可共存）
-* Geek-Plugin-Ehcache（Ehcache持久化缓存：提供缓存支持-可替换）
-* Geek-Plugin-Redis（Redis分布式缓存：提供缓存支持-可替换）
+* [Geek-Plugin-Websocket （ws长连接支持）](https://gitee.com/geek-xd/geek-plugin-websocket)
+* [Geek-Plugin-RabbitMQ（rabbitmq支持：提供事件监听能力-暂未统一）](https://gitee.com/geek-xd/geek-plugin-rabbitmq)
+* [Geek-Plugin-Minio（minio分布式存储：提供存储支持-可共存）](https://gitee.com/geek-xd/geek-plugin-minio)
+* [Geek-Plugin-Aliyun-OSS（阿里云OSS对象存储：提供存储支持-可共存）](https://gitee.com/geek-xd/geek-plugin-aliyun-oss)
+* [Geek-Plugin-Ehcache（Ehcache持久化缓存：提供缓存支持-可替换）](https://gitee.com/geek-xd/geek-plugin-ehcache)
+* [Geek-Plugin-Redis（Redis分布式缓存：提供缓存支持-可替换）](https://gitee.com/geek-xd/geek-plugin-redis)
+* [Geek-Plugin-Netty](https://gitee.com/geek-xd/geek-plugin-netty)
 
 ### 模块
 
-* Geek-Module-Flowable（工作流模块）
-* Geek-Module-Form（动态表单模块）
-* Geek-Module-Message（消息模块）
-* Geek-Module-Online（在线api模块）
-* Geek-Module-Quartz（定时任务模块）
-* Geek-Module-Generator（代码生成器模块）
+* [Geek-Module-Flowable（工作流模块）](https://gitee.com/geek-xd/geek-module-flowable)
+* [Geek-Module-Form（动态表单模块）](https://gitee.com/geek-xd/geek-module-form)
+* [Geek-Module-Message（消息模块）](https://gitee.com/geek-xd/geek-module-message)
+* [Geek-Module-Online（在线api模块）](https://gitee.com/geek-xd/geek-module-online)
+* [Geek-Module-Quartz（定时任务模块）](https://gitee.com/geek-xd/geek-module-quartz)
+* [Geek-Module-Generator（代码生成器模块）](https://gitee.com/geek-xd/geek-module-generator)
 
 ### 场景
 
-* Geek-Scene-Auth（扩展认证场景）
-* Geek-Scene-Pay（扩展支付场景）
-
+* [Geek-Scene-Auth（扩展认证场景）](https://gitee.com/geek-xd/geek-scene-auth)
+* [Geek-Scene-Pay（扩展支付场景）](https://gitee.com/geek-xd/geek-scene-pay)
 
 ## 演示图
 
