@@ -131,10 +131,10 @@ public class SysProfileController extends BaseController {
             String extractPath = loginUser.getUsername() + "/" + loginUser.getUserId() + "";
             String fileName = DateUtils.dateTimeNow() + "-avatar." + FileUtils.getExtension(file);
             String filePath = "avatar/" + extractPath + "/" + fileName;
-            String url = Sb.upload(filePath, file, MimeTypeUtils.IMAGE_EXTENSION);
+            filePath = Sb.upload(filePath, file, MimeTypeUtils.IMAGE_EXTENSION);
             if (userService.updateUserAvatar(loginUser.getUsername(), filePath)) {
                 AjaxResult ajax = AjaxResult.success();
-                ajax.put("imgUrl", url);
+                ajax.put("imgUrl", Sb.getURL(filePath));
                 // 更新缓存用户头像
                 loginUser.getUser().setAvatar(filePath);
                 tokenService.setLoginUser(loginUser);
