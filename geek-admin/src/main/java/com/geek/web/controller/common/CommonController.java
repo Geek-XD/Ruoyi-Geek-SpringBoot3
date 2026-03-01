@@ -67,7 +67,7 @@ public class CommonController {
             HttpServletRequest request) {
         try {
             if (!FileUtils.checkAllowDownload(fileName)) {
-                throw new Exception(StringUtils.format("文件名称({})非法，不允许下载。 ", fileName));
+                throw new IllegalArgumentException(StringUtils.format("文件名称({})非法，不允许下载。 ", fileName));
             }
             String realFileName = System.currentTimeMillis() + fileName.substring(fileName.indexOf("_") + 1);
             String filePath = GeekConfig.getDownloadPath() + fileName;
@@ -90,7 +90,7 @@ public class CommonController {
     @Operation(summary = "通用上传请求（单个）")
     @PostMapping("/upload")
     @Anonymous
-    public AjaxResult uploadFile(@RequestBody MultipartFile file) throws Exception {
+    public AjaxResult uploadFile(@RequestBody MultipartFile file) {
         try {
             String url = Sb.upload(file);
             AjaxResult ajax = AjaxResult.success();
@@ -110,15 +110,14 @@ public class CommonController {
     @Operation(summary = "通用上传请求（多个）")
     @PostMapping("/uploads")
     @Anonymous
-    public AjaxResult uploadFiles(@RequestBody List<MultipartFile> files)
-            throws Exception {
+    public AjaxResult uploadFiles(@RequestBody List<MultipartFile> files) {
         try {
             // 上传文件路径
             String filePath = GeekConfig.getUploadPath();
-            List<String> urls = new ArrayList<String>();
-            List<String> fileNames = new ArrayList<String>();
-            List<String> newFileNames = new ArrayList<String>();
-            List<String> originalFilenames = new ArrayList<String>();
+            List<String> urls = new ArrayList<>();
+            List<String> fileNames = new ArrayList<>();
+            List<String> newFileNames = new ArrayList<>();
+            List<String> originalFilenames = new ArrayList<>();
             for (MultipartFile file : files) {
                 // 上传并返回新文件名称
                 String fileName = Sb.upload(filePath, file);
@@ -146,11 +145,10 @@ public class CommonController {
     @GetMapping("/download/resource")
     @Anonymous
     public void resourceDownload(@Parameter(name = "resource", description = "资源名称") String resource,
-            HttpServletRequest request, HttpServletResponse response)
-            throws Exception {
+            HttpServletRequest request, HttpServletResponse response) {
         try {
             if (!FileUtils.checkAllowDownload(resource)) {
-                throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", resource));
+                throw new IllegalArgumentException(StringUtils.format("资源文件({})非法，不允许下载。 ", resource));
             }
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, resource);

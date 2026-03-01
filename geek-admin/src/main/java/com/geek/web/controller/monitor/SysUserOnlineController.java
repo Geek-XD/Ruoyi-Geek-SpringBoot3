@@ -41,7 +41,7 @@ public class SysUserOnlineController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<SysUserOnline> list(String ipaddr, String userName) {
         Collection<String> keys = CacheUtils.getkeys(CacheConstants.LOGIN_TOKEN_KEY);
-        List<SysUserOnline> userOnlineList = new ArrayList<SysUserOnline>();
+        List<SysUserOnline> userOnlineList = new ArrayList<>();
         for (String key : keys) {
             LoginUser user = CacheUtils.get(CacheConstants.LOGIN_TOKEN_KEY, key, LoginUser.class);
             if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName)) {

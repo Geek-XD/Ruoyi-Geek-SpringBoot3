@@ -105,8 +105,8 @@ public class DataScopeAspect {
     public void dataScopeFilter(JoinPoint joinPoint, SysUser user, String deptAlias, String userAlias,
             String permission) {
         StringBuilder sqlString = new StringBuilder();
-        List<String> conditions = new ArrayList<String>();
-        List<String> scopeCustomIds = new ArrayList<String>();
+        List<String> conditions = new ArrayList<>();
+        List<String> scopeCustomIds = new ArrayList<>();
         user.getRoles().forEach(role -> {
             if (DATA_SCOPE_CUSTOM.equals(role.getDataScope())
                     && StringUtils.equals(role.getStatus(), UserConstants.ROLE_NORMAL)

@@ -212,7 +212,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public List<RouterVo> buildMenus(List<SysMenu> menus) {
-        List<RouterVo> routers = new LinkedList<RouterVo>();
+        List<RouterVo> routers = new LinkedList<>();
         for (SysMenu menu : menus) {
             RouterVo router = new RouterVo();
             router.setHidden("1".equals(menu.getVisible()));
@@ -229,7 +229,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 router.setChildren(buildMenus(cMenus));
             } else if (isMenuFrame(menu)) {
                 router.setMeta(null);
-                List<RouterVo> childrenList = new ArrayList<RouterVo>();
+                List<RouterVo> childrenList = new ArrayList<>();
                 RouterVo children = new RouterVo();
                 children.setPath(menu.getPath());
                 children.setComponent(menu.getComponent());
@@ -242,7 +242,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             } else if (menu.getParentId().intValue() == MENU_ROOT_ID && isInnerLink(menu)) {
                 router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
                 router.setPath("/");
-                List<RouterVo> childrenList = new ArrayList<RouterVo>();
+                List<RouterVo> childrenList = new ArrayList<>();
                 RouterVo children = new RouterVo();
                 String routerPath = innerLinkReplaceEach(menu.getPath());
                 children.setPath(routerPath);
@@ -265,7 +265,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public List<SysMenu> buildMenuTree(List<SysMenu> menus) {
-        List<SysMenu> returnList = new ArrayList<SysMenu>();
+        List<SysMenu> returnList = new ArrayList<>();
         List<Long> tempList = menus.stream().map(SysMenu::getMenuId).collect(Collectors.toList());
         for (Iterator<SysMenu> iterator = menus.iterator(); iterator.hasNext();) {
             SysMenu menu = (SysMenu) iterator.next();
@@ -484,7 +484,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      * @return String
      */
     public List<SysMenu> getChildPerms(List<SysMenu> list, long parentId) {
-        List<SysMenu> returnList = new ArrayList<SysMenu>();
+        List<SysMenu> returnList = new ArrayList<>();
         for (Iterator<SysMenu> iterator = list.iterator(); iterator.hasNext();) {
             SysMenu t = (SysMenu) iterator.next();
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
@@ -517,7 +517,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      * 得到子节点列表
      */
     private List<SysMenu> getChildList(List<SysMenu> list, SysMenu t) {
-        List<SysMenu> tlist = new ArrayList<SysMenu>();
+        List<SysMenu> tlist = new ArrayList<>();
         Iterator<SysMenu> it = list.iterator();
         while (it.hasNext()) {
             SysMenu n = (SysMenu) it.next();

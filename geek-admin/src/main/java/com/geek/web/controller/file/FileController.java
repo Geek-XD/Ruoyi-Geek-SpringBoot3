@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -174,7 +175,7 @@ public class FileController extends BaseController {
             response.setContentType(MediaType.TEXT_HTML_VALUE);
             response.setCharacterEncoding(CharsetKit.UTF_8);
             String errorMessage = "下载文件失败: " + e.getMessage();
-            outputStream.write(errorMessage.getBytes(CharsetKit.UTF_8));
+            outputStream.write(errorMessage.getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
         } finally {
             outputStream.close();

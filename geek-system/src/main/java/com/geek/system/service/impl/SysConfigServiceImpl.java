@@ -11,6 +11,7 @@ import com.geek.common.core.text.Convert;
 import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.CacheUtils;
 import com.geek.common.utils.StringUtils;
+import com.geek.common.utils.poi.ExcelUtil;
 import com.geek.system.domain.SysConfig;
 import com.geek.system.mapper.SysConfigMapper;
 import com.geek.system.service.ISysConfigService;
@@ -88,7 +89,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
     @Override
     public void export(SysConfig config, HttpServletResponse response) {
         List<SysConfig> list = this.selectConfigList(config).list();
-        com.geek.common.utils.poi.ExcelUtil<SysConfig> util = new com.geek.common.utils.poi.ExcelUtil<SysConfig>(SysConfig.class);
+        ExcelUtil<SysConfig> util = new ExcelUtil<>(SysConfig.class);
         util.exportExcel(response, list, "参数数据");
     }
 

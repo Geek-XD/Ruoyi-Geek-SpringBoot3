@@ -335,7 +335,7 @@ public class HttpUtils {
             httpPost.addHeader("Content-Type", contentType);
         }
         // 添加参数
-        List<NameValuePair> list = new ArrayList<NameValuePair>();
+        List<NameValuePair> list = new ArrayList<>();
         if (paramsMap != null) {
             for (Map.Entry<String, Object> entry : paramsMap.entrySet()) {
                 list.add(new BasicNameValuePair(entry.getKey(), (String) entry.getValue()));

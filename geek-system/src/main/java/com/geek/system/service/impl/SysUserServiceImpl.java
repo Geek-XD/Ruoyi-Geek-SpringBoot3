@@ -109,7 +109,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @DataScope(deptAlias = "d", userAlias = "u")
     public void export(SysUser user, HttpServletResponse response) {
         List<SysUser> list = selectUserList(user).list();
-        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
+        ExcelUtil<SysUser> util = new ExcelUtil<>(SysUser.class);
         util.exportExcel(response, list, "用户数据");
     }
 
@@ -457,7 +457,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         List<Long> posts = user.getPostIds();
         if (StringUtils.isNotEmpty(posts)) {
             // 新增用户与岗位管理
-            List<SysUserPost> list = new ArrayList<SysUserPost>(posts.size());
+            List<SysUserPost> list = new ArrayList<>(posts.size());
             for (Long postId : posts) {
                 SysUserPost up = new SysUserPost();
                 up.setUserId(user.getUserId());
@@ -477,7 +477,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public void insertUserRole(Long userId, List<Long> roleIds) {
         if (StringUtils.isNotEmpty(roleIds)) {
             // 新增用户与角色管理
-            List<SysUserRole> list = new ArrayList<SysUserRole>(roleIds.size());
+            List<SysUserRole> list = new ArrayList<>(roleIds.size());
             for (Long roleId : roleIds) {
                 SysUserRole ur = new SysUserRole();
                 ur.setUserId(userId);

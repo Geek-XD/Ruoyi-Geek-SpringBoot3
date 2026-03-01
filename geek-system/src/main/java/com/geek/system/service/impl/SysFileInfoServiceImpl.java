@@ -48,7 +48,7 @@ public class SysFileInfoServiceImpl extends ServiceImpl<SysFileInfoMapper, SysFi
     @Override
     public void export(SysFileInfo sysFileInfo, HttpServletResponse response) {
         List<SysFileInfo> list = this.selectSysFileInfoList(sysFileInfo).list();
-        ExcelUtil<SysFileInfo> util = new ExcelUtil<SysFileInfo>(SysFileInfo.class);
+        ExcelUtil<SysFileInfo> util = new ExcelUtil<>(SysFileInfo.class);
         util.exportExcel(response, list, "文件数据");
     }
 }

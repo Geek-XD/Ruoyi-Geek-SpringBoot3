@@ -336,7 +336,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return list集合
      */
     public static final List<String> str2List(String str, String sep, boolean filterBlank, boolean trim) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         if (StringUtils.isEmpty(str)) {
             return list;
         }

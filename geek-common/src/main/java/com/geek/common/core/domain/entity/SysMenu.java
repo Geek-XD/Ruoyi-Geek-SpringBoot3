@@ -105,6 +105,6 @@ public class SysMenu extends BaseEntity {
     @Schema(title = "子菜单")
     @Column(ignore = true)
     @RelationOneToMany(selfField = "menuId", targetTable = "sys_menu", targetField = "parentId")
-    private List<SysMenu> children = new ArrayList<SysMenu>();
+    private List<SysMenu> children = new ArrayList<>();
 
 }

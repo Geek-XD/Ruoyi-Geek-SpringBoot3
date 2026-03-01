@@ -58,7 +58,7 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
     @Override
     public void export(SysLogininfor logininfor, HttpServletResponse response) {
         List<SysLogininfor> list = this.selectLogininforList(logininfor).list();
-        ExcelUtil<SysLogininfor> util = new ExcelUtil<SysLogininfor>(SysLogininfor.class);
+        ExcelUtil<SysLogininfor> util = new ExcelUtil<>(SysLogininfor.class);
         util.exportExcel(response, list, "登录日志");
     }
 

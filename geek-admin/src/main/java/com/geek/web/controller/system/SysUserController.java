@@ -87,7 +87,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:import')")
     @PostMapping("/importData")
     public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
-        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
+        ExcelUtil<SysUser> util = new ExcelUtil<>(SysUser.class);
         List<SysUser> userList = util.importExcel(file.getInputStream());
         String operName = getUsername();
         String message = userService.importUser(userList, updateSupport, operName);
@@ -97,7 +97,7 @@ public class SysUserController extends BaseController {
     @Operation(summary = "获取导入用户模板")
     @PostMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response) {
-        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
+        ExcelUtil<SysUser> util = new ExcelUtil<>(SysUser.class);
         util.importTemplateExcel(response, "用户数据");
     }
 

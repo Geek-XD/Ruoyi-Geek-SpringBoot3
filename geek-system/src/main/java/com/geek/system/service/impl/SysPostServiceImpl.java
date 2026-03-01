@@ -47,7 +47,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     @Override
     public void export(SysPost post, HttpServletResponse response) {
         List<SysPost> list = selectPostList(post).list();
-        ExcelUtil<SysPost> util = new ExcelUtil<SysPost>(SysPost.class);
+        ExcelUtil<SysPost> util = new ExcelUtil<>(SysPost.class);
         util.exportExcel(response, list, "岗位数据");
     }
 

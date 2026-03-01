@@ -57,7 +57,7 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
     @Override
     public void export(SysOperLog operLog, HttpServletResponse response) {
         List<SysOperLog> list = selectOperLogList(operLog).list();
-        ExcelUtil<SysOperLog> util = new ExcelUtil<SysOperLog>(SysOperLog.class);
+        ExcelUtil<SysOperLog> util = new ExcelUtil<>(SysOperLog.class);
         util.exportExcel(response, list, "操作日志");
     }
 

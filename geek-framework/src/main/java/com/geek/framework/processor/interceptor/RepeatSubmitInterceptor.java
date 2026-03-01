@@ -77,7 +77,7 @@ public class RepeatSubmitInterceptor implements HandlerInterceptor {
         if (StringUtils.isEmpty(nowParams)) {
             nowParams = JSON.toJSONString(request.getParameterMap());
         }
-        Map<String, Object> nowDataMap = new HashMap<String, Object>();
+        Map<String, Object> nowDataMap = new HashMap<>();
         nowDataMap.put(REPEAT_PARAMS, nowParams);
         nowDataMap.put(REPEAT_TIME, System.currentTimeMillis());
         // 请求地址（作为存放cache的key值）
@@ -97,7 +97,7 @@ public class RepeatSubmitInterceptor implements HandlerInterceptor {
                 }
             }
         }
-        Map<String, Object> cacheMap = new HashMap<String, Object>();
+        Map<String, Object> cacheMap = new HashMap<>();
         cacheMap.put(url, nowDataMap);
         CacheUtils.put(CacheConstants.REPEAT_SUBMIT_KEY, cacheRepeatKey, cacheMap, annotation.interval(),
                 TimeUnit.MILLISECONDS);

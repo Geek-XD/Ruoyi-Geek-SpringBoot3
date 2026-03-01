@@ -87,5 +87,5 @@ public class SysDept extends BaseEntity {
     @Schema(title = "子部门")
     @Column(ignore = true)
     @RelationOneToMany(selfField = "deptId", targetTable = "sys_dept", targetField = "parentId")
-    private List<SysDept> children = new ArrayList<SysDept>();
+    private List<SysDept> children = new ArrayList<>();
 }
