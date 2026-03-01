@@ -1,5 +1,6 @@
 package com.geek.common.utils;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +29,11 @@ public class CacheUtils {
      * @return
      */
     public static Cache getCache(String cacheName) {
-        return getCacheManager().getCache(cacheName);
+        Cache cache = getCacheManager().getCache(cacheName);
+        if(Objects.isNull(cache)){
+            throw new IllegalArgumentException("没有找到对应的缓存:"+cacheName);
+        }
+        return cache;
     }
 
     /**

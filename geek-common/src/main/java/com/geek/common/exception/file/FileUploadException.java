@@ -54,7 +54,7 @@ public class FileUploadException extends Exception
     }
 
     @Override
-    public Throwable getCause()
+    public synchronized Throwable getCause()
     {
         return cause;
     }

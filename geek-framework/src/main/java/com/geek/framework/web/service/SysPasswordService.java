@@ -1,5 +1,7 @@
 package com.geek.framework.web.service;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.security.core.Authentication;
@@ -18,8 +20,6 @@ import com.geek.common.utils.ip.IpUtils;
 import com.geek.framework.manager.AsyncManager;
 import com.geek.framework.manager.factory.AsyncFactory;
 import com.geek.framework.security.context.AuthenticationContextHolder;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * 登录密码方法
@@ -68,7 +68,7 @@ public class SysPasswordService
         {
             retryCount = 0;
         }
-        if (retryCount >= Integer.valueOf(maxRetryCount).intValue())
+        if (retryCount >= maxRetryCount)
         {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL,
                     MessageUtils.message("user.password.retry.limit.exceed", maxRetryCount, lockTime)));

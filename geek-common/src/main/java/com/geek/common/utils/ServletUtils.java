@@ -7,16 +7,19 @@ import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.Objects;
+
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.geek.common.constant.Constants;
 import com.geek.common.core.text.Convert;
+
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * 客户端工具类
@@ -128,6 +131,9 @@ public class ServletUtils
     public static ServletRequestAttributes getRequestAttributes()
     {
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+        if(Objects.isNull(attributes)){
+            throw new IllegalStateException("当前线程非请求线程");
+        }
         return (ServletRequestAttributes) attributes;
     }
 
