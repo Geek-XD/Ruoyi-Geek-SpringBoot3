@@ -1,5 +1,6 @@
 package com.geek.web.controller.file;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLConnection;
@@ -29,6 +30,7 @@ import com.geek.common.core.storage.GeekStorageBucket;
 import com.geek.common.core.storage.StorageBucketKey;
 import com.geek.common.core.storage.domain.SysFilePartETag;
 import com.geek.common.core.storage.service.StorageService;
+import com.geek.common.core.text.CharsetKit;
 import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.Sb;
 import com.geek.common.utils.SecurityUtils;
@@ -101,15 +103,13 @@ public class FileController extends BaseController {
     public void downloadUnified(
             @PathVariable(name = "bucketName", required = false) String bucketName,
             @RequestParam("filePath") String filePath,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) throws IOException {
         try {
             response.setContentType("application/octet-stream");
             if (StringUtils.isEmpty(bucketName)) {
                 Sb.downLoad(filePath, response);
             } else {
-                StorageBucketKey.use(bucketName, () -> {
-                    Sb.downLoad(filePath, response);
-                });
+                StorageBucketKey.use(bucketName, () -> Sb.downLoad(filePath, response));
             }
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
@@ -132,7 +132,7 @@ public class FileController extends BaseController {
                 StorageBucketKey.use(bucketName);
             }
             StorageService storageService = new StorageService(GeekConfig.getGeekStorageBucket());
-            filePath = URLDecoder.decode(filePath, "UTF-8");
+            filePath = URLDecoder.decode(filePath, CharsetKit.UTF_8);
             InputStream inputStream = storageService.downLoad(filePath);
             String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(filePath));
             if (contentType == null) {
@@ -160,11 +160,11 @@ public class FileController extends BaseController {
     public void resourceDownload(
             @RequestParam String filePath,
             HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) throws IOException {
         OutputStream outputStream = response.getOutputStream();
         try {
             if (!FileUtils.checkAllowDownload(filePath)) {
-                throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", filePath));
+                throw new IllegalArgumentException(StringUtils.format("资源文件({})非法，不允许下载。 ", filePath));
             }
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, filePath);
@@ -172,9 +172,9 @@ public class FileController extends BaseController {
         } catch (Exception e) {
             response.reset();
             response.setContentType(MediaType.TEXT_HTML_VALUE);
-            response.setCharacterEncoding("UTF-8");
+            response.setCharacterEncoding(CharsetKit.UTF_8);
             String errorMessage = "下载文件失败: " + e.getMessage();
-            outputStream.write(errorMessage.getBytes("UTF-8"));
+            outputStream.write(errorMessage.getBytes(CharsetKit.UTF_8));
             outputStream.flush();
         } finally {
             outputStream.close();

@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.geek.common.core.text.CharsetKit;
+
 /**
  * Md5加密方法
  *
@@ -36,7 +38,7 @@ public class Md5Utils {
         try {
             algorithm = MessageDigest.getInstance("MD5");
             algorithm.reset();
-            algorithm.update(s.getBytes("UTF-8"));
+            algorithm.update(s.getBytes(CharsetKit.UTF_8));
             byte[] messageDigest = algorithm.digest();
             return messageDigest;
         } catch (Exception e) {
@@ -71,7 +73,7 @@ public class Md5Utils {
     }
 
     public static String encryptMd5(String string) throws UnsupportedEncodingException {
-        return encryptMd5(string, "UTF-8");
+        return encryptMd5(string, CharsetKit.UTF_8);
     }
 
     public static String encryptMd5(String string, String charSet) throws UnsupportedEncodingException {

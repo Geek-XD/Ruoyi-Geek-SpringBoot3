@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.geek.common.core.storage.base.StorageBucket;
 import com.geek.common.core.storage.base.StorageEntity;
 import com.geek.common.core.storage.domain.SysFilePartETag;
+import com.geek.common.core.text.CharsetKit;
 import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.ServletUtils;
 import com.geek.common.utils.sign.Md5Utils;
@@ -80,7 +81,7 @@ public class LocalBucket implements StorageBucket {
         sb.append(url.delete(url.length() - request.getRequestURI().length(), url.length())
                 .append(contextPath).toString())
                 .append(getApi()).append("?")
-                .append("filePath=").append(URLEncoder.encode(filePath, "UTF-8"))
+                .append("filePath=").append(URLEncoder.encode(filePath, CharsetKit.UTF_8))
                 .append("&toHex=").append(toHex);
         return URI.create(sb.toString()).toURL();
     }
