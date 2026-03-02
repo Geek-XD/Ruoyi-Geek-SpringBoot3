@@ -3,8 +3,10 @@ package com.geek.system.service;
 import java.util.List;
 import java.util.Set;
 
+import com.geek.common.constant.UserConstants;
 import com.geek.common.core.domain.TreeSelect;
 import com.geek.common.core.domain.entity.SysMenu;
+import com.geek.common.utils.StringUtils;
 import com.geek.system.domain.vo.RouterVo;
 import com.mybatisflex.core.service.IService;
 
@@ -118,4 +120,19 @@ public interface ISysMenuService extends IService<SysMenu> {
      * @return 结果
      */
     public boolean checkRouteConfigUnique(SysMenu menu);
+
+    /**
+     * 更新或新增前检查
+     */
+    default public void checkMenuAllowed(SysMenu menu) {
+        if (!checkMenuNameUnique(menu)) {
+            throw new IllegalArgumentException("菜单名称已存在");
+        } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
+            throw new IllegalArgumentException("地址必须以http(s)://开头");
+        } else if (menu.getMenuId().equals(menu.getParentId())) {
+            throw new IllegalArgumentException("上级菜单不能选择自己");
+        } else if (!checkRouteConfigUnique(menu)) {
+            throw new IllegalArgumentException("路由名称或地址已存在");
+        }
+    }
 }

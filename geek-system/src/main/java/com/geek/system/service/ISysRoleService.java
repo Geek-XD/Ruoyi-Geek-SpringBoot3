@@ -171,6 +171,18 @@ public interface ISysRoleService extends IService<SysRole> {
      */
     public int insertAuthUsers(Long roleId, Long[] userIds);
 
+    /**
+     * 更新或新增前检查
+     * @param role
+     */
+    default public void checkRoleAllowedBeforeUpdate(SysRole role) {
+        if(!checkRoleNameUnique(role)){
+            throw new IllegalArgumentException("角色名称已存在");
+        } else if (!checkRoleKeyUnique(role)) {
+            throw new IllegalArgumentException("角色权限已存在");
+        }
+    }
+
     void export(SysRole role, HttpServletResponse response);
 
     Page<SysRole> page(SysRole role, int pageNum, int pageSize);

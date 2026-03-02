@@ -3,6 +3,7 @@ package com.geek.system.service;
 import java.util.List;
 
 import com.geek.common.core.domain.entity.SysUser;
+import com.geek.common.utils.StringUtils;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.service.IService;
@@ -212,6 +213,19 @@ public interface ISysUserService extends IService<SysUser> {
      * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+    /**
+     * 修改或更新前的检查
+     */
+    default void checkUserAllowedBeforeUpdate(SysUser user) {
+        if (!checkUserNameUnique(user)) {
+            throw new IllegalArgumentException("登录账号已存在");
+        } else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !checkPhoneUnique(user)) {
+            throw new IllegalArgumentException("手机号码已存在");
+        } else if (StringUtils.isNotEmpty(user.getEmail()) && !checkEmailUnique(user)) {
+            throw new IllegalArgumentException("邮箱账号已存在");
+        }
+    }
 
     Page<SysUser> page(SysUser user, int pageNum, int pageSize);
 
