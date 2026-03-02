@@ -6,9 +6,7 @@ package com.geek.common.constant;
  * @author geek
  */
 public class UserConstants {
-    /**
-     * 平台内系统用户的唯一标志
-     */
+    /** 平台内系统用户的唯一标志 */
     public static final String SYS_USER = "SYS_USER";
 
     /** 正常状态 */
@@ -77,4 +75,7 @@ public class UserConstants {
      */
     public static final int PASSWORD_MIN_LENGTH = 5;
     public static final int PASSWORD_MAX_LENGTH = 20;
+
+    private UserConstants() {
+    }
 }

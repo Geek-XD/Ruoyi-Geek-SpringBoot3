@@ -169,6 +169,6 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
     /** @deprecated */
     @Deprecated
-    public DateUtils() {
+    private DateUtils() {
     }
 }

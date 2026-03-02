@@ -87,4 +87,7 @@ public class SqlUtil {
             return "FIND_IN_SET(" + str + "," + columns + ")";
         }
     }
+
+    private SqlUtil() {
+    }
 }

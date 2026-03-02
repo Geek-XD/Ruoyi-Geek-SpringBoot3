@@ -468,4 +468,7 @@ public class HttpUtils {
         httpPost.setEntity(entity);
         return execute(httpPost, Constants.UTF8, false);
     }
+
+    private HttpUtils() {
+    }
 }

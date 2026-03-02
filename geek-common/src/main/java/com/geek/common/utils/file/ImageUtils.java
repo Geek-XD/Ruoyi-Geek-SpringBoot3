@@ -2,8 +2,10 @@ package com.geek.common.utils.file;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
@@ -57,29 +59,32 @@ public class ImageUtils {
      * @return 字节数据
      */
     public static byte[] readFile(String url) {
-        InputStream in = null;
-        try {
-            if (url.startsWith("http")) {
-                // 网络地址
-                URI uriObj = new URI(url);
-                URL urlObj = uriObj.toURL();
-                URLConnection urlConnection = urlObj.openConnection();
-                urlConnection.setConnectTimeout(30 * 1000);
-                urlConnection.setReadTimeout(60 * 1000);
-                urlConnection.setDoInput(true);
-                in = urlConnection.getInputStream();
-            } else {
-                // 本机地址
-                String localPath = GeekConfig.getProfile();
-                String downloadPath = localPath + StringUtils.substringAfter(url, Constants.RESOURCE_PREFIX);
-                in = new FileInputStream(downloadPath);
-            }
+        try (InputStream in = getInputStream(url)) {
             return IOUtils.toByteArray(in);
         } catch (Exception e) {
             log.error("获取文件路径异常 {}", e);
             return null;
-        } finally {
-            IOUtils.closeQuietly(in);
         }
+    }
+
+    private static InputStream getInputStream(String url) throws IOException, URISyntaxException {
+        if (url.startsWith("http")) {
+            // 网络地址
+            URI uriObj = new URI(url);
+            URL urlObj = uriObj.toURL();
+            URLConnection urlConnection = urlObj.openConnection();
+            urlConnection.setConnectTimeout(30 * 1000);
+            urlConnection.setReadTimeout(60 * 1000);
+            urlConnection.setDoInput(true);
+            return urlConnection.getInputStream();
+        } else {
+            // 本机地址
+            String localPath = GeekConfig.getProfile();
+            String downloadPath = localPath + StringUtils.substringAfter(url, Constants.RESOURCE_PREFIX);
+            return new FileInputStream(downloadPath);
+        }
+    }
+
+    private ImageUtils() {
     }
 }

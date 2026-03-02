@@ -30,8 +30,8 @@ public class CacheUtils {
      */
     public static Cache getCache(String cacheName) {
         Cache cache = getCacheManager().getCache(cacheName);
-        if(Objects.isNull(cache)){
-            throw new IllegalArgumentException("没有找到对应的缓存:"+cacheName);
+        if (Objects.isNull(cache)) {
+            throw new IllegalArgumentException("没有找到对应的缓存:" + cacheName);
         }
         return cache;
     }
@@ -148,5 +148,8 @@ public class CacheUtils {
      */
     public static void clear(String cacheName) {
         getCache(cacheName).clear();
+    }
+
+    private CacheUtils() {
     }
 }

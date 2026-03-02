@@ -5,8 +5,7 @@ package com.geek.common.constant;
  * 
  * @author geek
  */
-public class ScheduleConstants
-{
+public class ScheduleConstants {
     public static final String TASK_CLASS_NAME = "TASK_CLASS_NAME";
 
     /** 执行目标key */
@@ -24,8 +23,7 @@ public class ScheduleConstants
     /** 不触发立即执行 */
     public static final String MISFIRE_DO_NOTHING = "3";
 
-    public enum Status
-    {
+    public enum Status {
         /**
          * 正常
          */
@@ -37,14 +35,15 @@ public class ScheduleConstants
 
         private String value;
 
-        private Status(String value)
-        {
+        private Status(String value) {
             this.value = value;
         }
 
-        public String getValue()
-        {
+        public String getValue() {
             return value;
         }
+    }
+
+    private ScheduleConstants() {
     }
 }

@@ -184,10 +184,10 @@ public class Sb {
     /**
      * 上传文件分片
      *
-     * @param filePath 文件路径
-     * @param uploadId 上传任务ID
+     * @param filePath   文件路径
+     * @param uploadId   上传任务ID
      * @param partNumber 分片序号
-     * @param chunk    分片文件
+     * @param chunk      分片文件
      * @return 分片的ETag
      * @throws Exception
      */
@@ -210,8 +210,8 @@ public class Sb {
     /**
      * 合并文件分片
      *
-     * @param filePath 文件路径
-     * @param uploadId 上传任务ID
+     * @param filePath  文件路径
+     * @param uploadId  上传任务ID
      * @param partETags 分片信息
      * @return 文件地址
      * @throws Exception
@@ -223,5 +223,8 @@ public class Sb {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    private Sb() {
     }
 }

@@ -74,4 +74,7 @@ public class MybatisUtils {
         }
         return resources.toArray(new Resource[resources.size()]);
     }
+
+    private MybatisUtils() {
+    }
 }

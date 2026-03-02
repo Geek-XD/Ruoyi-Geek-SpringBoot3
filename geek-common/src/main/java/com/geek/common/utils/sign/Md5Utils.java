@@ -82,6 +82,7 @@ public class Md5Utils {
 
     /**
      * 计算文件的md5
+     * 
      * @param file 文件，可以是 MultipartFile 或 File
      * @return
      */
@@ -164,5 +165,8 @@ public class Md5Utils {
             log.error(e.getMessage());
         }
         return null;
+    }
+
+    private Md5Utils() {
     }
 }

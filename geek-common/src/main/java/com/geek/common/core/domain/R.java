@@ -21,7 +21,7 @@ public class R<T> implements Serializable {
     public static final int SUCCESS = HttpStatus.SUCCESS;
 
     /** 失败 */
-    public static final int FAIL = HttpStatus.ERROR;
+    public static final int ERROR = HttpStatus.ERROR;
 
     @Schema(title = "响应码")
     private int code;
@@ -45,19 +45,19 @@ public class R<T> implements Serializable {
     }
 
     public static <T> R<T> fail() {
-        return restResult(null, FAIL, "操作失败");
+        return restResult(null, ERROR, "操作失败");
     }
 
     public static <T> R<T> fail(String msg) {
-        return restResult(null, FAIL, msg);
+        return restResult(null, ERROR, msg);
     }
 
     public static <T> R<T> fail(T data) {
-        return restResult(data, FAIL, "操作失败");
+        return restResult(data, ERROR, "操作失败");
     }
 
     public static <T> R<T> fail(T data, String msg) {
-        return restResult(data, FAIL, msg);
+        return restResult(data, ERROR, msg);
     }
 
     public static <T> R<T> fail(int code, String msg) {

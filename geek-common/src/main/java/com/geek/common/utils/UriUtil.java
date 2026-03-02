@@ -145,4 +145,6 @@ public class UriUtil {
         return matchLevel;
     }
 
+    private UriUtil() {
+    }
 }

@@ -17,10 +17,10 @@ import com.geek.common.utils.http.HttpUtils;
 public class AddressUtils {
     private static final Logger log = LoggerFactory.getLogger(AddressUtils.class);
 
-    // IP地址查询
+    /** IP地址查询 */
     public static final String IP_URL = "http://whois.pconline.com.cn/ipJson.jsp";
 
-    // 未知地址
+    /** 未知地址 */
     public static final String UNKNOWN = "XX XX";
 
     public static String getRealAddressByIP(String ip) {
@@ -44,5 +44,8 @@ public class AddressUtils {
             }
         }
         return UNKNOWN;
+    }
+
+    private AddressUtils() {
     }
 }

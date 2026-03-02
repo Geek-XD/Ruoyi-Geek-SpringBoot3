@@ -89,16 +89,14 @@ public class FileUtils {
      * @throws IOException IO异常
      */
     public static String writeBytes(byte[] data, String uploadDir) throws IOException {
-        FileOutputStream fos = null;
         String pathName = "";
-        try {
-            String extension = getFileExtendName(data);
-            pathName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + extension;
-            File file = FileUtils.getAbsoluteFile(uploadDir, pathName);
-            fos = new FileOutputStream(file);
+        String extension = getFileExtendName(data);
+        pathName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + extension;
+        File file = FileUtils.getAbsoluteFile(uploadDir, pathName);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(data);
-        } finally {
-            IOUtils.close(fos);
+        } catch (IOException e) {
+            throw e;
         }
         return FileUtils.getPathFileName(uploadDir, pathName);
     }
@@ -400,6 +398,9 @@ public class FileUtils {
                 .append(File.separatorChar).append(DateUtils.dateTimeNow())
                 .append("_").append(UUID.fastUUID().toString().substring(0, 4))
                 .append(".").append(FileUtils.getExtension(file)).toString();
+    }
+
+    private FileUtils() {
     }
 
 }
