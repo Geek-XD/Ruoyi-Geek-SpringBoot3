@@ -15,12 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.geek.common.annotation.Log;
-import com.geek.common.constant.UserConstants;
 import com.geek.common.core.controller.BaseController;
 import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.core.domain.entity.SysMenu;
 import com.geek.common.enums.BusinessType;
-import com.geek.common.utils.StringUtils;
 import com.geek.system.service.ISysMenuService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -91,12 +89,10 @@ public class SysMenuController extends BaseController {
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysMenu menu) {
-        if (!menuService.checkMenuNameUnique(menu)) {
-            return error("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
-        } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
-            return error("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
-        } else if (!menuService.checkRouteConfigUnique(menu)) {
-            return error("新增菜单'" + menu.getMenuName() + "'失败，路由名称或地址已存在");
+        try {
+            menuService.checkMenuAllowed(menu);
+        } catch (IllegalArgumentException e) {
+            return error("新增菜单'" + menu.getMenuName() + "'失败，" + e.getMessage());
         }
         menu.setCreateBy(getUsername());
         return toAjax(menuService.save(menu));
@@ -110,17 +106,14 @@ public class SysMenuController extends BaseController {
     @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysMenu menu) {
-        if (!menuService.checkMenuNameUnique(menu)) {
-            return error("修改菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
-        } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
-            return error("修改菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
-        } else if (menu.getMenuId().equals(menu.getParentId())) {
-            return error("修改菜单'" + menu.getMenuName() + "'失败，上级菜单不能选择自己");
-        } else if (!menuService.checkRouteConfigUnique(menu)) {
-            return error("修改菜单'" + menu.getMenuName() + "'失败，路由名称或地址已存在");
+        try {
+            menuService.checkMenuAllowed(menu);
+        } catch (IllegalArgumentException e) {
+            return error("修改菜单'" + menu.getMenuName() + "'失败，" + e.getMessage());
         }
         menu.setUpdateBy(getUsername());
         return toAjax(menuService.updateById(menu));
+
     }
 
     /**
