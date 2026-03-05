@@ -129,7 +129,7 @@ public interface ISysMenuService extends IService<SysMenu> {
             throw new IllegalArgumentException("菜单名称已存在");
         } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
             throw new IllegalArgumentException("地址必须以http(s)://开头");
-        } else if (menu.getMenuId().equals(menu.getParentId())) {
+        } else if (menu.getParentId().equals(menu.getMenuId())) {
             throw new IllegalArgumentException("上级菜单不能选择自己");
         } else if (!checkRouteConfigUnique(menu)) {
             throw new IllegalArgumentException("路由名称或地址已存在");
