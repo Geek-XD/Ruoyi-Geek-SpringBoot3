@@ -4,7 +4,7 @@
     <parent>
         <artifactId>geek</artifactId>
         <groupId>com.geekxd</groupId>
-        <version>3.9.1-G</version>
+        <version>3.9.2-G</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -116,7 +116,7 @@
 
         <dependency>
             <groupId>com.mybatis-flex</groupId>
-            <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
+            <artifactId>mybatis-flex-spring-boot4-starter</artifactId>
         </dependency>
 
         <dependency>

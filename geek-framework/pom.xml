@@ -4,7 +4,7 @@
     <parent>
         <artifactId>geek</artifactId>
         <groupId>com.geekxd</groupId>
-        <version>3.9.1-G</version>
+        <version>3.9.2-G</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,13 +25,13 @@
         <!-- SpringBoot 拦截器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <artifactId>spring-boot-starter-aspectj</artifactId>
         </dependency>
 
         <!-- 阿里数据库连接池 -->
         <dependency>
             <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-3-starter</artifactId>
+            <artifactId>druid-spring-boot-4-starter</artifactId>
         </dependency>
 
         <!-- 验证码 -->

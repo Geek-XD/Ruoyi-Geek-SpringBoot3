@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.Cache;
 import org.springframework.cache.transaction.AbstractTransactionSupportingCacheManager;
 import org.springframework.cache.transaction.TransactionAwareCacheDecorator;
 import org.springframework.core.serializer.support.SerializationDelegate;
-import org.springframework.lang.Nullable;
 
 import com.geek.common.core.cache.TimedValue;
 import com.geek.common.core.cache.TtlCacheManager;

@@ -3,9 +3,9 @@ package com.geek.framework.cache;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.core.serializer.support.SerializationDelegate;
-import org.springframework.lang.Nullable;
 
 import com.geek.common.core.cache.TimedValue;
 

@@ -3,7 +3,7 @@ package com.geek.common.enums;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 请求方式

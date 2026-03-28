@@ -3,14 +3,16 @@ package com.geek.framework.config;
 import java.math.BigInteger;
 import java.util.TimeZone;
 
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.ser.std.ToStringSerializer;
 
 /**
  * 程序注解配置
@@ -22,17 +24,32 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 @EnableAspectJAutoProxy(exposeProxy = true)
 public class ApplicationConfig {
     @Bean
-    public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization() {
-        return builder -> {
+    public JsonMapperBuilderCustomizer jacksonObjectMapperCustomization() {
+        return builder -> { 
             // 时区配置
-            builder.timeZone(TimeZone.getDefault());
+            builder.defaultTimeZone(TimeZone.getDefault());
 
             // 将 long/Long/BigInteger 序列化为字符串，避免前端 JS 精度丢失
             SimpleModule longToStringModule = new SimpleModule();
             longToStringModule.addSerializer(Long.class, ToStringSerializer.instance);
             longToStringModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
             longToStringModule.addSerializer(BigInteger.class, ToStringSerializer.instance);
-            builder.modules(longToStringModule, new JavaTimeModule());
+            builder.addModule(longToStringModule);
         };
+    }
+
+    @Bean
+    public ObjectMapper legacyObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setTimeZone(TimeZone.getDefault());
+
+        com.fasterxml.jackson.databind.module.SimpleModule longToStringModule = new com.fasterxml.jackson.databind.module.SimpleModule();
+        longToStringModule.addSerializer(Long.class, com.fasterxml.jackson.databind.ser.std.ToStringSerializer.instance);
+        longToStringModule.addSerializer(Long.TYPE, com.fasterxml.jackson.databind.ser.std.ToStringSerializer.instance);
+        longToStringModule.addSerializer(BigInteger.class, com.fasterxml.jackson.databind.ser.std.ToStringSerializer.instance);
+
+        objectMapper.registerModule(longToStringModule);
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
     }
 }

@@ -1,12 +1,12 @@
 package com.geek.framework.datasource.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import com.geek.framework.datasource.properties.DynamicDataSourceProperties;
+import com.geek.framework.datasource.properties.DynamicDataSourceProperties.DynamicSourceProperties;
 
 import liquibase.integration.spring.SpringLiquibase;
 
@@ -19,7 +19,7 @@ public class LiquibaseConfig {
     @Bean
     public SpringLiquibase liquibase() {
         String primary = dataSourceProperties.getPrimary();
-        DataSourceProperties primaryProps = dataSourceProperties.getDatasource().get(primary);
+        DynamicSourceProperties primaryProps = dataSourceProperties.getDatasource().get(primary);
         DriverManagerDataSource nativeDs = new DriverManagerDataSource();
         nativeDs.setUrl(primaryProps.getUrl());
         nativeDs.setUsername(primaryProps.getUsername());

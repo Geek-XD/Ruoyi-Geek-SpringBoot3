@@ -7,7 +7,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.alibaba.druid.spring.boot3.autoconfigure.properties.DruidStatProperties;
+import com.alibaba.druid.spring.boot4.autoconfigure.properties.DruidStatProperties;
 import com.alibaba.druid.util.Utils;
 
 import jakarta.servlet.Filter;

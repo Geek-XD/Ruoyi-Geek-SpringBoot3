@@ -90,7 +90,7 @@ public class SecurityConfig {
                         // 注解标记允许匿名访问的url
                         .requestMatchers(permitAllUrl.getUrls().toArray(String[]::new)).permitAll()
                         // 静态资源，可匿名访问
-                        .requestMatchers(HttpMethod.GET, "/", "/**/*.{html,css,js}", "/profile/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**").permitAll()
                         // 除上面外的所有请求全部需要鉴权认证
                         .anyRequest().authenticated())
                 // 添加Logout filter
