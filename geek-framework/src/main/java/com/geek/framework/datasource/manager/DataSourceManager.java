@@ -14,6 +14,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.geek.framework.datasource.properties.DynamicDataSourceProperties;
@@ -22,6 +23,7 @@ import com.mybatisflex.core.datasource.FlexDataSource;
 import jakarta.annotation.PreDestroy;
 
 @Configuration
+@DependsOn("liquibase")
 public class DataSourceManager implements InitializingBean {
     protected final Logger logger = LoggerFactory.getLogger(DataSourceManager.class);
     private Map<String, DataSource> targetDataSources = new HashMap<>();
