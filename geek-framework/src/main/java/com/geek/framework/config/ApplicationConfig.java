@@ -8,9 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.databind.ser.std.ToStringSerializer;
 
@@ -25,7 +22,7 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 public class ApplicationConfig {
     @Bean
     public JsonMapperBuilderCustomizer jacksonObjectMapperCustomization() {
-        return builder -> { 
+        return builder -> {
             // 时区配置
             builder.defaultTimeZone(TimeZone.getDefault());
 
@@ -36,20 +33,5 @@ public class ApplicationConfig {
             longToStringModule.addSerializer(BigInteger.class, ToStringSerializer.instance);
             builder.addModule(longToStringModule);
         };
-    }
-
-    @Bean
-    public ObjectMapper legacyObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setTimeZone(TimeZone.getDefault());
-
-        com.fasterxml.jackson.databind.module.SimpleModule longToStringModule = new com.fasterxml.jackson.databind.module.SimpleModule();
-        longToStringModule.addSerializer(Long.class, com.fasterxml.jackson.databind.ser.std.ToStringSerializer.instance);
-        longToStringModule.addSerializer(Long.TYPE, com.fasterxml.jackson.databind.ser.std.ToStringSerializer.instance);
-        longToStringModule.addSerializer(BigInteger.class, com.fasterxml.jackson.databind.ser.std.ToStringSerializer.instance);
-
-        objectMapper.registerModule(longToStringModule);
-        objectMapper.registerModule(new JavaTimeModule());
-        return objectMapper;
     }
 }

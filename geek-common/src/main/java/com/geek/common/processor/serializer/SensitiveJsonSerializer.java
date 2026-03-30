@@ -1,29 +1,28 @@
 package com.geek.common.processor.serializer;
 
-import java.io.IOException;
 import java.util.Objects;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.geek.common.annotation.Sensitive;
 import com.geek.common.core.domain.model.LoginUser;
 import com.geek.common.utils.SecurityUtils;
 import com.mybatisflex.core.mask.MaskManager;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.BeanProperty;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * 数据脱敏序列化过滤
  *
  * @author geek
  */
-public class SensitiveJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
+public class SensitiveJsonSerializer extends ValueSerializer<String> {
     private String desensitizedType;
 
     @Override
-    public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(String value, JsonGenerator gen, SerializationContext serializers) throws JacksonException {
         if (desensitization()) {
             gen.writeString(MaskManager.mask(desensitizedType,value).toString());
         } else {
@@ -32,14 +31,13 @@ public class SensitiveJsonSerializer extends JsonSerializer<String> implements C
     }
 
     @Override
-    public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property)
-            throws JsonMappingException {
+    public ValueSerializer<?> createContextual(SerializationContext prov, BeanProperty property) {
         Sensitive annotation = property.getAnnotation(Sensitive.class);
         if (Objects.nonNull(annotation) && Objects.equals(String.class, property.getType().getRawClass())) {
             this.desensitizedType = annotation.desensitizedType();
             return this;
         }
-        return prov.findValueSerializer(property.getType(), property);
+        return prov.findValueSerializer(property.getType());
     }
 
     /**

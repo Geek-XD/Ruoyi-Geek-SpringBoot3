@@ -3,11 +3,12 @@ package com.geek.common.utils.ip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.geek.common.config.GeekConfig;
 import com.geek.common.utils.JSON;
 import com.geek.common.utils.StringUtils;
 import com.geek.common.utils.http.HttpUtils;
+
+import tools.jackson.databind.JsonNode;
 
 /**
  * 获取地址类
@@ -36,8 +37,8 @@ public class AddressUtils {
                     return UNKNOWN;
                 }
                 JsonNode obj = JSON.parseObject(rspStr);
-                String region = obj.get("pro").asText();
-                String city = obj.get("city").asText();
+                String region = obj.get("pro").asString();
+                String city = obj.get("city").asString();
                 return String.format("%s %s", region, city);
             } catch (Exception e) {
                 log.error("获取地理位置异常 {}", ip);

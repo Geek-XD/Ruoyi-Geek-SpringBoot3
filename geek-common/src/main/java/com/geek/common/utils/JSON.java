@@ -2,24 +2,25 @@ package com.geek.common.utils;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.geek.common.utils.spring.SpringUtils;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ser.FilterProvider;
 
 public class JSON {
 
-    private static ObjectMapper OBJECT_MAPPER = null;
+    private static JsonMapper JSON_MAPPER = null;
 
     private JSON() {
     }
 
-    public static ObjectMapper getObjectMapper() {
-        if (OBJECT_MAPPER == null) {
-            OBJECT_MAPPER = SpringUtils.getBean(ObjectMapper.class);
+    public static JsonMapper getJsonMapper() {
+        if (JSON_MAPPER == null) {
+            JSON_MAPPER = SpringUtils.getBean(JsonMapper.class);
         }
-        return OBJECT_MAPPER;
+        return JSON_MAPPER;
     }
 
     public static String toJSONString(Object object) {
@@ -29,9 +30,9 @@ public class JSON {
     public static String toJSONString(Object object, FilterProvider filterProvider) {
         try {
             if (filterProvider != null) {
-                return getObjectMapper().writer(filterProvider).writeValueAsString(object);
+                return getJsonMapper().writer(filterProvider).writeValueAsString(object);
             } else {
-                return getObjectMapper().writeValueAsString(object);
+                return getJsonMapper().writeValueAsString(object);
             }
         } catch (Exception e) {
             throw new RuntimeException("对象转JSON字符串异常", e);
@@ -43,7 +44,7 @@ public class JSON {
             return null;
         }
         try {
-            return getObjectMapper().readTree(text);
+            return getJsonMapper().readTree(text);
         } catch (Exception e) {
             throw new RuntimeException("JSON字符串转JsonNode异常", e);
         }
@@ -54,17 +55,18 @@ public class JSON {
             return null;
         }
         try {
-            return getObjectMapper().readValue(text, clazz);
+            return getJsonMapper().readValue(text, clazz);
         } catch (Exception e) {
             throw new RuntimeException("JSON字符串转对象异常", e);
         }
     }
 
-    public static ObjectNode createObjectNode() {
-        return getObjectMapper().createObjectNode();
+    public static ObjectNode createJsonNode() {
+        ObjectNode objectNode = getJsonMapper().createObjectNode();
+        return objectNode;
     }
 
-    public static ObjectNode createObjectNode(Map<String, ?> map) {
-        return getObjectMapper().convertValue(map, ObjectNode.class);
+    public static ObjectNode createJsonNode(Map<String, ?> map) {
+        return getJsonMapper().convertValue(map, ObjectNode.class);
     }
 }

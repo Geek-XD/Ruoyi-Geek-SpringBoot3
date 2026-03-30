@@ -55,7 +55,7 @@
 
         <!--引入jsr310模块 支持java8的时间序列化 -->
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <groupId>tools.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 

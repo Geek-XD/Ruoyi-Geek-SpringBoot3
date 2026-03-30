@@ -6,8 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.geek.common.processor.serializer.FilePathJsonSerializer;
+
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

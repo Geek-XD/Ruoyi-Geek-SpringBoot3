@@ -20,7 +20,6 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.geek.common.annotation.Anonymous;
-import com.geek.common.utils.spring.SpringUtils;
 
 /**
  * 设置Anonymous注解允许匿名访问的url
@@ -43,7 +42,6 @@ public class PermitAllUrlProperties implements InitializingBean, ApplicationCont
         RequestMappingHandlerMapping mapping = applicationContext.getBean("requestMappingHandlerMapping",
                 RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
-        String matching = SpringUtils.getRequiredProperty("spring.mvc.pathmatch.matching-strategy").toLowerCase();
         map.entrySet().stream()
                 .flatMap(entry -> {
                     HandlerMethod handlerMethod = entry.getValue();
@@ -54,13 +52,9 @@ public class PermitAllUrlProperties implements InitializingBean, ApplicationCont
                             new SimpleImmutableEntry<>(entry.getKey(), controller)).stream();
                 })
                 .filter(pair -> pair.getValue() != null)
-                .map(pair -> switch (matching) {
-                    case "ant_path_matcher" -> pair.getKey().getPatternsCondition().getPatterns();
-                    case "path_pattern_parser" -> pair.getKey().getPathPatternsCondition().getPatternValues();
-                    default -> pair.getKey().getPatternsCondition().getPatterns();
-                })
+                .map(pair -> pair.getKey().getPatternValues())
                 .flatMap(patterns -> Objects.requireNonNull(patterns).stream())
-                .map(url -> RegExUtils.replaceAll((CharSequence)url, PATTERN, ASTERISK))
+                .map(url -> RegExUtils.replaceAll((CharSequence) url, PATTERN, ASTERISK))
                 .forEach(urls::add);
     }
 

@@ -1,27 +1,25 @@
 package com.geek.common.processor.serializer;
 
-import java.io.IOException;
 import java.util.Objects;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.geek.common.annotation.FilePath;
 import com.geek.common.config.GeekConfig;
 import com.geek.common.core.storage.GeekStorageBucket;
 import com.geek.common.core.storage.service.StorageService;
 import com.geek.common.utils.StringUtils;
 
-public class FilePathJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.BeanProperty;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
+
+public class FilePathJsonSerializer extends ValueSerializer<String> {
 
     StorageService storageService;
 
     @Override
-    public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property)
-            throws JsonMappingException {
+    public ValueSerializer<?> createContextual(SerializationContext prov, BeanProperty property) {
         FilePath annotation = property.getAnnotation(FilePath.class);
         if (Objects.nonNull(annotation) && Objects.equals(String.class, property.getType().getRawClass())) {
             String storageName = annotation.value();
@@ -33,11 +31,12 @@ public class FilePathJsonSerializer extends JsonSerializer<String> implements Co
             }
             return this;
         }
-        return prov.findValueSerializer(property.getType(), property);
+        return prov.findValueSerializer(property.getType());
     }
 
     @Override
-    public void serialize(String arg0, JsonGenerator arg1, SerializerProvider arg2) throws IOException {
+    public void serialize(String arg0, JsonGenerator arg1, SerializationContext arg2)
+            throws JacksonException {
         if (storageService != null) {
             String url;
             try {
