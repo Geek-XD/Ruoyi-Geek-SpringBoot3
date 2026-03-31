@@ -134,6 +134,10 @@ public class StorageService {
      */
     public void deleteFile(String filePath) throws Exception {
         this.storageBucket.remove(filePath);
+        clearFileCache(filePath);
+    }
+
+    public void clearFileCache(String filePath) {
         if (this.fastUpload) {
             String md5 = CacheUtils.get(CacheConstants.FILE_PATH_MD5_KEY, filePath, String.class);
             if (StringUtils.isNotEmpty(md5)) {

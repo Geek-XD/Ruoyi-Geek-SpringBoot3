@@ -126,7 +126,7 @@ public class CacheUtils {
      * @param key
      */
     public static void remove(String cacheName, String key) {
-        getCache(cacheName).evict(key);
+        getCache(cacheName).evictIfPresent(key);
     }
 
     /**
@@ -137,8 +137,7 @@ public class CacheUtils {
      * @return
      */
     public static boolean removeIfPresent(String cacheName, String key) {
-        remove(cacheName, key);
-        return false;
+        return getCache(cacheName).evictIfPresent(key);
     }
 
     /**

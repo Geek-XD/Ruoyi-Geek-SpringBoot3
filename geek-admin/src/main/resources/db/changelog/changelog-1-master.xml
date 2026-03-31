@@ -101,9 +101,7 @@
             </column>
             <column name="file_type" remarks="文件类型/后缀" type="VARCHAR(50)"/>
             <column name="file_size" remarks="文件大小（字节）" type="BIGINT"/>
-            <column name="md5" remarks="文件MD5" type="VARCHAR(64)">
-                <constraints unique="true"/>
-            </column>
+            <column name="md5" remarks="文件MD5" type="VARCHAR(64)"/>
             <column defaultValue="" name="create_by" remarks="创建者" type="VARCHAR(64)"/>
             <column name="create_time" remarks="创建时间" type="datetime(0)"/>
             <column defaultValue="" name="update_by" remarks="更新者" type="VARCHAR(64)"/>
