@@ -14,11 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Properties;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,10 +31,12 @@ import com.geek.common.utils.uuid.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Builder
 @Slf4j
+@Getter
 public class LocalBucket implements StorageBucket {
 
     private String bucketName;
@@ -98,20 +98,14 @@ public class LocalBucket implements StorageBucket {
         return new URI(sb.toString()).toURL();
     }
 
-    // 存储分片上传的元数据
-    private final ConcurrentHashMap<String, List<Map<String, Object>>> uploadMetadata = new ConcurrentHashMap<>();
-
     public String initMultipartUpload(String filePath) throws Exception {
+        String uploadId = UUID.randomUUID().toString();
+        Path tempDir = getMultipartTempDir(uploadId);
         try {
-            String uploadId = UUID.randomUUID().toString();
-            uploadMetadata.put(uploadId, new ArrayList<>());
-
-            // 创建临时上传目录
-            Path tempDir = Paths.get(getBasePath(), "temp_uploads", uploadId);
             Files.createDirectories(tempDir);
+            saveUploadMetadata(uploadId, filePath);
             return uploadId;
         } catch (Exception e) {
-            log.error("初始化失败: 文件={}, 错误={}", filePath, e.getMessage());
             throw new ServiceException("初始化分片上传失败: " + e.getMessage());
         }
     }
@@ -119,11 +113,8 @@ public class LocalBucket implements StorageBucket {
     public SysFilePartETag uploadPart(String filePath, String uploadId, int partNumber, long partSize,
             InputStream inputStream)
             throws Exception {
-        if (!uploadMetadata.containsKey(uploadId)) {
-            throw new ServiceException("无效的 uploadId: " + uploadId);
-        }
-        Path tempDir = Paths.get(getBasePath(), "temp_uploads", uploadId);
-        Path partPath = tempDir.resolve("part_" + partNumber);
+        validateUploadMetadata(uploadId, filePath);
+        Path partPath = getPartPath(uploadId, partNumber);
         try (OutputStream fos = Files.newOutputStream(partPath)) {
             byte[] buffer = new byte[8192];
             int bytesRead;
@@ -142,38 +133,30 @@ public class LocalBucket implements StorageBucket {
             throw new ServiceException("计算分片 MD5 失败");
         }
         etag = etag.toUpperCase();
-        Map<String, Object> partInfo = Map.of(
-                "partNumber", partNumber,
-                "etag", etag,
-                "size", partSize,
-                "path", partPath.toString());
-        List<Map<String, Object>> parts = uploadMetadata.get(uploadId);
-        int insertPos = 0;
-        while (insertPos < parts.size()
-                && ((Number) parts.get(insertPos).get("partNumber")).intValue() < partNumber) {
-            insertPos++;
-        }
-        parts.add(insertPos, partInfo);
-        return new SysFilePartETag(partNumber, etag, partSize, null);
+        return SysFilePartETag.builder()
+                .partNumber(partNumber)
+                .eTag(etag)
+                .partSize(partSize)
+                .build();
     }
 
     public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
             throws Exception {
-        List<Map<String, Object>> storedParts = uploadMetadata.get(uploadId);
-        if (storedParts == null) {
-            throw new ServiceException("无效的 uploadId: " + uploadId);
+        validateUploadMetadata(uploadId, filePath);
+        List<SysFilePartETag> sortedParts = partETags.stream()
+                .sorted(Comparator.comparingInt(SysFilePartETag::getPartNumber))
+                .toList();
+        if (sortedParts.isEmpty()) {
+            throw new ServiceException("分片列表不能为空");
         }
-        if (partETags.size() != storedParts.size()) {
-            throw new ServiceException("分片数量不匹配: 预期=" + storedParts.size() + ", 实际=" + partETags.size());
-        }
-        // 验证每个分片的 ETag
-        for (int i = 0; i < partETags.size(); i++) {
-            Map<String, Object> expected = storedParts.get(i);
-            SysFilePartETag actual = partETags.get(i);
-
-            if (!expected.get("etag").equals(actual.getETag()) ||
-                    !expected.get("partNumber").equals(actual.getPartNumber())) {
-                throw new ServiceException("分片验证失败: 序号=" + actual.getPartNumber());
+        for (SysFilePartETag partETag : sortedParts) {
+            Path partPath = getPartPath(uploadId, partETag.getPartNumber());
+            if (!Files.exists(partPath)) {
+                throw new ServiceException("分片不存在: 序号=" + partETag.getPartNumber());
+            }
+            String actualEtag = Md5Utils.getMd5(partPath.toFile());
+            if (actualEtag == null || !actualEtag.toUpperCase().equals(partETag.getETag())) {
+                throw new ServiceException("分片验证失败: 序号=" + partETag.getPartNumber());
             }
         }
         Path destPath = Paths.get(getBasePath(), filePath);
@@ -183,23 +166,71 @@ public class LocalBucket implements StorageBucket {
                 StandardOpenOption.CREATE,
                 StandardOpenOption.WRITE,
                 StandardOpenOption.TRUNCATE_EXISTING)) {
-            for (Map<String, Object> part : storedParts) {
-                Path partPath = Paths.get((String) part.get("path"));
+            for (SysFilePartETag part : sortedParts) {
+                Path partPath = getPartPath(uploadId, part.getPartNumber());
                 try (FileChannel inChannel = FileChannel.open(partPath, StandardOpenOption.READ)) {
                     inChannel.transferTo(0, inChannel.size(), outChannel);
                 }
             }
         }
-        // 清理临时文件和元数据
-        Path tempDir = Paths.get(getBasePath(), "temp_uploads", uploadId);
-        Files.walk(tempDir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-        uploadMetadata.remove(uploadId);
-        log.info("分片合并完成: 文件={}, uploadId={}, 分片数={}", filePath, uploadId, storedParts.size());
+        deleteTempDir(uploadId);
         return filePath;
     }
 
-    public String getBucketName() {
-        return bucketName;
+    private static final String MULTIPART_DIR = "temp_uploads";
+    private static final String MULTIPART_META_FILE = "upload.properties";
+
+    private Path getMultipartTempDir(String uploadId) {
+        return Paths.get(getBasePath(), MULTIPART_DIR, uploadId);
+    }
+
+    private Path getMultipartMetadataPath(String uploadId) {
+        return getMultipartTempDir(uploadId).resolve(MULTIPART_META_FILE);
+    }
+
+    private Path getPartPath(String uploadId, int partNumber) {
+        return getMultipartTempDir(uploadId).resolve("part_" + partNumber);
+    }
+
+    private void saveUploadMetadata(String uploadId, String filePath) throws IOException {
+        Properties properties = new Properties();
+        properties.setProperty("filePath", filePath);
+        properties.setProperty("createdAt", String.valueOf(System.currentTimeMillis()));
+        try (OutputStream outputStream = Files.newOutputStream(
+                getMultipartMetadataPath(uploadId),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.WRITE)) {
+            properties.store(outputStream, null);
+        }
+    }
+
+    private void validateUploadMetadata(String uploadId, String filePath) throws IOException {
+        Path tempDir = getMultipartTempDir(uploadId);
+        if (!Files.isDirectory(tempDir)) {
+            throw new ServiceException("无效的 uploadId: " + uploadId);
+        }
+        Properties properties = new Properties();
+        Path metadataPath = getMultipartMetadataPath(uploadId);
+        if (!Files.exists(metadataPath)) {
+            throw new ServiceException("上传元数据不存在: " + uploadId);
+        }
+        try (InputStream inputStream = Files.newInputStream(metadataPath, StandardOpenOption.READ)) {
+            properties.load(inputStream);
+        }
+        String storedFilePath = properties.getProperty("filePath");
+        if (storedFilePath == null || !storedFilePath.equals(filePath)) {
+            throw new ServiceException("上传任务与文件路径不匹配: " + uploadId);
+        }
+    }
+
+    private void deleteTempDir(String uploadId) throws IOException {
+        Path tempDir = getMultipartTempDir(uploadId);
+        try (var walk = Files.walk(tempDir)) {
+            walk.sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        }
     }
 
     public String getBasePath() {
@@ -207,13 +238,5 @@ public class LocalBucket implements StorageBucket {
             basePath = basePath + "/";
         }
         return basePath;
-    }
-
-    public String getPermission() {
-        return permission;
-    }
-
-    public String getApi() {
-        return api;
     }
 }

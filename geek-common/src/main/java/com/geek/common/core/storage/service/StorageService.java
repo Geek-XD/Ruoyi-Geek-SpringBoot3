@@ -23,12 +23,14 @@ import com.geek.common.utils.sign.Md5Utils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 存储操作业务
  */
 @Getter
 @Setter
+@Slf4j
 public class StorageService {
 
     private StorageBucket storageBucket;
@@ -188,10 +190,19 @@ public class StorageService {
      */
     public String uploadPart(SysFilePartETag partETag, InputStream inputStream)
             throws Exception {
-        return this.storageBucket
-                .uploadPart(partETag.getFilePath(), partETag.getTaskId(), partETag.getPartNumber(),
-                        partETag.getPartSize(), inputStream)
-                .getETag();
+        try {
+            return this.storageBucket
+                    .uploadPart(
+                            partETag.getFilePath(),
+                            partETag.getTaskId(),
+                            partETag.getPartNumber(),
+                            partETag.getPartSize(),
+                            inputStream)
+                    .getETag();
+        } catch (Exception e) {
+            log.error("分片上传失败: 文件={}, 分片={}, 错误={}", partETag.getFilePath(), partETag.getPartNumber(), e);
+            throw new ServiceException("上传分片失败");
+        }
     }
 
     /**
@@ -219,6 +230,8 @@ public class StorageService {
             throw new ServiceException("分片信息格式不正确");
         }
         partETags.sort(Comparator.comparingInt(p -> p.getPartNumber()));
-        return this.storageBucket.completeMultipartUpload(filePath, uploadId, partETags);
+        String resultFilePath = this.storageBucket.completeMultipartUpload(filePath, uploadId, partETags);
+        log.info("分片合并完成: 文件={}, uploadId={}, 分片数={}", resultFilePath, uploadId, partETags.size());
+        return resultFilePath;
     }
 }

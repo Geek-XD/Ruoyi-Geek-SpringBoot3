@@ -4,9 +4,15 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SysFilePartETag implements Serializable {
     private static final long serialVersionUID = 2471854027355307627L;
     private Integer partNumber;
@@ -20,21 +26,6 @@ public class SysFilePartETag implements Serializable {
 
     public void seteTag(String eTag) {
         this.eTag = eTag;
-    }
-
-    public SysFilePartETag() {
-    }
-
-    public SysFilePartETag(Integer partNumber, String eTag) {
-        this.partNumber = partNumber;
-        this.eTag = eTag;
-    }
-
-    public SysFilePartETag(Integer partNumber, String eTag, long partSize, Long partCRC) {
-        this.partNumber = partNumber;
-        this.eTag = eTag;
-        this.partSize = partSize;
-        this.partCRC = partCRC;
     }
 
     public int hashCode() {

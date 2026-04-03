@@ -196,11 +196,12 @@ public class Sb {
         try {
             if (chunk == null || chunk.isEmpty())
                 throw new EmptyFileException();
-            SysFilePartETag partETag = new SysFilePartETag();
-            partETag.setPartNumber(partNumber);
-            partETag.setPartSize(chunk.getSize());
-            partETag.setTaskId(uploadId);
-            partETag.setFilePath(filePath);
+            SysFilePartETag partETag = SysFilePartETag.builder()
+                    .partNumber(partNumber)
+                    .partSize(chunk.getSize())
+                    .taskId(uploadId)
+                    .filePath(filePath)
+                    .build();
             return fileService.uploadPart(partETag, chunk.getInputStream());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
