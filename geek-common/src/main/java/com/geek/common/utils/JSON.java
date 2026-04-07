@@ -61,12 +61,11 @@ public class JSON {
         }
     }
 
-    public static ObjectNode createJsonNode() {
-        ObjectNode objectNode = getJsonMapper().createObjectNode();
-        return objectNode;
+    public static ObjectNode createObjectNode() {
+        return getJsonMapper().createObjectNode();
     }
 
-    public static ObjectNode createJsonNode(Map<String, ?> map) {
+    public static ObjectNode createObjectNode(Map<String, ?> map) {
         return getJsonMapper().convertValue(map, ObjectNode.class);
     }
 }

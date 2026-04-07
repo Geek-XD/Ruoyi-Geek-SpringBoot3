@@ -651,6 +651,6 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     /** @deprecated */
     @Deprecated
-    public StringUtils() {
+    private StringUtils() {
     }
 }

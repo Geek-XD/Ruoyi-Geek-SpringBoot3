@@ -16,13 +16,13 @@
 
     <dependencies>
 
-        <!-- spring-boot-actuator -->
-        <!-- <dependency>
+        <!-- spring-boot-actuator 生产环境监控 -->
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency> -->
+        </dependency>
 
-        <!-- spring-boot-devtools -->
+        <!-- spring-boot-devtools 开发环境热部署 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -36,9 +36,12 @@
         </dependency>
 
         <!-- Mysql驱动包 -->
+        <!-- druid 的 xa暂时不支持 mysql 9.0.0+ 连接速度:8.3.0>8.2.0>8.4.0 -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
+            <version>8.3.0</version>
+            <scope>runtime</scope>
         </dependency>
 
 
