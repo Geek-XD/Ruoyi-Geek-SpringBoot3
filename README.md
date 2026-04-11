@@ -112,6 +112,13 @@ command:
 修改项目根pom
 
 ```xml
+        <module>geek-plugins/geek-plugin-aliyun-oss</module>
+        <module>geek-plugins/geek-plugin-ehcache</module>
+        <module>geek-plugins/geek-plugin-minio</module>
+        <module>geek-plugins/geek-plugin-netty</module>
+        <module>geek-plugins/geek-plugin-rabbitmq</module>
+        <module>geek-plugins/geek-plugin-redis</module>
+        <module>geek-plugins/geek-plugin-websocket</module>
         <module>geek-modules/geek-module-flowable</module>
         <module>geek-modules/geek-module-form</module>
         <module>geek-modules/geek-module-generator</module>
@@ -125,6 +132,48 @@ command:
 修改admin的pom
 
 ```xml
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-plugin-aliyun-oss</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-plugin-minio</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-plugin-netty</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-plugin-rabbitmq</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-plugin-ehcache</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-plugin-redis</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geekxd</groupId>
+            <artifactId>geek-plugin-websocket</artifactId>
+            <version>${geek.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.geekxd</groupId>
             <artifactId>geek-module-flowable</artifactId>
