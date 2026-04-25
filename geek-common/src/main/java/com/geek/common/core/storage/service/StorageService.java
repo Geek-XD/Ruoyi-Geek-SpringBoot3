@@ -158,6 +158,9 @@ public class StorageService {
      *
      */
     public String generateUrl(String filePath) throws Exception {
+        if(filePath == null || filePath.startsWith("http")) {
+            return filePath;
+        }
         if ("public".equals(this.storageBucket.getPermission())) {
             return this.storageBucket.generatePublicUrl(filePath).toString();
         } else {
