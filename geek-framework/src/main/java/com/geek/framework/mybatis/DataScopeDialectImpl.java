@@ -2,6 +2,8 @@ package com.geek.framework.mybatis;
 
 import static com.mybatisflex.core.constant.SqlConsts.*;
 
+import java.util.List;
+
 import com.geek.common.utils.StringUtils;
 import com.geek.framework.processor.context.DataScopeContextHolder;
 import com.mybatisflex.core.dialect.DbType;
@@ -16,6 +18,8 @@ import com.mybatisflex.core.dialect.impl.DmDialect;
 import com.mybatisflex.core.dialect.impl.OracleDialect;
 import com.mybatisflex.core.dialect.impl.Sqlserver2005DialectImpl;
 import com.mybatisflex.core.dialect.impl.SqlserverDialectImpl;
+import com.mybatisflex.core.query.CPI;
+import com.mybatisflex.core.query.QueryTable;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.table.TableInfo;
 
@@ -96,7 +100,18 @@ public class DataScopeDialectImpl {
 
     private static void prepareAuth(QueryWrapper queryWrapper, OperateType operateType) {
         String dataScopeSql = DataScopeContextHolder.get();
-        if (StringUtils.isNotEmpty(dataScopeSql)) {
+        if (StringUtils.isEmpty(dataScopeSql)) {
+            return;
+        }
+        List<QueryTable> queryTables = CPI.getQueryTables(queryWrapper);
+        if (queryTables == null || queryTables.isEmpty()) {
+            return;
+        }
+        QueryTable t = queryTables.get(0);
+        if (queryTables.size() == 1 && "t".equals(t.getAlias()) && t.getName() == null && t.getSchema() == null) {
+            QueryWrapper child = CPI.getChildSelect(queryWrapper).get(0);
+            child.and(dataScopeSql);
+        } else {
             queryWrapper.and(dataScopeSql);
         }
     }

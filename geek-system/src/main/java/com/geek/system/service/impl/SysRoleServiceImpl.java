@@ -72,7 +72,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @DataScope(deptAlias = "d")
     public Page<SysRole> page(SysRole role, int pageNum, int pageSize) {
         QueryChain<SysRole> q = selectRoleList(role);
-        return q.page(Page.of(pageNum, pageSize));
+        Page<SysRole> pg = Page.of(pageNum, pageSize);
+        pg.setOptimizeCountQuery(false);
+        return q.page(pg);
     }
 
     @Override

@@ -102,6 +102,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @DataScope(deptAlias = "d", userAlias = "u")
     public Page<SysUser> page(SysUser user, int pageNum, int pageSize) {
         Page<SysUser> pg = Page.of(pageNum, pageSize);
+        pg.setOptimizeCountQuery(false);
         return selectUserList(user).page(pg);
     }
 
