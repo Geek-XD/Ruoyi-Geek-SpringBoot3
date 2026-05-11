@@ -14,197 +14,99 @@ fi
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT" || die "无法切换到仓库根：$REPO_ROOT"
 
-GITMODULES="$REPO_ROOT/.gitmodules"
 MODULE_YAML="$REPO_ROOT/geek-modules.yml"
+[ -f "$MODULE_YAML" ] || die "配置文件 geek-modules.yml 不存在。"
 
-[ -f "$MODULE_YAML" ] || die "配置文件 geek-modules.yml 不存在，请先创建（YAML 结构 modules: - name/url/path）。"
-
-# 从 geek-modules.yml 解析出 name -> path/url
-# 预期 YAML 结构：
-# modules:
-#   - name: Foo
-#     url: https://...
-#     path: some/path
+# 解析 YAML (保持原有的解析逻辑)
 parse_modules() {
   awk '
-    BEGIN {
-      inmods=0; initem=0; name=""; url=""; path="";
-    }
+    BEGIN { inmods=0; name=""; url=""; path=""; }
     /^[[:space:]]*#/ { next }
     /^[[:space:]]*$/ { next }
-
     /^[[:space:]]*modules:/ { inmods=1; next }
-
     inmods {
-      # 开始一个新条目
       if ($0 ~ /^[[:space:]]*-[[:space:]]*name:[[:space:]]*/) {
-        if (name != "" && url != "" && path != "") {
-          printf "%s\t%s\t%s\n", name, path, url;
-        }
-        initem=1; name=""; url=""; path="";
-        sub(/^[^:]*:[[:space:]]*/, "");
-        name=$0;
-        gsub(/^[[:space:]]+|[[:space:]]+$/, "", name);
+        if (name != "" && url != "" && path != "") printf "%s\t%s\t%s\n", name, path, url;
+        name=""; url=""; path="";
+        sub(/^[^:]*:[[:space:]]*/, ""); name=$0; gsub(/^[[:space:]]+|[[:space:]]+$/, "", name);
         next;
       }
-
-      if (initem && $0 ~ /^[[:space:]]*url:[[:space:]]*/) {
-        s=$0; sub(/^[^:]*:[[:space:]]*/, "", s);
-        url=s;
-        gsub(/^[[:space:]]+|[[:space:]]+$/, "", url);
-        next;
-      }
-
-      if (initem && $0 ~ /^[[:space:]]*path:[[:space:]]*/) {
-        s=$0; sub(/^[^:]*:[[:space:]]*/, "", s);
-        path=s;
-        gsub(/^[[:space:]]+|[[:space:]]+$/, "", path);
-        next;
-      }
+      if (inmods && $0 ~ /^[[:space:]]*url:[[:space:]]*/) { s=$0; sub(/^[^:]*:[[:space:]]*/, "", s); url=s; gsub(/^[[:space:]]+|[[:space:]]+$/, "", url); next; }
+      if (inmods && $0 ~ /^[[:space:]]*path:[[:space:]]*/) { s=$0; sub(/^[^:]*:[[:space:]]*/, "", s); path=s; gsub(/^[[:space:]]+|[[:space:]]+$/, "", path); next; }
     }
-
-    END {
-      if (name != "" && url != "" && path != "") {
-        printf "%s\t%s\t%s\n", name, path, url;
-      }
-    }
+    END { if (name != "" && url != "" && path != "") printf "%s\t%s\t%s\n", name, path, url; }
   ' "$MODULE_YAML"
 }
 
-# 列出 .gitmodules 中所有记录
-cmd_list() {
-  log "从 .gitmodules 解析的子模块列表："
-  parse_modules | while IFS=$'\t' read -r name path url; do
-    [ -n "$name" ] || continue
-    printf ' - name: %-25s path: %-40s url: %s\n' "$name" "$path" "$url"
-  done
-}
-
-# 查看当前索引中已载入的子模块（gitlink, mode 160000）
-cmd_status() {
-  log "当前索引中的子模块（gitlink，mode=160000）："
-  git ls-files -s | awk '$1 == 160000 {print $4}' | while read -r path; do
-    printf ' - %s\n' "$path"
-  done
-}
-
-# 一键同步/拉取配置文件中列出的所有模块
-cmd_sync_all() {
-  log "根据 geek-modules.yml 同步所有模块（逐个执行 add）..."
-  local name
-  # 这里只用第 1 列 name，后续复用 cmd_add 的逻辑
-  parse_modules | while IFS=$'\t' read -r name _ _; do
-    [ -n "$name" ] || continue
-    log "[SYNC] 处理模块: $name"
-    cmd_add "$name" || err "同步模块 '$name' 时出错，可稍后单独重试。"
-  done
-  log "[SYNC] 所有模块处理完成。"
-}
-
-# 一键删除配置文件中列出的所有模块
-cmd_remove_all() {
-  log "根据 geek-modules.yml 删除所有模块（逐个执行 remove）..."
-  local name
-  parse_modules | while IFS=$'\t' read -r name _ _; do
-    [ -n "$name" ] || continue
-    log "[REMOVE] 处理模块: $name"
-    cmd_remove "$name" || err "删除模块 '$name' 时出错，可稍后单独重试。"
-  done
-  log "[REMOVE] 所有模块处理完成。"
-}
-
-# 根据 name 查找 path + url
-get_module_info() {
-  local name="$1"
-  parse_modules | awk -v target="$name" -F '\t' '$1 == target {print $2 "\t" $3}'
-}
-
-# 添加一个模块：按 name 从 .gitmodules 取 path/url，然后 git submodule add
+# 核心拉取逻辑：极简版
 cmd_add() {
   local name="$1"
-  [ -n "$name" ] || die "用法：$0 add <module-name>（module-name 为 .gitmodules 中的名字）"
+  [ -n "$name" ] || die "用法：$0 add <module-name>"
 
-  local info
-  info="$(get_module_info "$name")" || true
-  [ -n "$info" ] || die "在 .gitmodules 中找不到名为 '$name' 的子模块条目。"
+  # 获取配置
+  local info path url
+  info="$(parse_modules | awk -v target="$name" -F '\t' '$1 == target {print $2 "\t" $3}')"
+  [ -n "$info" ] || die "找不到模块: $name"
 
-  local path url
   path="$(printf '%s\n' "$info" | cut -f1)"
   url="$(printf '%s\n' "$info" | cut -f2)"
 
-  [ -n "$path" ] || die "子模块 '$name' 的 path 为空，请检查 .gitmodules。"
-  [ -n "$url" ]  || die "子模块 '$name' 的 url 为空，请检查 .gitmodules。"
-
-  # 检查是否已经是 gitlink
-  if git ls-files -s -- "$path" 2>/dev/null | awk '$1 == 160000 {exit 0} END{exit 1}'; then
-    log "路径 '$path' 已经是子模块（gitlink），跳过 add。"
-    return 0
-  fi
-
-  # 如果目录已存在且不是子模块，提示用户
-  if [ -d "$path" ] && [ ! -d "$path/.git" ]; then
-    err "目录 '$path' 已存在且不是子模块目录，可能包含本地文件。"
-    err "请先手动备份/删除该目录，然后再执行 add。"
-    exit 1
-  fi
-
-  # 先用 git config --file .gitmodules 写入/覆盖配置，让 .gitmodules 与配置文件同步
-  if [ -f "$GITMODULES" ]; then
-    log "同步 .gitmodules：submodule.$name.path=$path, submodule.$name.url=$url"
-    git config -f "$GITMODULES" "submodule.$name.path" "$path"
-    git config -f "$GITMODULES" "submodule.$name.url" "$url"
+  # 1. 如果目录已存在（且里面有 .git），直接 pull
+  if [ -d "$path/.git" ]; then
+    log "目录已存在，正在更新: $path"
+    (cd "$path" && git pull)
+  
+  # 2. 如果目录不存在，直接 clone
+  elif [ ! -d "$path" ]; then
+    log "正在克隆新项目: $name -> $path"
+    # 创建父目录以防路径包含子文件夹
+    mkdir -p "$(dirname "$path")"
+    git clone "$url" "$path"
+  
+  # 3. 目录存在但不是 git 仓库（可能是手动创建的文件夹）
   else
-    log ".gitmodules 不存在，将在 git submodule add 时自动创建。"
+    die "目录 '$path' 已存在但不是 git 仓库，请手动处理。"
   fi
-
-  log "执行：git submodule add '$url' '$path'"
-  git submodule add "$url" "$path"
-
-  log "已添加子模块 '$name' -> path='$path'"
-  log "可执行：git submodule update --init --recursive"
 }
 
-# 删除一个模块：按 name 从 .gitmodules 取 path，然后 git rm + 清理 .git/modules
+# 批量同步
+cmd_sync_all() {
+  log "开始批量同步..."
+  parse_modules | while IFS=$'\t' read -r name _ _; do
+    [ -n "$name" ] || continue
+    cmd_add "$name" || err "同步 $name 失败"
+  done
+  log "同步完成。"
+}
+
+# 删除目录
 cmd_remove() {
   local name="$1"
-  [ -n "$name" ] || die "用法：$0 remove <module-name>"
-
-  local info
-  info="$(get_module_info "$name")" || true
-  [ -n "$info" ] || die "在 .gitmodules 中找不到名为 '$name' 的子模块条目。"
-
   local path
-  path="$(printf '%s\n' "$info" | cut -f1)"
-  [ -n "$path" ] || die "子模块 '$name' 的 path 为空，请检查 .gitmodules。"
-
-  log "将删除子模块 '$name'，路径 '$path'。"
-
-  # 停用
-  git submodule deinit -f -- "$path" 2>/dev/null || true
-
-  # 从索引移除 gitlink
-  if git ls-files -s -- "$path" 2>/dev/null | awk '$1 == 160000 {exit 0} END{exit 1}'; then
-    log "执行：git rm -f '$path'"
-    git rm -f "$path"
-  else
-    log "路径 '$path' 当前不是子模块 gitlink，仅尝试从索引移除（如果存在）。"
-    git rm --cached -f "$path" 2>/dev/null || true
-  fi
-
-  # 删除 .git/modules 下的元数据
-  local moddir=".git/modules/$path"
-  if [ -d "$moddir" ]; then
-    log "删除元数据目录：$moddir"
-    rm -rf "$moddir"
-  fi
-
-  # 最后删除工作区中的实际目录壳，避免后续 add 时报 "already exists"
+  path="$(parse_modules | awk -v target="$name" -F '\t' '$1 == target {print $2}')"
+  [ -n "$path" ] || die "找不到模块: $name"
+  
   if [ -d "$path" ]; then
-    echo "[INFO] Removing working tree directory '$path'"
-    rm -rf -- "$path"
+    log "删除目录: $path"
+    rm -rf "$path"
+  else
+    log "目录不存在: $path"
   fi
+}
 
-  log "注意：本脚本不自动修改 .gitmodules 中的该条目，如需彻底删除请手动编辑 .gitmodules。"
+cmd_remove_all() {
+  log "批量删除..."
+  parse_modules | while IFS=$'\t' read -r name _ _; do
+    [ -n "$name" ] || continue
+    cmd_remove "$name"
+  done
+}
+
+cmd_list() {
+  log "配置列表："
+  parse_modules | while IFS=$'\t' read -r name path url; do
+    printf ' - %-20s %s\n' "$name" "$path"
+  done
 }
 
 usage() {
@@ -212,28 +114,19 @@ usage() {
 用法：$0 <command> [args...]
 
 command:
-  list                 列出 .gitmodules 中的所有子模块 (name / path / url)
-  status               查看当前索引中的子模块（gitlink，已载入模块）
-  add <name>           根据 .gitmodules 中的 name 添加一个子模块（git submodule add）
-  remove <name>        根据 .gitmodules 中的 name 删除一个子模块（git rm + 清理 .git/modules）
-  sync-all             按 geek-modules.yml 中的配置，依次执行 add，同步/拉取所有模块
-  remove-all           按 geek-modules.yml 中的配置，依次执行 remove，删除所有模块
-
-示例：
-  $0 list
-  $0 status
-  $0 add Geek-Plugin-Ehcache
-  $0 remove Geek-Plugin-Ehcache
+  list          列出配置
+  sync-all      全部拉取/更新 (核心功能)
+  remove-all    全部删除
+  add <name>    单独拉取某个
+  remove <name> 单独删除某个
 EOF
 }
 
 case "$1" in
-  list)    shift; cmd_list "$@";;
-  status)  shift; cmd_status "$@";;
-  add)     shift; cmd_add "$@";;
-  remove)  shift; cmd_remove "$@";;
-  sync-all) shift; cmd_sync_all "$@";;
-  remove-all) shift; cmd_remove_all "$@";;
-  ""|-h|--help) usage;;
-  *) err "未知命令：$1"; usage; exit 1;;
+  list) cmd_list;;
+  sync-all) cmd_sync_all;;
+  remove-all) cmd_remove_all;;
+  add) shift; cmd_add "$@";;
+  remove) shift; cmd_remove "$@";;
+  *) usage; exit 1;;
 esac
