@@ -63,6 +63,8 @@ spring:
   cache:
     # 指定缓存类型 simple 默认缓存 jcache 本地缓存 redis 缓存（去plugins配置链接信息）
     type: simple
+  liquibase:
+    enabled: true
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
