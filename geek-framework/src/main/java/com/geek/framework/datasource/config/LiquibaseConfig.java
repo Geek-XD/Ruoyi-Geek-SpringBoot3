@@ -1,7 +1,7 @@
 package com.geek.framework.datasource.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -12,8 +12,11 @@ import com.geek.framework.datasource.properties.DynamicDataSourceProperties.Dyna
 import liquibase.integration.spring.SpringLiquibase;
 
 @Configuration
-@ConditionalOnProperty(name = "spring.liquibase.enabled", havingValue = "true", matchIfMissing = true)
 public class LiquibaseConfig {
+
+    @Value("${spring.liquibase.enabled:true}")
+    private boolean enabled;
+
 
     @Autowired
     private DynamicDataSourceProperties dataSourceProperties;
@@ -30,7 +33,7 @@ public class LiquibaseConfig {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(nativeDs);
         liquibase.setChangeLog("classpath:db/changelog/db.changelog-master.yaml");
-        liquibase.setShouldRun(true);
+        liquibase.setShouldRun(enabled);
         return liquibase;
     }
 }
