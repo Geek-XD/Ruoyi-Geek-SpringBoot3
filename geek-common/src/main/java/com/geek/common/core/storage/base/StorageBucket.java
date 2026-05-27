@@ -2,7 +2,11 @@ package com.geek.common.core.storage.base;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -76,6 +80,15 @@ public interface StorageBucket {
             return generatePresignedUrl(filePath, 3600);
         }
     };
+
+    default String encodeUrlPath(String filePath) {
+        if (filePath == null || filePath.isEmpty()) {
+            return "";
+        }
+        return Arrays.stream(filePath.replace("\\", "/").split("/"))
+                .map(segment -> URLEncoder.encode(segment, StandardCharsets.UTF_8).replace("+", "%20"))
+                .collect(Collectors.joining("/"));
+    }
 
     /**
      * 初始化分片上传
