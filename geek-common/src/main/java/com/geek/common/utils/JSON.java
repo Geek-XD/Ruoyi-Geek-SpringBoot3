@@ -92,7 +92,7 @@ public class JSON {
     public static String getString(String text, String fieldName) {
         JsonNode node = parseObject(text);
         if (node != null && node.has(fieldName)) {
-            return node.get(fieldName).asText();
+            return node.get(fieldName).asString();
         }
         return null;
     }
