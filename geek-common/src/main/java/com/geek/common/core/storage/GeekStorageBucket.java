@@ -49,17 +49,25 @@ public class GeekStorageBucket implements StorageBucket {
         sbTypeHashMap.put(storageBucketKey, sbType);
     }
 
-    public void removeDatasource(String storageBucketKey) {
+    public void removeStorageBucket(String storageBucketKey) {
         storageBucketMap.remove(storageBucketKey);
         sbTypeHashMap.remove(storageBucketKey);
     }
 
     public StorageBucket getStorageBucket(String storageBucketKey) {
-        return storageBucketMap.get(storageBucketKey);
+        StorageBucket storageBucket = storageBucketMap.get(storageBucketKey);
+        if (Objects.isNull(storageBucket)) {
+            throw new IllegalStateException("不存在该存储桶：" + storageBucketKey);
+        }
+        return storageBucket;
     }
 
     public String getSbType(String storageBucketKey) {
-        return sbTypeHashMap.get(storageBucketKey);
+        String sbType = sbTypeHashMap.get(storageBucketKey);
+        if (Objects.isNull(sbType)) {
+            throw new IllegalStateException("不存在该存储桶：" + storageBucketKey);
+        }
+        return sbType;
     }
 
     protected StorageBucket getStorageBucket() {
@@ -67,7 +75,7 @@ public class GeekStorageBucket implements StorageBucket {
         if (storageBucketMap.size() > 1) {
             String storageBucketKey = StorageBucketKey.get();
             if (StringUtils.isNotBlank(storageBucketKey)) {
-                storageBucket = storageBucketMap.get(storageBucketKey);
+                storageBucket = getStorageBucket(storageBucketKey);
             }
         }
         return storageBucket;
