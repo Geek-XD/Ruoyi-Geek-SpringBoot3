@@ -1,8 +1,11 @@
 package com.geek.framework.cache;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -15,9 +18,12 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheMonitor;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.support.CacheStat;
+import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.template.QuickConfig;
 import com.geek.common.core.cache.GeekCacheManager;
-import com.alicp.jetcache.anno.CacheType;
 
 @Component
 @SuppressWarnings("unchecked")
@@ -28,6 +34,7 @@ public class GeekJetCacheManager implements GeekCacheManager {
     private final Environment environment;
     private final ConcurrentMap<String, Cache<String, Object>> caches = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Set<String>> keyRegistry = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, DefaultCacheMonitor> cacheMonitors = new ConcurrentHashMap<>();
 
     public GeekJetCacheManager(com.alicp.jetcache.CacheManager cacheManager, GeekCacheProperties properties,
             Environment environment) {
@@ -38,7 +45,9 @@ public class GeekJetCacheManager implements GeekCacheManager {
 
     @Override
     public Collection<String> getCacheNames() {
-        return Collections.unmodifiableSet(caches.keySet());
+        Set<String> cacheNames = new LinkedHashSet<>(caches.keySet());
+        cacheNames.addAll(keyRegistry.keySet());
+        return Collections.unmodifiableSet(cacheNames);
     }
 
     @Override
@@ -153,7 +162,14 @@ public class GeekJetCacheManager implements GeekCacheManager {
         if (cacheType == CacheType.BOTH) {
             builder.syncLocal(properties.isSyncLocal());
         }
-        return (Cache<String, Object>) (Cache<?, ?>) cacheManager.getOrCreateCache(builder.build());
+        Cache<String, Object> cache = (Cache<String, Object>) (Cache<?, ?>) cacheManager.getOrCreateCache(builder.build());
+        DefaultCacheMonitor cacheMonitor = new DefaultCacheMonitor(cacheName);
+        List<CacheMonitor> monitors = cache.config().getMonitors();
+        List<CacheMonitor> configuredMonitors = monitors == null ? new ArrayList<>() : new ArrayList<>(monitors);
+        configuredMonitors.add(cacheMonitor);
+        cache.config().setMonitors(configuredMonitors);
+        cacheMonitors.put(cacheName, cacheMonitor);
+        return cache;
     }
 
     private CacheType resolveCacheType() {
@@ -161,6 +177,81 @@ public class GeekJetCacheManager implements GeekCacheManager {
             return CacheType.BOTH;
         }
         return CacheType.LOCAL;
+    }
+
+    public CacheType getCacheType() {
+        return resolveCacheType();
+    }
+
+    public String getArea() {
+        return properties.getArea();
+    }
+
+    public Duration getDefaultExpire() {
+        return properties.getDefaultExpire();
+    }
+
+    public Duration getLocalExpire() {
+        return properties.getLocalExpire();
+    }
+
+    public int getLocalLimit() {
+        return properties.getLocalLimit();
+    }
+
+    public boolean isSyncLocal() {
+        return properties.isSyncLocal();
+    }
+
+    public boolean isMultiLevelEnabled() {
+        return properties.isMultiLevelEnabled();
+    }
+
+    public boolean isPenetrationProtect() {
+        return properties.isPenetrationProtect();
+    }
+
+    public String getLocalProvider() {
+        return environment.getProperty("jetcache.local.default.type", "unknown");
+    }
+
+    public @Nullable String getRemoteProvider() {
+        return environment.getProperty("jetcache.remote.default.type");
+    }
+
+    public long getStatIntervalMinutes() {
+        return environment.getProperty("jetcache.statIntervalMinutes", Long.class, 0L);
+    }
+
+    public int getRegisteredKeyCount(String cacheName) {
+        Set<String> registeredKeys = keyRegistry.get(cacheName);
+        if (registeredKeys == null || registeredKeys.isEmpty()) {
+            return 0;
+        }
+        Cache<String, Object> cache = caches.get(cacheName);
+        if (cache == null) {
+            return registeredKeys.size();
+        }
+        int activeKeyCount = 0;
+        for (String key : Set.copyOf(registeredKeys)) {
+            if (cache.get(key) != null) {
+                activeKeyCount++;
+            } else {
+                registeredKeys.remove(key);
+            }
+        }
+        if (registeredKeys.isEmpty()) {
+            keyRegistry.remove(cacheName, registeredKeys);
+        }
+        return activeKeyCount;
+    }
+
+    public @Nullable CacheStat getCacheStat(String cacheName) {
+        DefaultCacheMonitor monitor = cacheMonitors.get(cacheName);
+        if (monitor == null) {
+            return null;
+        }
+        return monitor.getCacheStat().clone();
     }
 
     private void registerKey(String cacheName, String key) {
