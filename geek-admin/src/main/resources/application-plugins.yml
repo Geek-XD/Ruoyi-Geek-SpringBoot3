@@ -35,7 +35,7 @@ spring:
           max-wait: -1ms
   #配置rabbitMq 服务器
   rabbitmq:
-    enable: true
+    enable: false
     host: 127.0.0.1
     port: 5672
     username: guest
@@ -48,4 +48,4 @@ netty:
       bossThreads: 4
       workerThreads: 16
       port: 8081
-      enable: true
+      enable: false
