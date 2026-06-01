@@ -20,7 +20,12 @@ geek:
     local-expire: 3650d
     local-limit: 1000
     sync-local: true
-
+  websocket:
+    enabled: true
+    path: /websocket/message
+    max-online-count: 100
+    allowed-origins:
+      - "*"
 
 # 开发环境配置
 server:
