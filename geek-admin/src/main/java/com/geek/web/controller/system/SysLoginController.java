@@ -91,7 +91,7 @@ public class SysLoginController {
             loginUser.setPermissions(permissions);
             tokenService.refreshToken(loginUser);
         }
-        if (user.getAvatar() != null) {
+        if (StringUtils.isNotEmpty(user.getAvatar())) {
             try {
                 user.setAvatar(Sb.getURL(user.getAvatar()));
             } catch (Exception e) {
