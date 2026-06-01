@@ -1,13 +1,13 @@
-jetcache:
-  remote:
-    default:
-      type: redis.springdata
-      keyConvertor: jackson3
-      valueEncoder: java
-      valueDecoder: java
-      defaultExpireInMillis: 315360000000
-      broadcastChannel: geek:cache
-      keyPrefix: geek:cache
+# jetcache:
+#   remote:
+#     default:
+#       type: redis.springdata
+#       keyConvertor: jackson3
+#       valueEncoder: java
+#       valueDecoder: java
+#       defaultExpireInMillis: 315360000000
+#       broadcastChannel: geek:cache
+#       keyPrefix: geek:cache
 
 spring:
   data:
@@ -35,7 +35,7 @@ spring:
           max-wait: -1ms
   #配置rabbitMq 服务器
   rabbitmq:
-    enable: false
+    enable: true
     host: 127.0.0.1
     port: 5672
     username: guest
