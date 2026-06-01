@@ -18,10 +18,6 @@ modules:
     url: https://gitee.com/geek-xd/geek-plugin-redis.git
     path: geek-plugins/Geek-Plugin-Redis
 
-  - name: Geek-Plugin-Ehcache
-    url: https://gitee.com/geek-xd/geek-plugin-ehcache.git
-    path: geek-plugins/Geek-Plugin-Ehcache
-
   - name: Geek-Plugin-Minio
     url: https://gitee.com/geek-xd/geek-plugin-minio.git
     path: geek-plugins/Geek-Plugin-Minio

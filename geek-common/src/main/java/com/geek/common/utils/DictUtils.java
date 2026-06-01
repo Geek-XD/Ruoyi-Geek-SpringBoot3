@@ -2,8 +2,6 @@ package com.geek.common.utils;
 
 import java.util.List;
 
-import org.springframework.cache.Cache;
-
 import com.geek.common.constant.CacheConstants;
 import com.geek.common.core.domain.entity.SysDictData;
 
@@ -25,7 +23,7 @@ public class DictUtils {
      * @param dictDatas 字典数据列表
      */
     public static void setDictCache(String key, List<SysDictData> dictDatas) {
-        getDictCacheKey().put(key, dictDatas);
+        CacheUtils.put(CacheConstants.SYS_DICT_KEY, key, dictDatas);
     }
 
     /**
@@ -36,7 +34,7 @@ public class DictUtils {
      */
     @SuppressWarnings("unchecked")
     public static List<SysDictData> getDictCache(String key) {
-        List<SysDictData> arrayCache = (List<SysDictData>) getDictCacheKey().get(key, List.class);
+        List<SysDictData> arrayCache = (List<SysDictData>) CacheUtils.get(CacheConstants.SYS_DICT_KEY, key, List.class);
         if (StringUtils.isNotNull(arrayCache)) {
             return arrayCache;
         }
@@ -151,23 +149,14 @@ public class DictUtils {
      * @param key 字典键
      */
     public static void removeDictCache(String key) {
-        getDictCacheKey().evict(key);
+        CacheUtils.removeIfPresent(CacheConstants.SYS_DICT_KEY, key);
     }
 
     /**
      * 清空字典缓存
      */
     public static void clearDictCache() {
-        getDictCacheKey().clear();
-    }
-
-    /**
-     * 获取dict缓存
-     * 
-     * @return 缓存Cache
-     */
-    public static Cache getDictCacheKey() {
-        return CacheUtils.getCache(CacheConstants.SYS_DICT_KEY);
+        CacheUtils.clear(CacheConstants.SYS_DICT_KEY);
     }
 
     private DictUtils() {

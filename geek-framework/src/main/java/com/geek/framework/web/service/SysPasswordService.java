@@ -3,7 +3,6 @@ package com.geek.framework.web.service;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.Cache;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -41,20 +40,6 @@ public class SysPasswordService
 
     @Value(value = "${user.ip.lockTime:15}")
     public int ipLockTime;
-    /**
-     * 登录账户密码错误次数缓存键名
-     *
-     * @return 缓存Cache
-     */
-    private Cache getCache()
-    {
-        return CacheUtils.getCache(CacheConstants.PWD_ERR_CNT_KEY);
-    }
-
-    private Cache getIpCache() {
-        return CacheUtils.getCache(CacheConstants.IP_ERR_CNT_KEY);
-    }
-
     public void validate(SysUser user)
     {
         Authentication usernamePasswordAuthenticationToken = AuthenticationContextHolder.getContext();
@@ -63,7 +48,7 @@ public class SysPasswordService
 
         String ip = IpUtils.getIpAddr();
         validateIp(ip);
-        Integer retryCount = getCache().get(username, Integer.class);
+        Integer retryCount = CacheUtils.get(CacheConstants.PWD_ERR_CNT_KEY, username, Integer.class);
         if (retryCount == null)
         {
             retryCount = 0;
@@ -90,7 +75,7 @@ public class SysPasswordService
 
     public void validateIp(String ip)
     {
-        Integer ipRetryCount = getIpCache().get(ip, Integer.class);
+        Integer ipRetryCount = CacheUtils.get(CacheConstants.IP_ERR_CNT_KEY, ip, Integer.class);
         if (ipRetryCount == null)
         {
             ipRetryCount = 0;
@@ -104,7 +89,7 @@ public class SysPasswordService
 
     public void incrementIpFailCount(String ip)
     {
-        Integer ipRetryCount = getIpCache().get(ip, Integer.class);
+        Integer ipRetryCount = CacheUtils.get(CacheConstants.IP_ERR_CNT_KEY, ip, Integer.class);
         if (ipRetryCount == null)
         {
             ipRetryCount = 0;
@@ -120,6 +105,6 @@ public class SysPasswordService
 
     public void clearLoginRecordCache(String loginName)
     {
-        getCache().evictIfPresent(loginName);
+        CacheUtils.removeIfPresent(CacheConstants.PWD_ERR_CNT_KEY, loginName);
     }
 }

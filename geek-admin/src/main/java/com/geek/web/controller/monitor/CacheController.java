@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.cache.Cache.ValueWrapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -79,12 +78,12 @@ public class CacheController {
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @GetMapping("/getValue/{cacheName}/{cacheKey}")
     public AjaxResult getCacheValue(@PathVariable String cacheName, @PathVariable String cacheKey) {
-        ValueWrapper valueWrapper = CacheUtils.get(cacheName, cacheKey);
+        Object cachedValue = CacheUtils.get(cacheName, cacheKey);
         SysCache sysCache = new SysCache();
         sysCache.setCacheName(cacheName);
         sysCache.setCacheKey(cacheKey);
-        if (StringUtils.isNotNull(valueWrapper)) {
-            sysCache.setCacheValue(Convert.toStr(valueWrapper.get(), ""));
+        if (StringUtils.isNotNull(cachedValue)) {
+            sysCache.setCacheValue(Convert.toStr(cachedValue, ""));
         }
         return AjaxResult.success(sysCache);
     }
@@ -114,9 +113,7 @@ public class CacheController {
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @DeleteMapping("/clearCacheAll")
     public AjaxResult clearCacheAll() {
-        for (String cacheName : CacheUtils.getCacheManager().getCacheNames()) {
-            CacheUtils.clear(cacheName);
-        }
+        CacheUtils.clearAll();
         return AjaxResult.success();
     }
 }

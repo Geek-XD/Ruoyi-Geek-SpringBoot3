@@ -1,14 +1,12 @@
 package com.geek.common.utils;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.jspecify.annotations.Nullable;
-import org.springframework.cache.Cache;
 import org.springframework.util.ObjectUtils;
 
-import com.geek.common.core.cache.TtlCacheManager;
+import com.geek.common.core.cache.GeekCacheManager;
 import com.geek.common.utils.spring.SpringUtils;
 
 public class CacheUtils {
@@ -18,22 +16,8 @@ public class CacheUtils {
      *
      * @return
      */
-    public static TtlCacheManager getCacheManager() {
-        return SpringUtils.getBean(TtlCacheManager.class);
-    }
-
-    /**
-     * 根据cacheName从CacheManager中获取cache
-     *
-     * @param cacheName
-     * @return
-     */
-    public static Cache getCache(String cacheName) {
-        Cache cache = getCacheManager().getCache(cacheName);
-        if (Objects.isNull(cache)) {
-            throw new IllegalArgumentException("没有找到对应的缓存:" + cacheName);
-        }
-        return cache;
+    public static GeekCacheManager getCacheManager() {
+        return SpringUtils.getBean(GeekCacheManager.class);
     }
 
     /**
@@ -43,8 +27,7 @@ public class CacheUtils {
      * @return
      */
     public static Set<String> getkeys(String cacheName) {
-        Cache cache = getCache(cacheName);
-        return getCacheManager().getCachekeys(cache);
+        return getCacheManager().getCacheKeys(cacheName);
     }
 
     /**
@@ -68,9 +51,7 @@ public class CacheUtils {
      * @param <T>
      */
     public static void putIfAbsent(String cacheName, String key, Object value) {
-        if (ObjectUtils.isEmpty(get(cacheName, key))) {
-            put(cacheName, key, value, 0, null);
-        }
+        getCacheManager().putIfAbsent(cacheName, key, value);
     }
 
     public static boolean hasKey(String cacheName, String key) {
@@ -89,9 +70,9 @@ public class CacheUtils {
      */
     public static void put(String cacheName, String key, Object value, long timeout, TimeUnit unit) {
         if (timeout != 0 && unit != null) {
-            getCacheManager().setCacheObject(cacheName, key, value, timeout, unit);
+            getCacheManager().put(cacheName, key, value, timeout, unit);
         } else {
-            getCacheManager().setCacheObject(cacheName, key, value);
+            getCacheManager().put(cacheName, key, value);
         }
     }
 
@@ -102,8 +83,8 @@ public class CacheUtils {
      * @param key
      * @return
      */
-    public static Cache.ValueWrapper get(String cacheName, String key) {
-        return getCache(cacheName).get(key);
+    public static Object get(String cacheName, String key) {
+        return getCacheManager().get(cacheName, key);
     }
 
     /**
@@ -116,7 +97,7 @@ public class CacheUtils {
      * @return
      */
     public static <T> T get(String cacheName, String key, @Nullable Class<T> type) {
-        return getCache(cacheName).get(key, type);
+        return getCacheManager().get(cacheName, key, type);
     }
 
     /**
@@ -126,7 +107,7 @@ public class CacheUtils {
      * @param key
      */
     public static void remove(String cacheName, String key) {
-        getCache(cacheName).evictIfPresent(key);
+        getCacheManager().remove(cacheName, key);
     }
 
     /**
@@ -137,7 +118,7 @@ public class CacheUtils {
      * @return
      */
     public static boolean removeIfPresent(String cacheName, String key) {
-        return getCache(cacheName).evictIfPresent(key);
+        return getCacheManager().remove(cacheName, key);
     }
 
     /**
@@ -146,7 +127,11 @@ public class CacheUtils {
      * @param cacheName
      */
     public static void clear(String cacheName) {
-        getCache(cacheName).clear();
+        getCacheManager().clear(cacheName);
+    }
+
+    public static void clearAll() {
+        getCacheManager().clearAll();
     }
 
     private CacheUtils() {

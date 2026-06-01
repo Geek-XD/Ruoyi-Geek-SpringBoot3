@@ -17,12 +17,12 @@ public class CaptchaCacheServiceImpl implements CaptchaCacheService, AopInfrastr
 
     @Override
     public boolean exists(String arg0) {
-        return CacheUtils.get(CacheConstants.CAPTCHA_CODE_KEY, arg0) != null;
+        return CacheUtils.hasKey(CacheConstants.CAPTCHA_CODE_KEY, arg0);
     }
 
     @Override
     public String get(String arg0) {
-        return CacheUtils.get(CacheConstants.CAPTCHA_CODE_KEY, arg0).get().toString();
+        return CacheUtils.get(CacheConstants.CAPTCHA_CODE_KEY, arg0, String.class);
     }
 
     @Override

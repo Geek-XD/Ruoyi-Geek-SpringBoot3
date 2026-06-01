@@ -1,8 +1,6 @@
 package com.geek.system.service.impl;
 
 import java.util.List;
-
-import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 
 import com.geek.common.constant.CacheConstants;
@@ -46,7 +44,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
      */
     @Override
     public String selectConfigByKey(String configKey) {
-        String configValue = Convert.toStr(getCache().get(configKey, String.class));
+        String configValue = Convert.toStr(CacheUtils.get(CacheConstants.SYS_CONFIG_KEY, configKey, String.class));
         if (StringUtils.isNotEmpty(configValue)) {
             return configValue;
         }
@@ -141,7 +139,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
                 throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
             }
             this.removeById(configId);
-            getCache().evict(config.getConfigKey());
+            CacheUtils.removeIfPresent(CacheConstants.SYS_CONFIG_KEY, config.getConfigKey());
         }
     }
 
@@ -152,7 +150,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
     public void loadingConfigCache() {
         List<SysConfig> configsList = this.list();
         for (SysConfig config : configsList) {
-            getCache().put(config.getConfigKey(), config.getConfigValue());
+            CacheUtils.put(CacheConstants.SYS_CONFIG_KEY, config.getConfigKey(), config.getConfigValue());
         }
     }
 
@@ -161,7 +159,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
      */
     @Override
     public void clearConfigCache() {
-        CacheUtils.getCache(CacheConstants.SYS_CONFIG_KEY).clear();
+        CacheUtils.clear(CacheConstants.SYS_CONFIG_KEY);
     }
 
     /**
@@ -185,14 +183,5 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
                 .eq(SysConfig::getConfigKey, config.getConfigKey())
                 .ne(SysConfig::getConfigId, config.getConfigId())
                 .exists();
-    }
-
-    /**
-     * 获取config缓存
-     *
-     * @return
-     */
-    private Cache getCache() {
-        return CacheUtils.getCache(CacheConstants.SYS_CONFIG_KEY);
     }
 }
