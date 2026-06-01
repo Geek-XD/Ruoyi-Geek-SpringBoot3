@@ -22,10 +22,6 @@ modules:
     url: https://gitee.com/geek-xd/geek-plugin-minio.git
     path: geek-plugins/Geek-Plugin-Minio
 
-  - name: Geek-Plugin-Websocket
-    url: https://gitee.com/geek-xd/geek-plugin-websocket.git
-    path: geek-plugins/Geek-Plugin-Websocket
-
   - name: Geek-Module-Quartz
     url: https://gitee.com/geek-xd/geek-module-quartz.git
     path: geek-modules/Geek-Module-Quartz
