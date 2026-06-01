@@ -105,15 +105,14 @@ command:
 示例：
   ./geek.sh list
   ./geek.sh status
-  ./geek.sh add Geek-Plugin-Ehcache
-  ./geek.sh remove Geek-Plugin-Ehcache
+  ./geek.sh add Geek-Plugin-Redis
+  ./geek.sh remove Geek-Plugin-Redis
 ```
 
 修改项目根pom
 
 ```xml
         <module>geek-plugins/geek-plugin-aliyun-oss</module>
-        <module>geek-plugins/geek-plugin-ehcache</module>
         <module>geek-plugins/geek-plugin-minio</module>
         <module>geek-plugins/geek-plugin-netty</module>
         <module>geek-plugins/geek-plugin-rabbitmq</module>
@@ -153,12 +152,6 @@ command:
         <dependency>
             <groupId>com.geekxd</groupId>
             <artifactId>geek-plugin-rabbitmq</artifactId>
-            <version>${geek.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.geekxd</groupId>
-            <artifactId>geek-plugin-ehcache</artifactId>
             <version>${geek.version}</version>
         </dependency>
 
@@ -251,8 +244,7 @@ command:
 * [Geek-Plugin-RabbitMQ（rabbitmq支持：提供事件监听能力-暂未统一）](https://gitee.com/geek-xd/geek-plugin-rabbitmq)
 * [Geek-Plugin-Minio（minio分布式存储：提供存储支持-可共存）](https://gitee.com/geek-xd/geek-plugin-minio)
 * [Geek-Plugin-Aliyun-OSS（阿里云OSS对象存储：提供存储支持-可共存）](https://gitee.com/geek-xd/geek-plugin-aliyun-oss)
-* [Geek-Plugin-Ehcache（Ehcache持久化缓存：提供缓存支持-可替换）](https://gitee.com/geek-xd/geek-plugin-ehcache)
-* [Geek-Plugin-Redis（Redis分布式缓存：提供缓存支持-可替换）](https://gitee.com/geek-xd/geek-plugin-redis)
+* [Geek-Plugin-Redis（Redis增强：提供分布式缓存、限流、Pub/Sub）](https://gitee.com/geek-xd/geek-plugin-redis)
 * [Geek-Plugin-Netty](https://gitee.com/geek-xd/geek-plugin-netty)
 
 ### 模块
