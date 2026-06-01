@@ -2,9 +2,7 @@ package com.geek.web.controller.monitor;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,13 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alicp.jetcache.support.CacheStat;
-import com.geek.common.constant.CacheConstants;
 import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.core.text.Convert;
 import com.geek.common.utils.CacheUtils;
 import com.geek.common.utils.StringUtils;
 import com.geek.framework.cache.GeekJetCacheManager;
-import com.geek.system.domain.SysCache;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,22 +39,6 @@ public class CacheController {
 
     @Autowired
     private GeekJetCacheManager cacheManager;
-
-    private final static List<SysCache> caches = new ArrayList<>();
-    {
-        caches.add(new SysCache(CacheConstants.LOGIN_TOKEN_KEY, "用户信息"));
-        caches.add(new SysCache(CacheConstants.SYS_CONFIG_KEY, "配置信息"));
-        caches.add(new SysCache(CacheConstants.SYS_DICT_KEY, "数据字典"));
-        caches.add(new SysCache(CacheConstants.CAPTCHA_CODE_KEY, "验证码"));
-        caches.add(new SysCache(CacheConstants.PHONE_CODES, "短信验证码"));
-        caches.add(new SysCache(CacheConstants.EMAIL_CODES, "邮箱验证码"));
-        caches.add(new SysCache(CacheConstants.REPEAT_SUBMIT_KEY, "防重提交"));
-        caches.add(new SysCache(CacheConstants.RATE_LIMIT_KEY, "限流处理"));
-        caches.add(new SysCache(CacheConstants.PWD_ERR_CNT_KEY, "密码错误次数"));
-        caches.add(new SysCache(CacheConstants.IP_ERR_CNT_KEY, "IP错误次数"));
-        caches.add(new SysCache(CacheConstants.FILE_MD5_PATH_KEY, "path-md5"));
-        caches.add(new SysCache(CacheConstants.FILE_PATH_MD5_KEY, "md5-path"));
-    }
 
     @Operation(summary = "获取 JetCache 监控概览")
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
@@ -98,13 +78,13 @@ public class CacheController {
     @GetMapping("/getValue/{cacheName}/{cacheKey}")
     public AjaxResult getCacheValue(@PathVariable String cacheName, @PathVariable String cacheKey) {
         Object cachedValue = CacheUtils.get(cacheName, cacheKey);
-        SysCache sysCache = new SysCache();
-        sysCache.setCacheName(cacheName);
-        sysCache.setCacheKey(cacheKey);
+        Map<String, Object> cacheValue = new LinkedHashMap<>(3);
+        cacheValue.put("cacheName", cacheName);
+        cacheValue.put("cacheKey", cacheKey);
         if (StringUtils.isNotNull(cachedValue)) {
-            sysCache.setCacheValue(Convert.toStr(cachedValue, ""));
+            cacheValue.put("cacheValue", Convert.toStr(cachedValue, ""));
         }
-        return AjaxResult.success(sysCache);
+        return AjaxResult.success(cacheValue);
     }
 
     @Operation(summary = "清除缓存")
@@ -146,25 +126,27 @@ public class CacheController {
         return AjaxResult.success();
     }
 
-    private List<SysCache> buildCacheCatalog() {
-        Map<String, SysCache> cacheCatalog = new LinkedHashMap<>();
-        for (SysCache cache : caches) {
-            cacheCatalog.put(cache.getCacheName(), new SysCache(cache.getCacheName(), cache.getRemark()));
+    private List<Map<String, Object>> buildCacheCatalog() {
+        List<String> cacheNames = new ArrayList<>(cacheManager.getCacheNames());
+        cacheNames.sort(String::compareTo);
+        List<Map<String, Object>> cacheCatalog = new ArrayList<>(cacheNames.size());
+        for (String cacheName : cacheNames) {
+            Map<String, Object> item = new LinkedHashMap<>(1);
+            item.put("cacheName", cacheName);
+            cacheCatalog.add(item);
         }
-        for (String cacheName : cacheManager.getCacheNames()) {
-            cacheCatalog.computeIfAbsent(cacheName, ignored -> new SysCache(cacheName, "业务缓存"));
-        }
-        return new ArrayList<>(cacheCatalog.values());
+        return cacheCatalog;
     }
 
     private List<Map<String, Object>> buildCacheStats() {
         List<Map<String, Object>> stats = new ArrayList<>();
-        for (SysCache cache : buildCacheCatalog()) {
-            CacheStat cacheStat = cacheManager.getCacheStat(cache.getCacheName());
+        List<String> cacheNames = new ArrayList<>(cacheManager.getCacheNames());
+        cacheNames.sort(String::compareTo);
+        for (String cacheName : cacheNames) {
+            CacheStat cacheStat = cacheManager.getCacheStat(cacheName);
             Map<String, Object> item = new LinkedHashMap<>();
-            item.put("cacheName", cache.getCacheName());
-            item.put("remark", cache.getRemark());
-            item.put("keyCount", cacheManager.getRegisteredKeyCount(cache.getCacheName()));
+            item.put("cacheName", cacheName);
+            item.put("keyCount", cacheManager.getRegisteredKeyCount(cacheName));
             item.put("cacheType", cacheManager.getCacheType().name());
             item.put("defaultExpire", formatDuration(cacheManager.getDefaultExpire()));
             item.put("localExpire", formatDuration(cacheManager.getLocalExpire()));

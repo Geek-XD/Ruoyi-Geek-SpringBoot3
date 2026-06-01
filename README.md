@@ -117,7 +117,6 @@ command:
         <module>geek-plugins/geek-plugin-netty</module>
         <module>geek-plugins/geek-plugin-rabbitmq</module>
         <module>geek-plugins/geek-plugin-redis</module>
-        <module>geek-plugins/geek-plugin-websocket</module>
         <module>geek-modules/geek-module-flowable</module>
         <module>geek-modules/geek-module-form</module>
         <module>geek-modules/geek-module-generator</module>
@@ -158,12 +157,6 @@ command:
         <dependency>
             <groupId>com.geekxd</groupId>
             <artifactId>geek-plugin-redis</artifactId>
-            <version>${geek.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.geekxd</groupId>
-            <artifactId>geek-plugin-websocket</artifactId>
             <version>${geek.version}</version>
         </dependency>
 
@@ -240,7 +233,6 @@ command:
 
 ### 插件
 
-* [Geek-Plugin-Websocket （ws长连接支持）](https://gitee.com/geek-xd/geek-plugin-websocket)
 * [Geek-Plugin-RabbitMQ（rabbitmq支持：提供事件监听能力-暂未统一）](https://gitee.com/geek-xd/geek-plugin-rabbitmq)
 * [Geek-Plugin-Minio（minio分布式存储：提供存储支持-可共存）](https://gitee.com/geek-xd/geek-plugin-minio)
 * [Geek-Plugin-Aliyun-OSS（阿里云OSS对象存储：提供存储支持-可共存）](https://gitee.com/geek-xd/geek-plugin-aliyun-oss)
