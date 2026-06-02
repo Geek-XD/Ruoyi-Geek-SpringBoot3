@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.geek.common.utils.spring.SpringUtils;
 
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
@@ -69,8 +70,15 @@ public class JSON {
         }
     }
 
-    public static <T> T fromJson(String text, Class<T> clazz) {
-        return parseObject(text, clazz);
+    public static <T> T parseObject(String text, TypeReference<T> typeReference) {
+        if (StringUtils.isEmpty(text)) {
+            return null;
+        }
+        try {
+            return getJsonMapper().readValue(text, typeReference);
+        } catch (Exception e) {
+            throw new RuntimeException("JSON字符串转对象异常", e);
+        }
     }
 
     public static JsonNode parseJson(String text) {
@@ -152,5 +160,9 @@ public class JSON {
 
     public static ObjectNode createObjectNode(Map<String, ?> map) {
         return getJsonMapper().convertValue(map, ObjectNode.class);
+    }
+
+    public static <T> T createObjectNode(Object fromValue, TypeReference<T> toValueTypeRef) {
+        return getJsonMapper().convertValue(fromValue, toValueTypeRef);
     }
 }
