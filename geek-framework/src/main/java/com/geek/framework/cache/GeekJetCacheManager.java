@@ -18,6 +18,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.support.CacheStat;
@@ -29,14 +30,14 @@ import com.geek.common.core.cache.GeekCacheManager;
 @SuppressWarnings("unchecked")
 public class GeekJetCacheManager implements GeekCacheManager {
 
-    private final com.alicp.jetcache.CacheManager cacheManager;
+    private final CacheManager cacheManager;
     private final GeekCacheProperties properties;
     private final Environment environment;
     private final ConcurrentMap<String, Cache<String, Object>> caches = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Set<String>> keyRegistry = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, DefaultCacheMonitor> cacheMonitors = new ConcurrentHashMap<>();
 
-    public GeekJetCacheManager(com.alicp.jetcache.CacheManager cacheManager, GeekCacheProperties properties,
+    public GeekJetCacheManager(CacheManager cacheManager, GeekCacheProperties properties,
             Environment environment) {
         this.cacheManager = cacheManager;
         this.properties = properties;

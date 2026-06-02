@@ -7,7 +7,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -18,7 +17,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @author geek
  */
 @EnableAsync
-@EnableCaching
 @MapperScan(basePackages = { "com.geek.**.mapper" })
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class }, scanBasePackages = { "com.geek", "com.anji.captcha" })
 public class GeekApplication {

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.BiConsumer;
 
 import javax.sql.DataSource;
 
@@ -12,17 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.geek.framework.datasource.properties.DynamicDataSourceProperties;
-import com.mybatisflex.core.datasource.FlexDataSource;
 
 import jakarta.annotation.PreDestroy;
 
-@Configuration
+@Component
 @DependsOn("liquibase")
 public class DataSourceManager implements InitializingBean {
     protected final Logger logger = LoggerFactory.getLogger(DataSourceManager.class);
@@ -30,17 +29,6 @@ public class DataSourceManager implements InitializingBean {
 
     @Autowired
     private DynamicDataSourceProperties dataSourceProperties;
-
-    @Bean
-    public FlexDataSource dataSource() {
-        String primary = dataSourceProperties.getPrimary();
-        DataSource primaryDataSource = targetDataSources.get(primary);
-        FlexDataSource dynamicDataSource = new FlexDataSource(primary, primaryDataSource);
-        for (Map.Entry<String, DataSource> entry : targetDataSources.entrySet()) {
-            dynamicDataSource.addDataSource(entry.getKey(), entry.getValue());
-        }
-        return dynamicDataSource;
-    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -67,11 +55,13 @@ public class DataSourceManager implements InitializingBean {
 
     @PreDestroy
     public void destroy() {
-        for (DataSource dataSource :  targetDataSources.values()) {
+        forEachDataSource((name, dataSource) -> {
             if (dataSource instanceof DruidDataSource) {
                 ((DruidDataSource) dataSource).close();
+            } else {
+                logger.warn("数据源：{} 不是 DruidDataSource，无法关闭", name);
             }
-        }
+        });
     }
 
     public DataSource getDataSource(String name) {
@@ -80,5 +70,9 @@ public class DataSourceManager implements InitializingBean {
 
     public DataSource getPrimaryDataSource() {
         return targetDataSources.get(dataSourceProperties.getPrimary());
+    }
+
+    public void forEachDataSource(BiConsumer<String, DataSource> consumer) {
+        targetDataSources.forEach(consumer);
     }
 }

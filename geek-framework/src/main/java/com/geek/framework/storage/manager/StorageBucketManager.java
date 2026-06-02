@@ -6,15 +6,15 @@ import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import com.geek.common.config.GeekConfig;
 import com.geek.common.core.storage.GeekStorageBucket;
 import com.geek.common.core.storage.base.StorageBucket;
 import com.geek.common.core.storage.base.StorageFactory;
-import com.geek.framework.storage.properties.DynamicStorageBootProperties;
+import com.geek.framework.storage.config.DynamicStorageBootProperties;
 
-@Configuration
+@Component
 public class StorageBucketManager implements InitializingBean {
 
     private Map<String, StorageBucket> targetBuckets = new HashMap<>();

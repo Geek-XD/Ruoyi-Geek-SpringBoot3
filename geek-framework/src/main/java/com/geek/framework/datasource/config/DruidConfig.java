@@ -3,12 +3,14 @@ package com.geek.framework.datasource.config;
 import java.io.IOException;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.alibaba.druid.spring.boot4.autoconfigure.properties.DruidStatProperties;
 import com.alibaba.druid.util.Utils;
+import com.geek.framework.datasource.properties.DruidProperties;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -22,8 +24,9 @@ import jakarta.servlet.ServletResponse;
  * @author geek
  */
 @Configuration
+@EnableConfigurationProperties(DruidProperties.class)
 public class DruidConfig {
-    
+
     /**
      * 去除监控页面底部的广告
      */
