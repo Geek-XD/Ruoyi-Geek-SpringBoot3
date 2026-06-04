@@ -1,4 +1,4 @@
-package com.geek.framework.storage.manager;
+package com.geek.framework.storage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,6 @@ import com.geek.common.config.GeekConfig;
 import com.geek.common.core.storage.GeekStorageBucket;
 import com.geek.common.core.storage.base.StorageBucket;
 import com.geek.common.core.storage.base.StorageFactory;
-import com.geek.framework.storage.config.DynamicStorageBootProperties;
 
 @Component
 public class StorageBucketManager implements InitializingBean {
@@ -21,7 +20,7 @@ public class StorageBucketManager implements InitializingBean {
     private Map<String, String> sbTypeHashMap = new HashMap<>();
 
     @Autowired
-    DynamicStorageBootProperties storageBootProperties;
+    DynamicStorageBucketProperties storageBootProperties;
 
     @Autowired
     Map<String, StorageFactory<?>> storageFactoryMap;

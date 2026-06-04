@@ -1,4 +1,4 @@
-package com.geek.framework.storage.domain;
+package com.geek.framework.storage.local.domain;
 
 import java.io.File;
 import java.io.FileInputStream;

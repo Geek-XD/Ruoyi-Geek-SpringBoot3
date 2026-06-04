@@ -1,5 +1,7 @@
 package com.geek.framework.websocket;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -11,9 +13,9 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.geek.common.core.domain.Message;
 import com.geek.common.core.domain.Message.MessageBuilder;
 import com.geek.common.core.domain.model.LoginUser;
-import com.geek.common.enums.MessageType;
 import com.geek.common.utils.JSON;
 import com.geek.common.utils.StringUtils;
+import com.geek.framework.websocket.handler.GeekWebSocketMessageHandler;
 
 @Component
 public class GeekWebSocketHandler extends TextWebSocketHandler {
@@ -21,9 +23,12 @@ public class GeekWebSocketHandler extends TextWebSocketHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeekWebSocketHandler.class);
 
     private final GeekWebSocketSessionRegistry sessionRegistry;
+    private final List<GeekWebSocketMessageHandler> messageHandlers;
 
-    public GeekWebSocketHandler(GeekWebSocketSessionRegistry sessionRegistry) {
+    public GeekWebSocketHandler(GeekWebSocketSessionRegistry sessionRegistry,
+            List<GeekWebSocketMessageHandler> messageHandlers) {
         this.sessionRegistry = sessionRegistry;
+        this.messageHandlers = messageHandlers;
     }
 
     @Override
@@ -36,7 +41,11 @@ public class GeekWebSocketHandler extends TextWebSocketHandler {
         }
         try {
             sessionRegistry.register(session, loginUser);
-            LOGGER.info("建立连接 - {}", session.getId());
+            LOGGER.info("建立连接 - sessionId={}, username={}, uri={}, remote={}",
+                    session.getId(),
+                    loginUser.getUsername(),
+                    session.getUri(),
+                    session.getRemoteAddress());
             LOGGER.info("当前人数 - {}", sessionRegistry.getUsers().size());
             message.content("连接成功,你好" + loginUser.getUsername());
             sessionRegistry.sendMessage(session, message.build());
@@ -67,19 +76,20 @@ public class GeekWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         Message payload = JSON.parseObject(message.getPayload(), Message.class);
-        if (payload != null && MessageType.ASYNC_MESSAGE.equals(payload.getType())) {
-            sessionRegistry.sendMessage(session, payload);
-            return;
-        }
-        if (payload == null || StringUtils.isEmpty(payload.getReceiver())) {
+        if (payload == null) {
             LOGGER.warn("忽略无效的 WebSocket 消息: {}", message.getPayload());
             return;
         }
-        WebSocketSession receiver = sessionRegistry.getByUsername(payload.getReceiver());
-        if (receiver == null) {
-            LOGGER.warn("无法找到接收者 - {}", payload.getReceiver());
-            return;
+        LOGGER.info("收到 WebSocket 消息 - sessionId={}, type={}, subject={}, content={}",
+                session.getId(),
+                payload.getType(),
+                payload.getSubject(),
+                payload.getContent());
+        for (GeekWebSocketMessageHandler messageHandler : messageHandlers) {
+            if (messageHandler.handle(session, payload)) {
+                return;
+            }
         }
-        sessionRegistry.sendMessage(receiver, payload);
+        LOGGER.warn("未匹配到 WebSocket 消息处理器: {}", message.getPayload());
     }
 }

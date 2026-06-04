@@ -1,4 +1,4 @@
-package com.geek.framework.storage.config;
+package com.geek.framework.storage;
 
 import java.util.Properties;
 
@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 @ConfigurationProperties(prefix = "storage")
-public class DynamicStorageBootProperties {
+public class DynamicStorageBucketProperties {
     private LinkedMap<String, Properties> buckets = new LinkedMap<>();
     private String primary;
 }

@@ -1,10 +1,10 @@
-package com.geek.framework.storage.config;
+package com.geek.framework.storage;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(DynamicStorageBootProperties.class)
+@EnableConfigurationProperties(DynamicStorageBucketProperties.class)
 public class StorageBucketConfiguration {
     
 }

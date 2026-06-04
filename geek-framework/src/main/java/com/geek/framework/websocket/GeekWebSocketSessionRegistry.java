@@ -3,6 +3,7 @@ package com.geek.framework.websocket;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
@@ -24,6 +25,8 @@ public class GeekWebSocketSessionRegistry {
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> usernameSessions = new ConcurrentHashMap<>();
     private final Map<String, LoginUser> loginUsers = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> subjectSubscriptions = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> sessionSubscriptions = new ConcurrentHashMap<>();
     private final Semaphore socketSemaphore;
     private final GeekWebSocketProperties properties;
 
@@ -49,9 +52,104 @@ public class GeekWebSocketSessionRegistry {
         if (loginUser != null) {
             usernameSessions.remove(loginUser.getUsername(), removedSession);
         }
+        unsubscribeAll(sessionId);
         if (removedSession != null) {
             socketSemaphore.release();
         }
+    }
+
+    /**
+     * 订阅主题
+     * 
+     * @param sessionId 会话ID
+     * @param subject 主题名称
+     */
+    public void subscribe(String sessionId, String subject) {
+        if (sessionId == null || subject == null) {
+            return;
+        }
+        subjectSubscriptions.computeIfAbsent(subject, k -> ConcurrentHashMap.newKeySet()).add(sessionId);
+        sessionSubscriptions.computeIfAbsent(sessionId, k -> ConcurrentHashMap.newKeySet()).add(subject);
+        LOGGER.info("会话 {} 订阅主题: {}", sessionId, subject);
+    }
+
+    /**
+     * 取消订阅主题
+     * 
+     * @param sessionId 会话ID
+     * @param subject 主题名称
+     */
+    public void unsubscribe(String sessionId, String subject) {
+        if (sessionId == null || subject == null) {
+            return;
+        }
+        Set<String> subscribers = subjectSubscriptions.get(subject);
+        if (subscribers != null) {
+            subscribers.remove(sessionId);
+            if (subscribers.isEmpty()) {
+                subjectSubscriptions.remove(subject);
+            }
+        }
+        Set<String> subjects = sessionSubscriptions.get(sessionId);
+        if (subjects != null) {
+            subjects.remove(subject);
+            if (subjects.isEmpty()) {
+                sessionSubscriptions.remove(sessionId);
+            }
+        }
+        LOGGER.info("会话 {} 取消订阅主题: {}", sessionId, subject);
+    }
+
+    /**
+     * 取消所有订阅
+     * 
+     * @param sessionId 会话ID
+     */
+    public void unsubscribeAll(String sessionId) {
+        Set<String> subjects = sessionSubscriptions.remove(sessionId);
+        if (subjects != null) {
+            for (String subject : subjects) {
+                Set<String> subscribers = subjectSubscriptions.get(subject);
+                if (subscribers != null) {
+                    subscribers.remove(sessionId);
+                    if (subscribers.isEmpty()) {
+                        subjectSubscriptions.remove(subject);
+                    }
+                }
+            }
+            LOGGER.info("会话 {} 取消所有订阅", sessionId);
+        }
+    }
+
+    /**
+     * 向订阅了指定主题的所有会话广播消息
+     * 
+     * @param subject 主题名称
+     * @param message 消息内容
+     */
+    public void broadcast(String subject, Message message) {
+        if (subject == null) {
+            return;
+        }
+        Set<String> subscribers = subjectSubscriptions.get(subject);
+        if (subscribers == null || subscribers.isEmpty()) {
+            LOGGER.info("主题 {} 没有订阅者, 在线会话数: {}", subject, sessions.size());
+            return;
+        }
+        String messageJson = JSON.toJSONString(message);
+        int successCount = 0;
+        for (String sessionId : subscribers) {
+            WebSocketSession session = sessions.get(sessionId);
+            if (session != null && session.isOpen()) {
+                try {
+                    session.sendMessage(new TextMessage(messageJson));
+                    successCount++;
+                } catch (IOException e) {
+                    LOGGER.error("[广播消息异常] sessionId: {}, subject: {}", sessionId, subject, e);
+                }
+            }
+        }
+        LOGGER.info("向主题 {} 广播消息，成功发送: {}/{}", subject, successCount, subscribers.size());
     }
 
     public WebSocketSession getByUsername(String username) {

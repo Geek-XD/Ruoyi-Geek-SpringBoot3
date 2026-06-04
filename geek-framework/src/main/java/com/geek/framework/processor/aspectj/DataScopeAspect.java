@@ -34,9 +34,6 @@ import com.mybatisflex.core.dialect.DbType;
 @Aspect
 @Component
 public class DataScopeAspect {
-
-    // @Autowired
-    // DataSourceManager dataSourceManager;
     /**
      * 全部数据权限
      */

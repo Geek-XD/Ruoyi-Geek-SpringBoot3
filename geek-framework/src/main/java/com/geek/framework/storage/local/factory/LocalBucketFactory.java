@@ -1,4 +1,4 @@
-package com.geek.framework.storage.factory;
+package com.geek.framework.storage.local.factory;
 
 import java.util.Properties;
 
@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.geek.common.core.storage.base.StorageFactory;
-import com.geek.framework.storage.domain.LocalBucket;
+import com.geek.framework.storage.local.domain.LocalBucket;
 
 @Configuration("local")
 public class LocalBucketFactory extends StorageFactory<LocalBucket> implements WebMvcConfigurer {

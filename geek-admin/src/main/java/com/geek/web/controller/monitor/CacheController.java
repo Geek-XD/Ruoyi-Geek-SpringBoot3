@@ -21,6 +21,7 @@ import com.geek.common.core.text.Convert;
 import com.geek.common.utils.CacheUtils;
 import com.geek.common.utils.StringUtils;
 import com.geek.framework.cache.GeekJetCacheManager;
+import com.geek.framework.cache.GeekJetCacheReport;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,6 +40,9 @@ public class CacheController {
 
     @Autowired
     private GeekJetCacheManager cacheManager;
+
+    @Autowired
+    private GeekJetCacheReport cacheReport;
 
     @Operation(summary = "获取 JetCache 监控概览")
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
@@ -143,13 +147,13 @@ public class CacheController {
         List<String> cacheNames = new ArrayList<>(cacheManager.getCacheNames());
         cacheNames.sort(String::compareTo);
         for (String cacheName : cacheNames) {
-            CacheStat cacheStat = cacheManager.getCacheStat(cacheName);
+            CacheStat cacheStat = cacheReport.getCacheStat(cacheName);
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("cacheName", cacheName);
-            item.put("keyCount", cacheManager.getRegisteredKeyCount(cacheName));
-            item.put("cacheType", cacheManager.getCacheType().name());
-            item.put("defaultExpire", formatDuration(cacheManager.getDefaultExpire()));
-            item.put("localExpire", formatDuration(cacheManager.getLocalExpire()));
+            item.put("keyCount", cacheReport.getRegisteredKeyCount(cacheName));
+            item.put("cacheType", cacheReport.getCacheType().name());
+            item.put("defaultExpire", formatDuration(cacheReport.getDefaultExpire()));
+            item.put("localExpire", formatDuration(cacheReport.getLocalExpire()));
             item.put("qps", round(cacheStat == null ? 0D : cacheStat.qps()));
             item.put("hitRate", round((cacheStat == null ? 0D : cacheStat.hitRate()) * 100));
             item.put("getCount", cacheStat == null ? 0L : cacheStat.getGetCount());
@@ -177,17 +181,17 @@ public class CacheController {
                 .sum();
 
         Map<String, Object> summary = new LinkedHashMap<>();
-        summary.put("area", cacheManager.getArea());
-        summary.put("cacheType", cacheManager.getCacheType().name());
-        summary.put("localProvider", cacheManager.getLocalProvider());
-        summary.put("remoteProvider", cacheManager.getRemoteProvider());
-        summary.put("multiLevelEnabled", cacheManager.isMultiLevelEnabled());
-        summary.put("syncLocal", cacheManager.isSyncLocal());
-        summary.put("penetrationProtect", cacheManager.isPenetrationProtect());
-        summary.put("defaultExpire", formatDuration(cacheManager.getDefaultExpire()));
-        summary.put("localExpire", formatDuration(cacheManager.getLocalExpire()));
-        summary.put("localLimit", cacheManager.getLocalLimit());
-        summary.put("statIntervalMinutes", cacheManager.getStatIntervalMinutes());
+        summary.put("area", cacheReport.getArea());
+        summary.put("cacheType", cacheReport.getCacheType().name());
+        summary.put("localProvider", cacheReport.getLocalProvider());
+        summary.put("remoteProvider", cacheReport.getRemoteProvider());
+        summary.put("multiLevelEnabled", cacheReport.isMultiLevelEnabled());
+        summary.put("syncLocal", cacheReport.isSyncLocal());
+        summary.put("penetrationProtect", cacheReport.isPenetrationProtect());
+        summary.put("defaultExpire", formatDuration(cacheReport.getDefaultExpire()));
+        summary.put("localExpire", formatDuration(cacheReport.getLocalExpire()));
+        summary.put("localLimit", cacheReport.getLocalLimit());
+        summary.put("statIntervalMinutes", cacheReport.getStatIntervalMinutes());
         summary.put("cacheCount", cacheStats.size());
         summary.put("activeCacheCount", cacheManager.getCacheNames().size());
         summary.put("keyCount", totalKeys);
