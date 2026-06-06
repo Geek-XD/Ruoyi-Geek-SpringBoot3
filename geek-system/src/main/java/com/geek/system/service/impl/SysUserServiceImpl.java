@@ -421,7 +421,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     @Override
     public boolean resetPwd(SysUser user) {
-        return super.save(user);
+        return super.updateById(user);
     }
 
     /**
