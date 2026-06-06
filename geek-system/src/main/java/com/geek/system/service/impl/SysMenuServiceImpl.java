@@ -2,6 +2,7 @@ package com.geek.system.service.impl;
 
 import static com.geek.common.core.domain.entity.table.SysMenuTableDef.*;
 import static com.geek.system.domain.table.SysRoleMenuTableDef.*;
+import static com.mybatisflex.core.query.QueryMethods.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +73,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public List<SysMenu> selectMenuList(SysMenu menu, Long userId) {
         QueryChain<SysMenu> query = this.queryChain()
+                .select(distinct(SYS_MENU.ALL_COLUMNS))
                 .like(SysMenu::getMenuName, menu.getMenuName())
                 .eq(SysMenu::getVisible, menu.getVisible())
                 .eq(SysMenu::getStatus, menu.getStatus())
@@ -99,7 +101,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public Set<String> selectMenuPermsByUserId(Long userId) {
         List<String> perms = this.queryChain()
-                .select(QueryMethods.distinct(SysMenu::getPerms))
+                .select(distinct(SysMenu::getPerms))
                 .leftJoin(SysRoleMenu.class)
                 .on(SysMenu::getMenuId, SysRoleMenu::getMenuId)
                 .leftJoin(SysUserRole.class)
@@ -129,7 +131,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public Set<String> selectMenuPermsByRoleId(Long roleId) {
         List<String> perms = QueryChain.of(SysMenu.class)
-                .select(QueryMethods.distinct(SysMenu::getPerms))
+                .select(distinct(SysMenu::getPerms))
                 .leftJoin(SysRoleMenu.class)
                 .on(SysRoleMenu::getMenuId, SysMenu::getMenuId)
                 .eq(SysMenu::getStatus, QueryMethods.string("0"))
@@ -153,7 +155,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public List<SysMenu> selectMenuTreeByUserId(Long userId) {
 
-        QueryChain<SysMenu> qc = this.queryChain();
+        QueryChain<SysMenu> qc = this.queryChain().select(distinct(SYS_MENU.ALL_COLUMNS));
         if (!SecurityUtils.isAdmin(userId)) {
             qc.leftJoin(SysRoleMenu.class)
                     .on(SysRoleMenu::getMenuId, SysMenu::getMenuId)
@@ -411,7 +413,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     public String getRouterPath(SysMenu menu) {
         String routerPath = menu.getPath();
         // 内链打开外网方式
-        if (menu.getParentId().intValue() != MENU_ROOT_ID  && isInnerLink(menu)) {
+        if (menu.getParentId().intValue() != MENU_ROOT_ID && isInnerLink(menu)) {
             routerPath = innerLinkReplaceEach(routerPath);
         }
         // 非外链并且是一级目录（类型为目录）
@@ -473,7 +475,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      * @return 结果
      */
     public boolean isParentView(SysMenu menu) {
-        return menu.getParentId().intValue() != MENU_ROOT_ID  && UserConstants.TYPE_DIR.equals(menu.getMenuType());
+        return menu.getParentId().intValue() != MENU_ROOT_ID && UserConstants.TYPE_DIR.equals(menu.getMenuType());
     }
 
     /**
