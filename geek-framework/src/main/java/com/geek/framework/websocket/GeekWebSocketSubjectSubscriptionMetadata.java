@@ -14,16 +14,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GeekWebSocketNodeMetadata implements Serializable {
+public class GeekWebSocketSubjectSubscriptionMetadata implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private String nodeName;
-    private long startedAt;
-    private int onlineCount;
+    private String subject;
     @Builder.Default
     private Set<String> sessionIds = new LinkedHashSet<>();
-    @Builder.Default
-    private Set<String> subjects = new LinkedHashSet<>();
 }

@@ -46,6 +46,10 @@ public class CacheConstants {
 
     public static final String WEBSOCKET_SESSION_KEY = "websocket_session";
 
+    public static final String WEBSOCKET_SUBJECT_SUBSCRIPTION_KEY = "websocket_subject_subscription";
+
+    public static final String WEBSOCKET_SESSION_SUBSCRIPTION_KEY = "websocket_session_subscription";
+
     private CacheConstants() {
     }
 }

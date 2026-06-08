@@ -109,6 +109,9 @@ public class GeekWebSocketSessionRegistry {
         }
         subjectSubscriptions.computeIfAbsent(subject, k -> ConcurrentHashMap.newKeySet()).add(sessionId);
         sessionSubscriptions.computeIfAbsent(sessionId, k -> ConcurrentHashMap.newKeySet()).add(subject);
+        refreshSubjectSubscriptionMetadata(subject);
+        refreshSessionSubscriptionMetadata(sessionId);
+        refreshNodeMetadataQuietly();
         LOGGER.info("会话 {} 订阅主题: {}", sessionId, subject);
     }
 
@@ -136,6 +139,9 @@ public class GeekWebSocketSessionRegistry {
                 sessionSubscriptions.remove(sessionId);
             }
         }
+        refreshSubjectSubscriptionMetadata(subject);
+        refreshSessionSubscriptionMetadata(sessionId);
+        refreshNodeMetadataQuietly();
         LOGGER.info("会话 {} 取消订阅主题: {}", sessionId, subject);
     }
 
@@ -155,8 +161,13 @@ public class GeekWebSocketSessionRegistry {
                         subjectSubscriptions.remove(subject);
                     }
                 }
+                refreshSubjectSubscriptionMetadata(subject);
             }
+            removeSessionSubscriptionMetadata(sessionId);
+            refreshNodeMetadataQuietly();
             LOGGER.info("会话 {} 取消所有订阅", sessionId);
+        } else {
+            removeSessionSubscriptionMetadata(sessionId);
         }
     }
 
@@ -247,6 +258,7 @@ public class GeekWebSocketSessionRegistry {
                 .startedAt(startedAt)
                 .onlineCount(sessions.size())
                 .sessionIds(new LinkedHashSet<>(sessions.keySet()))
+                .subjects(new LinkedHashSet<>(subjectSubscriptions.keySet()))
                 .build();
         cacheManager.put(CacheConstants.WEBSOCKET_NODE_KEY, nodeName, metadata);
     }
@@ -262,9 +274,19 @@ public class GeekWebSocketSessionRegistry {
     private void resetCurrentNodeCacheState() {
         GeekWebSocketNodeMetadata previousNode = cacheManager.get(CacheConstants.WEBSOCKET_NODE_KEY, nodeName,
                 GeekWebSocketNodeMetadata.class);
-        if (previousNode != null && previousNode.getSessionIds() != null) {
-            for (String sessionId : previousNode.getSessionIds()) {
-                cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_KEY, buildSessionCacheKey(sessionId));
+        if (previousNode != null) {
+            if (previousNode.getSessionIds() != null) {
+                for (String sessionId : previousNode.getSessionIds()) {
+                    cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_KEY, buildSessionCacheKey(sessionId));
+                    cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_SUBSCRIPTION_KEY,
+                            buildSessionSubscriptionCacheKey(sessionId));
+                }
+            }
+            if (previousNode.getSubjects() != null) {
+                for (String subject : previousNode.getSubjects()) {
+                    cacheManager.remove(CacheConstants.WEBSOCKET_SUBJECT_SUBSCRIPTION_KEY,
+                            buildSubjectSubscriptionCacheKey(subject));
+                }
             }
         }
         cacheManager.remove(CacheConstants.WEBSOCKET_NODE_KEY, nodeName);
@@ -272,8 +294,15 @@ public class GeekWebSocketSessionRegistry {
 
     private void clearCurrentNodeCacheState() {
         Set<String> currentSessionIds = new LinkedHashSet<>(sessions.keySet());
+        Set<String> currentSubjects = new LinkedHashSet<>(subjectSubscriptions.keySet());
         for (String sessionId : currentSessionIds) {
             cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_KEY, buildSessionCacheKey(sessionId));
+            cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_SUBSCRIPTION_KEY,
+                    buildSessionSubscriptionCacheKey(sessionId));
+        }
+        for (String subject : currentSubjects) {
+            cacheManager.remove(CacheConstants.WEBSOCKET_SUBJECT_SUBSCRIPTION_KEY,
+                    buildSubjectSubscriptionCacheKey(subject));
         }
         cacheManager.remove(CacheConstants.WEBSOCKET_NODE_KEY, nodeName);
         LOGGER.info("清理 WebSocket 节点缓存描述完成 - nodeName={}, sessionCount={}", nodeName, currentSessionIds.size());
@@ -281,6 +310,59 @@ public class GeekWebSocketSessionRegistry {
 
     private String buildSessionCacheKey(String sessionId) {
         return nodeName + ":" + sessionId;
+    }
+
+    private String buildSubjectSubscriptionCacheKey(String subject) {
+        return nodeName + ":" + subject;
+    }
+
+    private String buildSessionSubscriptionCacheKey(String sessionId) {
+        return nodeName + ":" + sessionId;
+    }
+
+    private void refreshSubjectSubscriptionMetadata(String subject) {
+        if (subject == null) {
+            return;
+        }
+        Set<String> sessionIds = subjectSubscriptions.get(subject);
+        if (sessionIds == null || sessionIds.isEmpty()) {
+            cacheManager.remove(CacheConstants.WEBSOCKET_SUBJECT_SUBSCRIPTION_KEY,
+                    buildSubjectSubscriptionCacheKey(subject));
+            return;
+        }
+        GeekWebSocketSubjectSubscriptionMetadata metadata = GeekWebSocketSubjectSubscriptionMetadata.builder()
+                .nodeName(nodeName)
+                .subject(subject)
+                .sessionIds(new LinkedHashSet<>(sessionIds))
+                .build();
+        cacheManager.put(CacheConstants.WEBSOCKET_SUBJECT_SUBSCRIPTION_KEY,
+                buildSubjectSubscriptionCacheKey(subject), metadata);
+    }
+
+    private void refreshSessionSubscriptionMetadata(String sessionId) {
+        if (sessionId == null) {
+            return;
+        }
+        Set<String> subjects = sessionSubscriptions.get(sessionId);
+        if (subjects == null || subjects.isEmpty()) {
+            removeSessionSubscriptionMetadata(sessionId);
+            return;
+        }
+        GeekWebSocketSessionSubscriptionMetadata metadata = GeekWebSocketSessionSubscriptionMetadata.builder()
+                .nodeName(nodeName)
+                .sessionId(sessionId)
+                .subjects(new LinkedHashSet<>(subjects))
+                .build();
+        cacheManager.put(CacheConstants.WEBSOCKET_SESSION_SUBSCRIPTION_KEY,
+                buildSessionSubscriptionCacheKey(sessionId), metadata);
+    }
+
+    private void removeSessionSubscriptionMetadata(String sessionId) {
+        if (sessionId == null) {
+            return;
+        }
+        cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_SUBSCRIPTION_KEY,
+                buildSessionSubscriptionCacheKey(sessionId));
     }
 
     private String resolveNodeName(GeekWebSocketProperties properties, Environment environment) {
