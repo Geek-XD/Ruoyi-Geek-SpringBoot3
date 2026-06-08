@@ -1,6 +1,9 @@
 package com.geek.framework.websocket;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.util.LinkedHashSet;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -9,13 +12,21 @@ import java.util.concurrent.Semaphore;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 
+import com.geek.common.constant.CacheConstants;
+import com.geek.common.core.cache.GeekCacheManager;
 import com.geek.common.core.domain.Message;
 import com.geek.common.core.domain.model.LoginUser;
 import com.geek.common.utils.JSON;
+import com.geek.common.utils.StringUtils;
+
+import jakarta.annotation.PreDestroy;
 
 @Component
 public class GeekWebSocketSessionRegistry {
@@ -29,20 +40,46 @@ public class GeekWebSocketSessionRegistry {
     private final Map<String, Set<String>> sessionSubscriptions = new ConcurrentHashMap<>();
     private final Semaphore socketSemaphore;
     private final GeekWebSocketProperties properties;
+    private final GeekCacheManager cacheManager;
+    private final String nodeName;
+    private final long startedAt;
 
-    public GeekWebSocketSessionRegistry(GeekWebSocketProperties properties) {
+    public GeekWebSocketSessionRegistry(GeekWebSocketProperties properties, GeekCacheManager cacheManager,
+            Environment environment) {
         this.properties = properties;
+        this.cacheManager = cacheManager;
         this.socketSemaphore = new Semaphore(properties.getMaxOnlineCount());
+        this.nodeName = resolveNodeName(properties, environment);
+        this.startedAt = System.currentTimeMillis();
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void initializeNodeMetadata() {
+        resetCurrentNodeCacheState();
+        refreshNodeMetadata();
+        LOGGER.info("WebSocket 节点缓存初始化完成 - nodeName={}", nodeName);
     }
 
     public void register(WebSocketSession session, LoginUser loginUser) {
         if (!socketSemaphore.tryAcquire()) {
             throw new IllegalStateException("当前在线人数超过限制数：" + properties.getMaxOnlineCount());
         }
-        sessions.put(session.getId(), session);
-        if (loginUser != null) {
-            loginUsers.put(session.getId(), loginUser);
-            usernameSessions.put(loginUser.getUsername(), session);
+        try {
+            sessions.put(session.getId(), session);
+            if (loginUser != null) {
+                loginUsers.put(session.getId(), loginUser);
+                usernameSessions.put(loginUser.getUsername(), session);
+            }
+            cacheSessionMetadata(session, loginUser);
+            refreshNodeMetadata();
+        } catch (RuntimeException e) {
+            sessions.remove(session.getId());
+            if (loginUser != null) {
+                loginUsers.remove(session.getId());
+                usernameSessions.remove(loginUser.getUsername(), session);
+            }
+            socketSemaphore.release();
+            throw new IllegalStateException("WebSocket 会话缓存注册失败", e);
         }
     }
 
@@ -56,6 +93,8 @@ public class GeekWebSocketSessionRegistry {
         if (removedSession != null) {
             socketSemaphore.release();
         }
+        removeSessionMetadata(sessionId);
+        refreshNodeMetadataQuietly();
     }
 
     /**
@@ -178,5 +217,93 @@ public class GeekWebSocketSessionRegistry {
                 LOGGER.error("[发送消息异常]", e);
             }
         }
+    }
+
+    @PreDestroy
+    public void destroy() {
+        clearCurrentNodeCacheState();
+    }
+
+    private void cacheSessionMetadata(WebSocketSession session, LoginUser loginUser) {
+        GeekWebSocketSessionMetadata metadata = GeekWebSocketSessionMetadata.builder()
+                .sessionId(session.getId())
+                .nodeName(nodeName)
+                .username(loginUser == null ? null : loginUser.getUsername())
+                .userId(loginUser == null ? null : loginUser.getUserId())
+                .uri(toString(session.getUri()))
+                .remoteAddress(session.getRemoteAddress() == null ? null : session.getRemoteAddress().toString())
+                .connectedAt(System.currentTimeMillis())
+                .build();
+        cacheManager.put(CacheConstants.WEBSOCKET_SESSION_KEY, buildSessionCacheKey(session.getId()), metadata);
+    }
+
+    private void removeSessionMetadata(String sessionId) {
+        cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_KEY, buildSessionCacheKey(sessionId));
+    }
+
+    private void refreshNodeMetadata() {
+        GeekWebSocketNodeMetadata metadata = GeekWebSocketNodeMetadata.builder()
+                .nodeName(nodeName)
+                .startedAt(startedAt)
+                .onlineCount(sessions.size())
+                .sessionIds(new LinkedHashSet<>(sessions.keySet()))
+                .build();
+        cacheManager.put(CacheConstants.WEBSOCKET_NODE_KEY, nodeName, metadata);
+    }
+
+    private void refreshNodeMetadataQuietly() {
+        try {
+            refreshNodeMetadata();
+        } catch (RuntimeException e) {
+            LOGGER.warn("刷新 WebSocket 节点缓存描述失败 - nodeName={}", nodeName, e);
+        }
+    }
+
+    private void resetCurrentNodeCacheState() {
+        GeekWebSocketNodeMetadata previousNode = cacheManager.get(CacheConstants.WEBSOCKET_NODE_KEY, nodeName,
+                GeekWebSocketNodeMetadata.class);
+        if (previousNode != null && previousNode.getSessionIds() != null) {
+            for (String sessionId : previousNode.getSessionIds()) {
+                cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_KEY, buildSessionCacheKey(sessionId));
+            }
+        }
+        cacheManager.remove(CacheConstants.WEBSOCKET_NODE_KEY, nodeName);
+    }
+
+    private void clearCurrentNodeCacheState() {
+        Set<String> currentSessionIds = new LinkedHashSet<>(sessions.keySet());
+        for (String sessionId : currentSessionIds) {
+            cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_KEY, buildSessionCacheKey(sessionId));
+        }
+        cacheManager.remove(CacheConstants.WEBSOCKET_NODE_KEY, nodeName);
+        LOGGER.info("清理 WebSocket 节点缓存描述完成 - nodeName={}, sessionCount={}", nodeName, currentSessionIds.size());
+    }
+
+    private String buildSessionCacheKey(String sessionId) {
+        return nodeName + ":" + sessionId;
+    }
+
+    private String resolveNodeName(GeekWebSocketProperties properties, Environment environment) {
+        if (StringUtils.isNotEmpty(properties.getNodeName())) {
+            return properties.getNodeName();
+        }
+        String appName = environment.getProperty("spring.application.name", "application");
+        if (StringUtils.isNotEmpty(appName)) {
+            return appName;
+        }
+        return resolveHostName();
+    }
+
+    private String resolveHostName() {
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (Exception e) {
+            LOGGER.warn("获取主机名失败，WebSocket 节点名将使用 unknown-host", e);
+            return "unknown-host";
+        }
+    }
+
+    private String toString(URI uri) {
+        return uri == null ? null : uri.toString();
     }
 }

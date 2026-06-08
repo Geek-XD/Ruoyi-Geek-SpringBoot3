@@ -19,6 +19,7 @@ public final class CacheObjectMapperFactory {
             .allowIfSubType("java.")
             .allowIfSubType("javax.")
             .allowIfSubType("jakarta.")
+            .allowIfSubType("com.alicp.jetcache.")
             .allowIfSubType("com.geek.")
             .allowIfSubTypeIsArray()
             .build();

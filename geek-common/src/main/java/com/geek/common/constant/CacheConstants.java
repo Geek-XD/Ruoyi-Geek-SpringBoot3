@@ -42,6 +42,10 @@ public class CacheConstants {
     /** 文件路径 cache key */
     public static final String FILE_PATH_MD5_KEY = "file_path_md5";
 
+    public static final String WEBSOCKET_NODE_KEY = "websocket_node";
+
+    public static final String WEBSOCKET_SESSION_KEY = "websocket_session";
+
     private CacheConstants() {
     }
 }

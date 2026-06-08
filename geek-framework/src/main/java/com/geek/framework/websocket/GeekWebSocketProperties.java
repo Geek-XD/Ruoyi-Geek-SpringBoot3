@@ -16,6 +16,7 @@ public class GeekWebSocketProperties {
     @Getter(AccessLevel.NONE)
     private boolean enabled = true;
     private String path = "/websocket/message";
+    private String nodeName;
     private int maxOnlineCount = 100;
     private List<String> allowedOrigins = new ArrayList<>(List.of("*"));
 

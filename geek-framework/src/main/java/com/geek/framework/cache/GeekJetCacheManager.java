@@ -158,7 +158,7 @@ public class GeekJetCacheManager implements GeekCacheManager {
 
     private Cache<String, Object> createCache(String cacheName) {
         CacheType cacheType = resolveCacheType();
-        QuickConfig.Builder builder = QuickConfig.newBuilder(properties.getArea(), cacheName)
+        QuickConfig.Builder builder = QuickConfig.newBuilder(properties.getArea(), buildRemoteCacheName(cacheName))
                 .expire(properties.getDefaultExpire())
                 .cacheType(cacheType)
                 .localLimit(properties.getLocalLimit())
@@ -179,6 +179,20 @@ public class GeekJetCacheManager implements GeekCacheManager {
         cache.config().setMonitors(configuredMonitors);
         cacheMonitors.put(cacheName, cacheMonitor);
         return cache;
+    }
+
+    String buildRemoteCacheName(String cacheName) {
+        if (cacheName == null || cacheName.isEmpty()) {
+            return cacheName;
+        }
+        String normalized = cacheName;
+        if (normalized.startsWith(":")) {
+            normalized = normalized.substring(1);
+        }
+        if (normalized.endsWith(":")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        return ":" + normalized + ":";
     }
 
     public CacheType resolveCacheType() {
