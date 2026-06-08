@@ -3,11 +3,11 @@
 #     default:
 #       type: redis.springdata
 #       keyConvertor: jackson3
-#       valueEncoder: java
-#       valueDecoder: java
+#       valueEncoder: bean:jetCacheValueEncoder
+#       valueDecoder: bean:jetCacheValueDecoder
 #       defaultExpireInMillis: 315360000000
 #       broadcastChannel: geek:cache
-#       keyPrefix: geek:cache
+#       keyPrefix: geek
 
 spring:
   data:
