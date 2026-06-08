@@ -1,4 +1,4 @@
-package com.geek.framework.websocket;
+package com.geek.framework.websocket.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+
+import com.geek.framework.websocket.transport.GeekWebSocketHandler;
+import com.geek.framework.websocket.transport.GeekWebSocketHandshakeInterceptor;
 
 @Configuration
 @EnableWebSocket

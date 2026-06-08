@@ -1,4 +1,4 @@
-package com.geek.framework.websocket;
+package com.geek.framework.websocket.metadata;
 
 import java.io.Serial;
 import java.io.Serializable;

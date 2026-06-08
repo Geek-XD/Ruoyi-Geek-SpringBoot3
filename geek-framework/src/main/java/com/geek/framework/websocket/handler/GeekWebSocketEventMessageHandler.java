@@ -11,7 +11,7 @@ import org.springframework.web.socket.WebSocketSession;
 import com.geek.common.core.domain.Message;
 import com.geek.common.enums.MessageType;
 import com.geek.common.utils.StringUtils;
-import com.geek.framework.websocket.GeekWebSocketSessionRegistry;
+import com.geek.framework.websocket.registry.GeekWebSocketSessionRegistry;
 
 @Component
 @Order(200)

@@ -1,4 +1,4 @@
-package com.geek.framework.websocket;
+package com.geek.framework.websocket.metadata;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -14,13 +14,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GeekWebSocketSessionSubscriptionMetadata implements Serializable {
+public class GeekWebSocketNodeMetadata implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private String nodeName;
-    private String sessionId;
+    private long startedAt;
+    private int onlineCount;
+    @Builder.Default
+    private Set<String> sessionIds = new LinkedHashSet<>();
     @Builder.Default
     private Set<String> subjects = new LinkedHashSet<>();
 }

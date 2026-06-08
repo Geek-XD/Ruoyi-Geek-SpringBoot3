@@ -1,4 +1,4 @@
-package com.geek.framework.websocket;
+package com.geek.framework.websocket.publisher;
 
 import java.util.Map;
 import java.util.Objects;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.geek.common.core.domain.Message;
 import com.geek.common.enums.MessageType;
+import com.geek.framework.websocket.registry.GeekWebSocketSessionRegistry;
 import com.geek.common.utils.StringUtils;
 
 @Component

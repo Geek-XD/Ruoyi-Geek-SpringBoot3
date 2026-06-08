@@ -1,4 +1,4 @@
-package com.geek.framework.websocket;
+package com.geek.framework.websocket.transport;
 
 import java.util.List;
 
@@ -16,6 +16,7 @@ import com.geek.common.core.domain.model.LoginUser;
 import com.geek.common.utils.JSON;
 import com.geek.common.utils.StringUtils;
 import com.geek.framework.websocket.handler.GeekWebSocketMessageHandler;
+import com.geek.framework.websocket.registry.GeekWebSocketSessionRegistry;
 
 @Component
 public class GeekWebSocketHandler extends TextWebSocketHandler {

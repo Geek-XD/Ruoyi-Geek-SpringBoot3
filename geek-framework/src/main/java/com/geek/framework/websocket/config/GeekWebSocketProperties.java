@@ -1,4 +1,4 @@
-package com.geek.framework.websocket;
+package com.geek.framework.websocket.config;
 
 import java.util.ArrayList;
 import java.util.List;
