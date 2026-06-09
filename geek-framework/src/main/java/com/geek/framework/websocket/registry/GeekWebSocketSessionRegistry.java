@@ -12,12 +12,13 @@ import java.util.concurrent.Semaphore;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 
 import com.geek.common.constant.CacheConstants;
 import com.geek.common.core.cache.GeekCacheManager;
@@ -48,6 +49,7 @@ public class GeekWebSocketSessionRegistry {
     private final GeekCacheManager cacheManager;
     private final String nodeName;
     private final long startedAt;
+    private volatile boolean nodeCacheCleared;
 
     public GeekWebSocketSessionRegistry(GeekWebSocketProperties properties, GeekCacheManager cacheManager,
             Environment environment) {
@@ -235,9 +237,18 @@ public class GeekWebSocketSessionRegistry {
         }
     }
 
+    @EventListener(ContextClosedEvent.class)
+    public void onContextClosed() {
+        if (!nodeCacheCleared) {
+            clearCurrentNodeCacheState();
+        }
+    }
+
     @PreDestroy
     public void destroy() {
-        clearCurrentNodeCacheState();
+        if (!nodeCacheCleared) {
+            clearCurrentNodeCacheState();
+        }
     }
 
     private void cacheSessionMetadata(WebSocketSession session, LoginUser loginUser) {
@@ -300,17 +311,22 @@ public class GeekWebSocketSessionRegistry {
     private void clearCurrentNodeCacheState() {
         Set<String> currentSessionIds = new LinkedHashSet<>(sessions.keySet());
         Set<String> currentSubjects = new LinkedHashSet<>(subjectSubscriptions.keySet());
-        for (String sessionId : currentSessionIds) {
-            cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_KEY, buildSessionCacheKey(sessionId));
-            cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_SUBSCRIPTION_KEY,
-                    buildSessionSubscriptionCacheKey(sessionId));
+        try {
+            for (String sessionId : currentSessionIds) {
+                cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_KEY, buildSessionCacheKey(sessionId));
+                cacheManager.remove(CacheConstants.WEBSOCKET_SESSION_SUBSCRIPTION_KEY,
+                        buildSessionSubscriptionCacheKey(sessionId));
+            }
+            for (String subject : currentSubjects) {
+                cacheManager.remove(CacheConstants.WEBSOCKET_SUBJECT_SUBSCRIPTION_KEY,
+                        buildSubjectSubscriptionCacheKey(subject));
+            }
+            cacheManager.remove(CacheConstants.WEBSOCKET_NODE_KEY, nodeName);
+            LOGGER.info("清理 WebSocket 节点缓存描述完成 - nodeName={}, sessionCount={}", nodeName,
+                    currentSessionIds.size());
+        } finally {
+            nodeCacheCleared = true;
         }
-        for (String subject : currentSubjects) {
-            cacheManager.remove(CacheConstants.WEBSOCKET_SUBJECT_SUBSCRIPTION_KEY,
-                    buildSubjectSubscriptionCacheKey(subject));
-        }
-        cacheManager.remove(CacheConstants.WEBSOCKET_NODE_KEY, nodeName);
-        LOGGER.info("清理 WebSocket 节点缓存描述完成 - nodeName={}, sessionCount={}", nodeName, currentSessionIds.size());
     }
 
     private String buildSessionCacheKey(String sessionId) {
