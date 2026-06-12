@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -15,18 +14,18 @@ import com.geek.common.utils.StringUtils;
 import com.geek.system.service.ISysMenuService;
 import com.geek.system.service.ISysRoleService;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 用户权限处理
  * 
  * @author geek
  */
 @Component
+@RequiredArgsConstructor
 public class SysPermissionService {
-    @Autowired
-    private ISysRoleService roleService;
-
-    @Autowired
-    private ISysMenuService menuService;
+    private final ISysRoleService roleService;
+    private final ISysMenuService menuService;
 
     /**
      * 获取角色数据权限

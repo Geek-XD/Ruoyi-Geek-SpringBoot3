@@ -9,26 +9,26 @@ import java.util.function.BiConsumer;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.geek.framework.datasource.properties.DynamicDataSourceProperties;
+import com.geek.framework.datasource.config.DynamicDataSourceProperties;
 
 import jakarta.annotation.PreDestroy;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @DependsOn("liquibase")
+@RequiredArgsConstructor
 public class DataSourceManager implements InitializingBean {
-    protected final Logger logger = LoggerFactory.getLogger(DataSourceManager.class);
-    private Map<String, DataSource> targetDataSources = new HashMap<>();
 
-    @Autowired
-    private DynamicDataSourceProperties dataSourceProperties;
+    private final DynamicDataSourceProperties dataSourceProperties;
+
+    private Map<String, DataSource> targetDataSources = new HashMap<>();
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -36,7 +36,7 @@ public class DataSourceManager implements InitializingBean {
             long start = System.currentTimeMillis();
             Properties properties = dataSourceProperties.build(props);
             DruidDataSource dataSource = createDataSource(name, properties);
-            logger.info("数据源：{} 链接成功，耗时：{}ms", name, System.currentTimeMillis() - start);
+            log.info("数据源：{} 链接成功，耗时：{}ms", name, System.currentTimeMillis() - start);
             targetDataSources.put(name, dataSource);
         });
     }
@@ -59,7 +59,7 @@ public class DataSourceManager implements InitializingBean {
             if (dataSource instanceof DruidDataSource) {
                 ((DruidDataSource) dataSource).close();
             } else {
-                logger.warn("数据源：{} 不是 DruidDataSource，无法关闭", name);
+                log.warn("数据源：{} 不是 DruidDataSource，无法关闭", name);
             }
         });
     }

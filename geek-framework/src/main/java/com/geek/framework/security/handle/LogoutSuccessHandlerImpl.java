@@ -2,7 +2,6 @@ package com.geek.framework.security.handle;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -21,6 +20,7 @@ import com.geek.framework.web.service.TokenService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 自定义退出处理类 返回成功
@@ -28,15 +28,11 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author geek
  */
 @Configuration
+@RequiredArgsConstructor
 public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
-    @Autowired
-    private TokenService tokenService;
+    private final TokenService tokenService;
 
-    /**
-     * 退出处理
-     * 
-     * @return
-     */
+    /** 退出处理 */
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {

@@ -1,13 +1,11 @@
 package com.geek.framework.datasource.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-import com.geek.framework.datasource.properties.DynamicDataSourceProperties;
-import com.geek.framework.datasource.properties.DynamicDataSourceProperties.DynamicSourceProperties;
+import com.geek.framework.datasource.config.DynamicDataSourceProperties.DynamicSourceProperties;
 
 import liquibase.integration.spring.SpringLiquibase;
 
@@ -17,12 +15,8 @@ public class LiquibaseConfig {
     @Value("${spring.liquibase.enabled:true}")
     private boolean enabled;
 
-
-    @Autowired
-    private DynamicDataSourceProperties dataSourceProperties;
-
     @Bean
-    public SpringLiquibase liquibase() {
+    public SpringLiquibase liquibase(DynamicDataSourceProperties dataSourceProperties) {
         String primary = dataSourceProperties.getPrimary();
         DynamicSourceProperties primaryProps = dataSourceProperties.getDatasource().get(primary);
         DriverManagerDataSource nativeDs = new DriverManagerDataSource();

@@ -1,6 +1,5 @@
 package com.geek.framework.web.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,7 +31,7 @@ import com.geek.framework.security.context.AuthenticationContextHolder;
 import com.geek.system.service.ISysConfigService;
 import com.geek.system.service.ISysUserService;
 
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 登录校验方法
@@ -40,41 +39,29 @@ import jakarta.annotation.Resource;
  * @author geek
  */
 @Component
-public class SysLoginService
-{
-    @Autowired
-    private TokenService tokenService;
-
-    @Resource
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private ISysUserService userService;
-
-    @Autowired
-    private ISysConfigService configService;
-
-    @Autowired
-    private SysPasswordService passwordService;
-
-    @Autowired
-    private CaptchaService captchaService;
+@RequiredArgsConstructor
+public class SysLoginService {
+    private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
+    private final ISysUserService userService;
+    private final ISysConfigService configService;
+    private final SysPasswordService passwordService;
+    private final CaptchaService captchaService;
 
     /**
      * 登录验证
      *
      * @param username 用户名
      * @param password 密码
-     * @param code 验证码
-     * @param uuid 唯一标识
+     * @param code     验证码
+     * @param uuid     唯一标识
      * @return 结果
      */
-    public String login(String username, String password, CaptchaVO captchaVO)
-    {
+    public String login(String username, String password, CaptchaVO captchaVO) {
         // 验证码校验
         // validateCaptcha(username, code, uuid);
         ResponseModel rm = captchaService.check(captchaVO);
-        if(!rm.isSuccess()){
+        if (!rm.isSuccess()) {
             throw new CaptchaException();
         }
         // 登录前置校验
@@ -84,32 +71,28 @@ public class SysLoginService
         passwordService.validateIp(ip);
         // 用户验证
         Authentication authentication = null;
-        try
-        {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
+                    password);
             AuthenticationContextHolder.setContext(authenticationToken);
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authentication = authenticationManager.authenticate(authenticationToken);
-        }
-        catch (Exception e)
-        {
-            if (e instanceof BadCredentialsException)
-            {
-                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
+        } catch (Exception e) {
+            if (e instanceof BadCredentialsException) {
+                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL,
+                        MessageUtils.message("user.password.not.match")));
                 throw new UserPasswordNotMatchException();
-            }
-            else
-            {
+            } else {
                 passwordService.incrementIpFailCount(ip);
-                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage()));
+                AsyncManager.me()
+                        .execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage()));
                 throw new ServiceException(e.getMessage());
             }
-        }
-        finally
-        {
+        } finally {
             AuthenticationContextHolder.clearContext();
         }
-        AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
+        AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS,
+                MessageUtils.message("user.login.success")));
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         recordLoginInfo(loginUser.getUserId());
         // 生成token
@@ -120,25 +103,23 @@ public class SysLoginService
      * 校验验证码
      *
      * @param username 用户名
-     * @param code 验证码
-     * @param uuid 唯一标识
+     * @param code     验证码
+     * @param uuid     唯一标识
      * @return 结果
      */
-    public void validateCaptcha(String username, String code, String uuid)
-    {
+    public void validateCaptcha(String username, String code, String uuid) {
         boolean captchaEnabled = configService.selectCaptchaEnabled();
-        if (captchaEnabled)
-        {
+        if (captchaEnabled) {
             String captcha = CacheUtils.get(CacheConstants.CAPTCHA_CODE_KEY, StringUtils.nvl(uuid, ""), String.class);
             CacheUtils.removeIfPresent(CacheConstants.CAPTCHA_CODE_KEY, StringUtils.nvl(uuid, ""));
-            if (captcha == null)
-            {
-                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire")));
+            if (captcha == null) {
+                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL,
+                        MessageUtils.message("user.jcaptcha.expire")));
                 throw new CaptchaExpireException();
             }
-            if (!code.equalsIgnoreCase(captcha))
-            {
-                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
+            if (!code.equalsIgnoreCase(captcha)) {
+                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL,
+                        MessageUtils.message("user.jcaptcha.error")));
                 throw new CaptchaException();
             }
         }
@@ -146,36 +127,36 @@ public class SysLoginService
 
     /**
      * 登录前置校验
+     * 
      * @param username 用户名
      * @param password 用户密码
      */
-    public void loginPreCheck(String username, String password)
-    {
+    public void loginPreCheck(String username, String password) {
         // 用户名或密码为空 错误
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password))
-        {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("not.null")));
+        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+            AsyncManager.me().execute(
+                    AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("not.null")));
             throw new UserNotExistsException();
         }
         // 密码如果不在指定范围内 错误
         if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
-                || password.length() > UserConstants.PASSWORD_MAX_LENGTH)
-        {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL,MessageUtils.message("user.password.not.match")));
+                || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL,
+                    MessageUtils.message("user.password.not.match")));
             throw new UserPasswordNotMatchException();
         }
         // 用户名不在指定范围内 错误
         if (username.length() < UserConstants.USERNAME_MIN_LENGTH
-                || username.length() > UserConstants.USERNAME_MAX_LENGTH)
-        {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
+                || username.length() > UserConstants.USERNAME_MAX_LENGTH) {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL,
+                    MessageUtils.message("user.password.not.match")));
             throw new UserPasswordNotMatchException();
         }
         // IP黑名单校验
         String blackStr = configService.selectConfigByKey("sys.login.blackIPList");
-        if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr()))
-        {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("login.blocked")));
+        if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr())) {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL,
+                    MessageUtils.message("login.blocked")));
             throw new BlackListException();
         }
     }
@@ -185,8 +166,7 @@ public class SysLoginService
      *
      * @param userId 用户ID
      */
-    public void recordLoginInfo(Long userId)
-    {
+    public void recordLoginInfo(Long userId) {
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userId);
         sysUser.setDeptId(null);

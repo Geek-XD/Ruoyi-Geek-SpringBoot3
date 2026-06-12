@@ -26,8 +26,7 @@ import com.geek.framework.security.context.AuthenticationContextHolder;
  * @author geek
  */
 @Component
-public class SysPasswordService
-{
+public class SysPasswordService {
 
     @Value(value = "${user.password.maxRetryCount}")
     private int maxRetryCount;
@@ -40,8 +39,8 @@ public class SysPasswordService
 
     @Value(value = "${user.ip.lockTime:15}")
     public int ipLockTime;
-    public void validate(SysUser user)
-    {
+
+    public void validate(SysUser user) {
         Authentication usernamePasswordAuthenticationToken = AuthenticationContextHolder.getContext();
         String username = usernamePasswordAuthenticationToken.getName();
         String password = usernamePasswordAuthenticationToken.getCredentials().toString();
@@ -49,62 +48,50 @@ public class SysPasswordService
         String ip = IpUtils.getIpAddr();
         validateIp(ip);
         Integer retryCount = CacheUtils.get(CacheConstants.PWD_ERR_CNT_KEY, username, Integer.class);
-        if (retryCount == null)
-        {
+        if (retryCount == null) {
             retryCount = 0;
         }
-        if (retryCount >= maxRetryCount)
-        {
+        if (retryCount >= maxRetryCount) {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL,
                     MessageUtils.message("user.password.retry.limit.exceed", maxRetryCount, lockTime)));
             throw new UserPasswordRetryLimitExceedException(maxRetryCount, lockTime);
         }
-        if (!matches(user, password))
-        {
+        if (!matches(user, password)) {
             retryCount = retryCount + 1;
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL,
                     MessageUtils.message("user.password.retry.limit.count", retryCount)));
-            CacheUtils.put(CacheConstants.PWD_ERR_CNT_KEY,username,retryCount,lockTime,TimeUnit.MINUTES);
+            CacheUtils.put(CacheConstants.PWD_ERR_CNT_KEY, username, retryCount, lockTime, TimeUnit.MINUTES);
             throw new UserPasswordNotMatchException();
-        }
-        else
-        {
+        } else {
             clearLoginRecordCache(username);
         }
     }
 
-    public void validateIp(String ip)
-    {
+    public void validateIp(String ip) {
         Integer ipRetryCount = CacheUtils.get(CacheConstants.IP_ERR_CNT_KEY, ip, Integer.class);
-        if (ipRetryCount == null)
-        {
+        if (ipRetryCount == null) {
             ipRetryCount = 0;
         }
 
-        if (ipRetryCount >= maxIpRetryCount)
-        {
+        if (ipRetryCount >= maxIpRetryCount) {
             throw new IpRetryLimitExceedException(maxIpRetryCount, ipLockTime);
         }
     }
 
-    public void incrementIpFailCount(String ip)
-    {
+    public void incrementIpFailCount(String ip) {
         Integer ipRetryCount = CacheUtils.get(CacheConstants.IP_ERR_CNT_KEY, ip, Integer.class);
-        if (ipRetryCount == null)
-        {
+        if (ipRetryCount == null) {
             ipRetryCount = 0;
         }
         ipRetryCount += 1;
-        CacheUtils.put(CacheConstants.IP_ERR_CNT_KEY,ip,ipRetryCount,ipLockTime,TimeUnit.MINUTES);
+        CacheUtils.put(CacheConstants.IP_ERR_CNT_KEY, ip, ipRetryCount, ipLockTime, TimeUnit.MINUTES);
     }
 
-    public boolean matches(SysUser user, String rawPassword)
-    {
+    public boolean matches(SysUser user, String rawPassword) {
         return SecurityUtils.matchesPassword(rawPassword, user.getPassword());
     }
 
-    public void clearLoginRecordCache(String loginName)
-    {
+    public void clearLoginRecordCache(String loginName) {
         CacheUtils.removeIfPresent(CacheConstants.PWD_ERR_CNT_KEY, loginName);
     }
 }

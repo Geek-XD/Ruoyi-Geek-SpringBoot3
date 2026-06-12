@@ -1,11 +1,11 @@
-package com.geek.framework.datasource.properties;
+package com.geek.framework.datasource.config;
 
 import java.util.Properties;
 
 import org.apache.commons.collections4.map.LinkedMap;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import jakarta.annotation.Resource;
 import lombok.Data;
 
 @Data
@@ -15,7 +15,7 @@ public class DynamicDataSourceProperties {
     private LinkedMap<String, DynamicSourceProperties> datasource;
     private String primary;
 
-    @Autowired
+    @Resource
     DruidProperties druidProperties;
 
     public Properties build(DynamicSourceProperties dataSourceProperties) {

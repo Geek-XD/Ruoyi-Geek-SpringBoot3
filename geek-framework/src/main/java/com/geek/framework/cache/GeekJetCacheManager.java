@@ -24,6 +24,7 @@ import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.template.QuickConfig;
 import com.geek.common.core.cache.GeekCacheManager;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -35,21 +36,12 @@ public class GeekJetCacheManager implements GeekCacheManager {
     private final GeekCacheProperties properties;
     private final Environment environment;
 
+    @Getter
     private final ConcurrentMap<String, Cache<String, Object>> caches = new ConcurrentHashMap<>();
+    @Getter
     private final ConcurrentMap<String, Set<String>> keyRegistry = new ConcurrentHashMap<>();
+    @Getter
     private final ConcurrentMap<String, DefaultCacheMonitor> cacheMonitors = new ConcurrentHashMap<>();
-
-    ConcurrentMap<String, Cache<String, Object>> getCaches() {
-        return caches;
-    }
-
-    ConcurrentMap<String, Set<String>> getKeyRegistry() {
-        return keyRegistry;
-    }
-
-    ConcurrentMap<String, DefaultCacheMonitor> getCacheMonitors() {
-        return cacheMonitors;
-    }
 
     @Override
     public Collection<String> getCacheNames() {

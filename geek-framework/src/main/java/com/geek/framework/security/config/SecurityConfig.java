@@ -1,6 +1,5 @@
 package com.geek.framework.security.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +23,8 @@ import com.geek.framework.security.filter.JwtAuthenticationTokenFilter;
 import com.geek.framework.security.handle.AuthenticationEntryPointImpl;
 import com.geek.framework.security.handle.LogoutSuccessHandlerImpl;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * spring security配置
  *
@@ -31,27 +32,23 @@ import com.geek.framework.security.handle.LogoutSuccessHandlerImpl;
  */
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     /** 认证失败处理类 */
-    @Autowired
-    private AuthenticationEntryPointImpl unauthorizedHandler;
+    private final AuthenticationEntryPointImpl unauthorizedHandler;
 
     /** 退出处理类 */
-    @Autowired
-    private LogoutSuccessHandlerImpl logoutSuccessHandler;
+    private final LogoutSuccessHandlerImpl logoutSuccessHandler;
 
     /** token认证过滤器 */
-    @Autowired
-    private JwtAuthenticationTokenFilter authenticationTokenFilter;
+    private final JwtAuthenticationTokenFilter authenticationTokenFilter;
 
     /** 跨域过滤器 */
-    @Autowired
-    private CorsFilter corsFilter;
+    private final CorsFilter corsFilter;
 
     /** 允许匿名访问的地址 */
-    @Autowired
-    private PermitAllUrlProperties permitAllUrl;
+    private final PermitAllUrlProperties permitAllUrl;
 
     @Value("${security.whitList}")
     private String WHIT_LIST;
@@ -90,7 +87,8 @@ public class SecurityConfig {
                         // 注解标记允许匿名访问的url
                         .requestMatchers(permitAllUrl.getUrls().toArray(String[]::new)).permitAll()
                         // 静态资源，可匿名访问
-                        .requestMatchers(HttpMethod.GET, "/", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**")
+                        .permitAll()
                         // 除上面外的所有请求全部需要鉴权认证
                         .anyRequest().authenticated())
                 // 添加Logout filter

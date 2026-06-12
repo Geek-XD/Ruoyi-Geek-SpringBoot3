@@ -1,4 +1,4 @@
-package com.geek.framework.datasource.properties;
+package com.geek.framework.datasource.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
