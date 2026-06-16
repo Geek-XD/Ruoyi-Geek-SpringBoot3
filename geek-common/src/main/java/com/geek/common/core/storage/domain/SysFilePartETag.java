@@ -38,15 +38,14 @@ public class SysFilePartETag implements Serializable {
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        } else if (!(obj instanceof SysFilePartETag)) {
-            return false;
-        } else {
-            SysFilePartETag other = (SysFilePartETag) obj;
-            if (this.partNumber != other.partNumber) {
+        } else if (obj instanceof SysFilePartETag sfp) {
+            if (this.partNumber != sfp.partNumber) {
                 return false;
             } else {
-                return this.eTag == null ? other.eTag == null : this.eTag.equals(other.eTag);
+                return this.eTag == null ? sfp.eTag == null : this.eTag.equals(sfp.eTag);
             }
+        } else {
+            return false;
         }
     }
 }

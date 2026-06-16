@@ -1,4 +1,4 @@
-package com.geek.framework.mybatis;
+package com.geek.framework.orm;
 
 import com.geek.common.core.domain.BaseEntity;
 import com.geek.common.utils.DateUtils;

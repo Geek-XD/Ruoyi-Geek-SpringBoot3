@@ -1,4 +1,4 @@
-package com.geek.framework.mybatis;
+package com.geek.framework.orm;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

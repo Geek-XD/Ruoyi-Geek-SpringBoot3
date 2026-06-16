@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.geek.common.annotation.Anonymous;
-import com.geek.common.config.GeekConfig;
 import com.geek.common.core.controller.BaseController;
 import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.core.storage.GeekStorageBucket;
@@ -54,12 +53,15 @@ public class FileController extends BaseController {
     @Autowired
     private ISysFileInfoService sysFileInfoService;
 
+    @Autowired
+    private GeekStorageBucket geekStorageBucket;
+
     /**
      * 获取所有可用存储渠道及其client列表
      */
     @GetMapping("/client-list")
     public AjaxResult getClientList() {
-        return success(GeekConfig.getGeekStorageBucket().getStorageBucketMap().keySet());
+        return success(geekStorageBucket.getStorageBucketMap().keySet());
     }
 
     /**
@@ -70,7 +72,6 @@ public class FileController extends BaseController {
             @PathVariable(name = "bucketName", required = false) String bucketName,
             @RequestParam("file") MultipartFile file) {
         try {
-            GeekStorageBucket geekStorageBucket = GeekConfig.getGeekStorageBucket();
             String filePath = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             SysFileInfo sysFileInfo = sysFileInfoService.buildSysFileInfo(file);
             AjaxResult ajax = AjaxResult.success();
@@ -132,7 +133,7 @@ public class FileController extends BaseController {
             if (StringUtils.isEmpty(bucketName)) {
                 StorageBucketKey.use(bucketName);
             }
-            StorageService storageService = new StorageService(GeekConfig.getGeekStorageBucket());
+            StorageService storageService = new StorageService(geekStorageBucket);
             filePath = URLDecoder.decode(filePath, CharsetKit.UTF_8);
             InputStream inputStream = storageService.downLoad(filePath);
             String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(filePath));
@@ -249,7 +250,7 @@ public class FileController extends BaseController {
             fileInfo.setFilePath(finalPath);
             fileInfo.setFileSize(fileSize);
             fileInfo.setFileType(dotIndex >= 0 ? fileName.substring(dotIndex + 1) : "");
-            fileInfo.setStorageType(GeekConfig.getGeekStorageBucket().getDefaultSbType());
+            fileInfo.setStorageType(geekStorageBucket.getDefaultSbType());
             fileInfo.setCreateBy(userName);
             fileInfo.setCreateTime(new Date());
             fileInfo.setUpdateBy(userName);

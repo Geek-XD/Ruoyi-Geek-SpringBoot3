@@ -1,4 +1,4 @@
-package com.geek.common.core.storage.base;
+package com.geek.common.core.storage.domain;
 
 import java.io.InputStream;
 

@@ -10,8 +10,9 @@ import java.util.stream.Collectors;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.geek.common.constant.CacheConstants;
+import com.geek.common.core.storage.base.MultipartUploadable;
 import com.geek.common.core.storage.base.StorageBucket;
-import com.geek.common.core.storage.base.StorageEntity;
+import com.geek.common.core.storage.domain.StorageEntity;
 import com.geek.common.core.storage.domain.SysFilePartETag;
 import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.CacheUtils;
@@ -158,7 +159,7 @@ public class StorageService {
      *
      */
     public String generateUrl(String filePath) throws Exception {
-        if(filePath == null || filePath.startsWith("http")) {
+        if (filePath == null || filePath.startsWith("http")) {
             return filePath;
         }
         if ("public".equals(this.storageBucket.getPermission())) {
@@ -178,7 +179,11 @@ public class StorageService {
         if (fileSize > MAX_FILE_SIZE) {
             throw new IllegalArgumentException("文件过大");
         }
-        return this.storageBucket.initMultipartUpload(filePath);
+        if (this.storageBucket instanceof MultipartUploadable msb) {
+            return msb.initMultipartUpload(filePath);
+        } else {
+            throw new UnsupportedOperationException("当前存储桶不支持分片上传");
+        }
     }
 
     /**
@@ -193,18 +198,22 @@ public class StorageService {
      */
     public String uploadPart(SysFilePartETag partETag, InputStream inputStream)
             throws Exception {
-        try {
-            return this.storageBucket
-                    .uploadPart(
-                            partETag.getFilePath(),
-                            partETag.getTaskId(),
-                            partETag.getPartNumber(),
-                            partETag.getPartSize(),
-                            inputStream)
-                    .getETag();
-        } catch (Exception e) {
-            log.error("分片上传失败: 文件={}, 分片={}, 错误={}", partETag.getFilePath(), partETag.getPartNumber(), e);
-            throw new ServiceException("上传分片失败");
+        if (this.storageBucket instanceof MultipartUploadable msb) {
+            try {
+                return msb
+                        .uploadPart(
+                                partETag.getFilePath(),
+                                partETag.getTaskId(),
+                                partETag.getPartNumber(),
+                                partETag.getPartSize(),
+                                inputStream)
+                        .getETag();
+            } catch (Exception e) {
+                log.error("分片上传失败: 文件={}, 分片={}, 错误={}", partETag.getFilePath(), partETag.getPartNumber(), e);
+                throw new ServiceException("上传分片失败");
+            }
+        } else {
+            throw new UnsupportedOperationException("当前存储桶不支持分片上传");
         }
     }
 
@@ -218,23 +227,27 @@ public class StorageService {
      */
     public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
             throws Exception {
-        if (partETags == null || partETags.isEmpty()) {
-            throw new IllegalArgumentException("分片标识列表不能为空");
+        if (this.storageBucket instanceof MultipartUploadable msb) {
+            if (partETags == null || partETags.isEmpty()) {
+                throw new IllegalArgumentException("分片标识列表不能为空");
+            }
+            List<SysFilePartETag> validParts = partETags.stream()
+                    .filter(part -> part != null && part.getPartNumber() != null && part.getETag() != null)
+                    .peek(part -> {
+                        if (part.getPartNumber() <= 0 || StringUtils.isEmpty(part.getETag())) {
+                            throw new ServiceException("分片序号或ETag无效");
+                        }
+                    })
+                    .collect(Collectors.toList());
+            if (validParts.size() != partETags.size()) {
+                throw new ServiceException("分片信息格式不正确");
+            }
+            partETags.sort(Comparator.comparingInt(p -> p.getPartNumber()));
+            String resultFilePath = msb.completeMultipartUpload(filePath, uploadId, partETags);
+            log.info("分片合并完成: 文件={}, uploadId={}, 分片数={}", resultFilePath, uploadId, partETags.size());
+            return resultFilePath;
+        } else {
+            throw new UnsupportedOperationException("当前存储桶不支持分片上传");
         }
-        List<SysFilePartETag> validParts = partETags.stream()
-                .filter(part -> part != null && part.getPartNumber() != null && part.getETag() != null)
-                .peek(part -> {
-                    if (part.getPartNumber() <= 0 || StringUtils.isEmpty(part.getETag())) {
-                        throw new ServiceException("分片序号或ETag无效");
-                    }
-                })
-                .collect(Collectors.toList());
-        if (validParts.size() != partETags.size()) {
-            throw new ServiceException("分片信息格式不正确");
-        }
-        partETags.sort(Comparator.comparingInt(p -> p.getPartNumber()));
-        String resultFilePath = this.storageBucket.completeMultipartUpload(filePath, uploadId, partETags);
-        log.info("分片合并完成: 文件={}, uploadId={}, 分片数={}", resultFilePath, uploadId, partETags.size());
-        return resultFilePath;
     }
 }

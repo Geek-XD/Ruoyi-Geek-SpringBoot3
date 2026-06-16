@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.geek.common.annotation.Log;
-import com.geek.common.config.GeekConfig;
 import com.geek.common.core.controller.BaseController;
 import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
 import com.geek.common.core.page.TableSupport;
+import com.geek.common.core.storage.GeekStorageBucket;
 import com.geek.common.core.storage.service.StorageService;
 import com.geek.common.enums.BusinessType;
 import com.geek.system.domain.SysFileInfo;
@@ -43,6 +43,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SysFileInfoController extends BaseController {
     @Autowired
     private ISysFileInfoService sysFileInfoService;
+
+    @Autowired
+    private GeekStorageBucket geekStorageBucket;
 
     /**
      * 查询文件列表
@@ -108,7 +111,7 @@ public class SysFileInfoController extends BaseController {
     @Log(title = "文件", businessType = BusinessType.DELETE)
     @DeleteMapping("/{fileIds}")
     public AjaxResult remove(@PathVariable(name = "fileIds") List<Long> fileIds) {
-        StorageService fileService = new StorageService(GeekConfig.getGeekStorageBucket());
+        StorageService fileService = new StorageService(geekStorageBucket);
         sysFileInfoService.list(QueryWrapper.create().in(SysFileInfo::getFileId, fileIds))
             .stream()
             .map(SysFileInfo::getFilePath)

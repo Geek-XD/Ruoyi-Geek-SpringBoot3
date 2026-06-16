@@ -1,4 +1,4 @@
-package com.geek.framework.mybatis;
+package com.geek.framework.orm;
 
 import static com.mybatisflex.core.constant.SqlConsts.*;
 

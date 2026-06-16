@@ -20,8 +20,9 @@ import java.util.Properties;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.geek.common.core.storage.base.MultipartUploadable;
 import com.geek.common.core.storage.base.StorageBucket;
-import com.geek.common.core.storage.base.StorageEntity;
+import com.geek.common.core.storage.domain.StorageEntity;
 import com.geek.common.core.storage.domain.SysFilePartETag;
 import com.geek.common.core.text.CharsetKit;
 import com.geek.common.exception.ServiceException;
@@ -37,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @Slf4j
 @Getter
-public class LocalBucket implements StorageBucket {
+public class LocalBucket implements StorageBucket, MultipartUploadable {
 
     private String bucketName;
     private String basePath;

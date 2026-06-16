@@ -9,15 +9,16 @@ import java.util.Objects;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.geek.common.core.storage.base.MultipartUploadable;
 import com.geek.common.core.storage.base.StorageBucket;
-import com.geek.common.core.storage.base.StorageEntity;
+import com.geek.common.core.storage.domain.StorageEntity;
 import com.geek.common.core.storage.domain.SysFilePartETag;
 import com.geek.common.utils.StringUtils;
 
 import lombok.Getter;
 
 @Getter
-public class GeekStorageBucket implements StorageBucket {
+public class GeekStorageBucket implements StorageBucket, MultipartUploadable {
     private final Map<String, StorageBucket> storageBucketMap = new HashMap<>();
     private final Map<String, String> sbTypeHashMap = new HashMap<>();
 
@@ -113,19 +114,31 @@ public class GeekStorageBucket implements StorageBucket {
 
     @Override
     public String initMultipartUpload(String filePath) throws Exception {
-        return getStorageBucket().initMultipartUpload(filePath);
+        if (getStorageBucket() instanceof MultipartUploadable msb) {
+            return msb.initMultipartUpload(filePath);
+        } else {
+            throw new UnsupportedOperationException("当前存储桶不支持分片上传");
+        }
     }
 
     @Override
     public SysFilePartETag uploadPart(String filePath, String uploadId, int partNumber, long partSize,
             InputStream inputStream) throws Exception {
-        return getStorageBucket().uploadPart(filePath, uploadId, partNumber, partSize, inputStream);
+        if (getStorageBucket() instanceof MultipartUploadable msb) {
+            return msb.uploadPart(filePath, uploadId, partNumber, partSize, inputStream);
+        } else {
+            throw new UnsupportedOperationException("当前存储桶不支持分片上传");
+        }
     }
 
     @Override
     public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
             throws Exception {
-        return getStorageBucket().completeMultipartUpload(filePath, uploadId, partETags);
+        if (getStorageBucket() instanceof MultipartUploadable msb) {
+            return msb.completeMultipartUpload(filePath, uploadId, partETags);
+        } else {
+            throw new UnsupportedOperationException("当前存储桶不支持分片上传");
+        }
     }
 
 }
