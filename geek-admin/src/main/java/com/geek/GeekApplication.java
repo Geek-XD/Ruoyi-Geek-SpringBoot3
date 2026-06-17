@@ -11,8 +11,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-import com.geek.framework.captcha.config.CaptchaServiceFactoryLifecycleManager;
-
 /**
  * 启动程序
  * 
@@ -24,7 +22,6 @@ import com.geek.framework.captcha.config.CaptchaServiceFactoryLifecycleManager;
 public class GeekApplication {
     public static void main(String[] args) throws UnknownHostException {
         // System.setProperty("spring.devtools.restart.enabled", "false");
-        CaptchaServiceFactoryLifecycleManager.refreshFactoryCaches();
         ConfigurableApplicationContext application = SpringApplication.run(GeekApplication.class, args);
         System.out.println("(♥◠‿◠)ﾉﾞ  极客启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
                 " .-------.       ____     __        \n" +

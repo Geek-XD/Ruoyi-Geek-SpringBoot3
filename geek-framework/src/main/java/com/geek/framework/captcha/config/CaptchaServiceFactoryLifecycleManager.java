@@ -2,15 +2,22 @@ package com.geek.framework.captcha.config;
 
 import java.util.ServiceLoader;
 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
+import org.springframework.stereotype.Component;
+
 import com.anji.captcha.service.CaptchaCacheService;
 import com.anji.captcha.service.CaptchaService;
 import com.anji.captcha.service.impl.CaptchaServiceFactory;
 
-public class CaptchaServiceFactoryLifecycleManager {
+@Component
+public class CaptchaServiceFactoryLifecycleManager implements BeanFactoryPostProcessor, PriorityOrdered {
 
-    public static void refreshFactoryCaches() {
+    static void refreshFactoryCaches(ClassLoader classLoader) {
         clearFactoryCaches();
-        ClassLoader classLoader = resolveClassLoader();
         for (CaptchaCacheService cacheService : ServiceLoader.load(CaptchaCacheService.class, classLoader)) {
             CaptchaServiceFactory.cacheService.put(cacheService.type(), cacheService);
         }
@@ -19,13 +26,26 @@ public class CaptchaServiceFactoryLifecycleManager {
         }
     }
 
-    public static void clearFactoryCaches() {
+    static void clearFactoryCaches() {
         CaptchaServiceFactory.cacheService.clear();
         CaptchaServiceFactory.instances.clear();
     }
 
-    private static ClassLoader resolveClassLoader() {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        refreshFactoryCaches(resolveClassLoader(beanFactory));
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
+    }
+
+    private ClassLoader resolveClassLoader(ConfigurableListableBeanFactory beanFactory) {
+        ClassLoader classLoader = beanFactory.getBeanClassLoader();
+        if (classLoader == null) {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        }
         if (classLoader == null) {
             classLoader = CaptchaServiceFactoryLifecycleManager.class.getClassLoader();
         }
