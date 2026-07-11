@@ -42,18 +42,6 @@ public class CacheUtils {
         put(cacheName, key, value, 0, null);
     }
 
-    /**
-     * 如果没有则进行缓存,根据cacheName,key缓存数据
-     *
-     * @param cacheName
-     * @param key
-     * @param value
-     * @param <T>
-     */
-    public static void putIfAbsent(String cacheName, String key, Object value) {
-        getCacheManager().putIfAbsent(cacheName, key, value);
-    }
-
     public static boolean hasKey(String cacheName, String key) {
         return !ObjectUtils.isEmpty(get(cacheName, key));
     }

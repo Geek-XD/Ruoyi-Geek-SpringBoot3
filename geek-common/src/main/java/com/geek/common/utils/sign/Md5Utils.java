@@ -13,15 +13,21 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.geek.common.core.storage.domain.StorageEntity;
 import com.geek.common.core.text.CharsetKit;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Md5加密方法
  *
  * @author geek
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Md5Utils {
     private static final Logger log = LoggerFactory.getLogger(Md5Utils.class);
 
@@ -102,19 +108,21 @@ public class Md5Utils {
     }
 
     private static InputStream getInputStream(Object file) throws IOException {
-        if (file instanceof MultipartFile) {
-            return ((MultipartFile) file).getInputStream();
-        } else if (file instanceof File) {
-            return new FileInputStream((File) file);
+        if (file instanceof InputStreamSource isf) {
+            return isf.getInputStream();
+        } else if (file instanceof File f) {
+            return new FileInputStream(f);
         }
         throw new IllegalArgumentException("Unsupported file type");
     }
 
     private static long getFileSize(Object file) throws IOException {
-        if (file instanceof MultipartFile) {
-            return ((MultipartFile) file).getSize();
-        } else if (file instanceof File) {
-            return ((File) file).length();
+        if (file instanceof MultipartFile mf) {
+            return mf.getSize();
+        } else if (file instanceof File f) {
+            return f.length();
+        } else if (file instanceof StorageEntity s) {
+            return s.getByteCount();
         }
         throw new IllegalArgumentException("Unsupported file type");
     }
@@ -165,8 +173,5 @@ public class Md5Utils {
             log.error(e.getMessage());
         }
         return null;
-    }
-
-    private Md5Utils() {
     }
 }

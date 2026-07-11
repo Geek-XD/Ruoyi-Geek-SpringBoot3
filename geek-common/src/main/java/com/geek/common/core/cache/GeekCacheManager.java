@@ -16,8 +16,6 @@ public interface GeekCacheManager {
 
     <T> void put(String cacheName, String key, T value, long timeout, TimeUnit timeUnit);
 
-    boolean putIfAbsent(String cacheName, String key, Object value);
-
     @Nullable
     Object get(String cacheName, String key);
 

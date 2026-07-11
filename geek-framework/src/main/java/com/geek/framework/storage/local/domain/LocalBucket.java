@@ -47,7 +47,7 @@ public class LocalBucket implements StorageBucket, MultipartUploadable {
 
     @Override
     public void put(String filePath, MultipartFile file) {
-        Path dest = Paths.get(getBasePath(), filePath);
+        Path dest = resolveStoragePath(filePath);
         try (InputStream inputStream = file.getInputStream()) {
             Files.createDirectories(dest.getParent());
             Files.copy(inputStream, dest);
@@ -58,7 +58,7 @@ public class LocalBucket implements StorageBucket, MultipartUploadable {
 
     @Override
     public StorageEntity get(String filePath) throws IOException {
-        Path file = Paths.get(getBasePath(), filePath);
+        Path file = resolveStoragePath(filePath);
         StorageEntity fileEntity = new StorageEntity();
         fileEntity.setFilePath(filePath);
         fileEntity.setInputStream(new FileInputStream(file.toFile()));
@@ -68,7 +68,7 @@ public class LocalBucket implements StorageBucket, MultipartUploadable {
 
     @Override
     public void remove(String filePath) throws IOException {
-        Path file = Paths.get(getBasePath(), filePath);
+        Path file = resolveStoragePath(filePath);
         Files.deleteIfExists(file);
     }
 
@@ -160,7 +160,7 @@ public class LocalBucket implements StorageBucket, MultipartUploadable {
                 throw new ServiceException("分片验证失败: 序号=" + partETag.getPartNumber());
             }
         }
-        Path destPath = Paths.get(getBasePath(), filePath);
+        Path destPath = resolveStoragePath(filePath);
         Files.createDirectories(destPath.getParent());
         try (WritableByteChannel outChannel = Files.newByteChannel(
                 destPath,
@@ -182,7 +182,7 @@ public class LocalBucket implements StorageBucket, MultipartUploadable {
     private static final String MULTIPART_META_FILE = "upload.properties";
 
     private Path getMultipartTempDir(String uploadId) {
-        return Paths.get(getBasePath(), MULTIPART_DIR, uploadId);
+        return resolveStoragePath(MULTIPART_DIR + "/" + uploadId);
     }
 
     private Path getMultipartMetadataPath(String uploadId) {
@@ -239,5 +239,18 @@ public class LocalBucket implements StorageBucket, MultipartUploadable {
             basePath = basePath + "/";
         }
         return basePath;
+    }
+
+    private Path resolveStoragePath(String filePath) {
+        String sanitizedPath = filePath == null ? "" : filePath.replace('\\', '/');
+        while (sanitizedPath.startsWith("/")) {
+            sanitizedPath = sanitizedPath.substring(1);
+        }
+        Path root = Paths.get(getBasePath()).normalize().toAbsolutePath();
+        Path resolved = root.resolve(sanitizedPath).normalize();
+        if (!resolved.startsWith(root)) {
+            throw new ServiceException("非法文件路径");
+        }
+        return resolved;
     }
 }

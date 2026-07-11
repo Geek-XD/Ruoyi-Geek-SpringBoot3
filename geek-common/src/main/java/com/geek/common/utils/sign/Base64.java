@@ -1,10 +1,14 @@
 package com.geek.common.utils.sign;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * Base64工具类
  * 
  * @author geek
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Base64 {
     static private final int BASELENGTH = 128;
     static private final int LOOKUPLENGTH = 64;
@@ -249,8 +253,5 @@ public final class Base64 {
             }
         }
         return newSize;
-    }
-
-    private Base64() {
     }
 }

@@ -80,16 +80,6 @@ public class GeekJetCacheManager implements GeekCacheManager {
     }
 
     @Override
-    public boolean putIfAbsent(String cacheName, String key, Object value) {
-        Cache<String, Object> cache = getOrCreateCache(cacheName);
-        boolean inserted = cache.putIfAbsent(key, value);
-        if (inserted) {
-            registerKey(cacheName, key);
-        }
-        return inserted;
-    }
-
-    @Override
     public @Nullable Object get(String cacheName, String key) {
         Object value = getOrCreateCache(cacheName).get(key);
         if (value == null) {
