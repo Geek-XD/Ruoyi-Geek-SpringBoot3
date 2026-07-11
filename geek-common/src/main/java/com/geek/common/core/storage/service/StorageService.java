@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.geek.common.constant.CacheConstants;
+import com.geek.common.core.storage.GeekStorageBucket;
+import com.geek.common.core.storage.StorageBucketKey;
 import com.geek.common.core.storage.base.MultipartUploadable;
 import com.geek.common.core.storage.base.StorageBucket;
 import com.geek.common.core.storage.domain.StorageEntity;
@@ -60,13 +62,14 @@ public class StorageService {
         }
         if (this.fastUpload) {
             String md5 = Md5Utils.getMd5(file);
-            String pathForMd5 = CacheUtils.get(CacheConstants.FILE_MD5_PATH_KEY, md5, String.class);
+            String bucketName = resolveBucketName();
+            String pathForMd5 = CacheUtils.get(CacheConstants.FILE_MD5_PATH_KEY, buildMd5CacheKey(bucketName, md5), String.class);
             if (StringUtils.isNotEmpty(pathForMd5)) {
                 filePath = pathForMd5;
             } else {
                 this.storageBucket.put(filePath, file);
-                CacheUtils.put(CacheConstants.FILE_MD5_PATH_KEY, md5, filePath);
-                CacheUtils.put(CacheConstants.FILE_PATH_MD5_KEY, filePath, md5);
+                CacheUtils.put(CacheConstants.FILE_MD5_PATH_KEY, buildMd5CacheKey(bucketName, md5), filePath);
+                CacheUtils.put(CacheConstants.FILE_PATH_MD5_KEY, buildPathCacheKey(bucketName, filePath), md5);
             }
         } else {
             this.storageBucket.put(filePath, file);
@@ -142,12 +145,32 @@ public class StorageService {
 
     public void clearFileCache(String filePath) {
         if (this.fastUpload) {
-            String md5 = CacheUtils.get(CacheConstants.FILE_PATH_MD5_KEY, filePath, String.class);
+            String bucketName = resolveBucketName();
+            String md5 = CacheUtils.get(CacheConstants.FILE_PATH_MD5_KEY, buildPathCacheKey(bucketName, filePath), String.class);
             if (StringUtils.isNotEmpty(md5)) {
-                CacheUtils.remove(CacheConstants.FILE_PATH_MD5_KEY, filePath);
-                CacheUtils.remove(CacheConstants.FILE_MD5_PATH_KEY, md5);
+                CacheUtils.remove(CacheConstants.FILE_PATH_MD5_KEY, buildPathCacheKey(bucketName, filePath));
+                CacheUtils.remove(CacheConstants.FILE_MD5_PATH_KEY, buildMd5CacheKey(bucketName, md5));
             }
         }
+    }
+
+    private String resolveBucketName() {
+        String bucketName = StorageBucketKey.get();
+        if (StringUtils.isNotEmpty(bucketName)) {
+            return bucketName;
+        }
+        if (this.storageBucket instanceof GeekStorageBucket geekStorageBucket) {
+            return geekStorageBucket.getDefaultStorageBucketKey();
+        }
+        return "DEFAULT";
+    }
+
+    private String buildMd5CacheKey(String bucketName, String md5) {
+        return bucketName + ":" + md5;
+    }
+
+    private String buildPathCacheKey(String bucketName, String filePath) {
+        return bucketName + ":" + filePath;
     }
 
     /**

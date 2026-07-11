@@ -2,6 +2,7 @@ package com.geek.system.domain;
 
 import com.geek.common.annotation.Excel;
 import com.geek.common.core.domain.BaseEntity;
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 
@@ -41,6 +42,10 @@ public class SysFileInfo extends BaseEntity {
     @Excel(name = "存储类型")
     private String storageType;
 
+    @Schema(title = "存储桶标识")
+    @Excel(name = "存储桶标识")
+    private String bucketName;
+
     /** 文件类型/后缀 */
     @Schema(title = "文件类型/后缀")
     @Excel(name = "文件类型/后缀")
@@ -56,8 +61,32 @@ public class SysFileInfo extends BaseEntity {
     @Excel(name = "文件MD5")
     private String md5;
 
+    @Schema(title = "引用的根文件信息ID")
+    @Excel(name = "引用文件信息ID")
+    private Long referenceFileId;
+
+    @Schema(title = "来源/用处")
+    @Excel(name = "来源/用处")
+    private String useType;
+
     /** 删除标志（0代表存在 2代表删除） */
     @Schema(title = "删除标志（0代表存在 2代表删除）")
     private Integer delFlag;
+
+    @Schema(title = "是否为引用信息")
+    @Column(ignore = true)
+    private Boolean referenceFlag;
+
+    @Schema(title = "引用数量")
+    @Column(ignore = true)
+    private Long referenceCount;
+
+    @Schema(title = "引用目标文件名")
+    @Column(ignore = true)
+    private String referenceTargetFileName;
+
+    @Schema(title = "引用目标文件路径")
+    @Column(ignore = true)
+    private String referenceTargetFilePath;
 
 }

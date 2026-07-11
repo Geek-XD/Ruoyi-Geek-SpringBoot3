@@ -9,9 +9,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="fileName" column="file_name" />
         <result property="filePath" column="file_path" />
         <result property="storageType" column="storage_type" />
+        <result property="bucketName" column="bucket_name" />
         <result property="fileType" column="file_type" />
         <result property="fileSize" column="file_size" />
         <result property="md5" column="md5" />
+        <result property="referenceFileId" column="reference_file_id" />
+        <result property="useType" column="use_type" />
         <result property="createBy" column="create_by" />
         <result property="createTime" column="create_time" />
         <result property="updateBy" column="update_by" />
@@ -19,4 +22,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark" column="remark" />
         <result property="delFlag" column="del_flag" />
     </resultMap>
+
 </mapper>

@@ -99,9 +99,14 @@
             <column name="storage_type" remarks="存储类型（local/minio/oss）" type="VARCHAR(32)">
                 <constraints nullable="false"/>
             </column>
+            <column name="bucket_name" remarks="存储桶标识" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
             <column name="file_type" remarks="文件类型/后缀" type="VARCHAR(50)"/>
             <column name="file_size" remarks="文件大小（字节）" type="BIGINT"/>
             <column name="md5" remarks="文件MD5" type="VARCHAR(64)"/>
+            <column name="reference_file_id" remarks="引用的根文件信息ID" type="BIGINT"/>
+            <column name="use_type" remarks="来源/用处" type="VARCHAR(64)"/>
             <column defaultValue="" name="create_by" remarks="创建者" type="VARCHAR(64)"/>
             <column name="create_time" remarks="创建时间" type="datetime(0)"/>
             <column defaultValue="" name="update_by" remarks="更新者" type="VARCHAR(64)"/>
@@ -109,6 +114,14 @@
             <column name="remark" remarks="备注" type="VARCHAR(255)"/>
             <column defaultValue="0" name="del_flag" remarks="删除标志（0代表存在 1代表删除）" type="SMALLINT"/>
         </createTable>
+        <createIndex associatedWith="" indexName="idx_sys_file_info_physical" tableName="sys_file_info">
+            <column name="bucket_name"/>
+            <column name="storage_type"/>
+            <column name="md5"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="idx_sys_file_info_reference" tableName="sys_file_info">
+            <column name="reference_file_id"/>
+        </createIndex>
     </changeSet>
     <changeSet author="Administrator (generated)" id="1764223194862-34">
         <createTable remarks="系统访问记录" tableName="sys_logininfor">

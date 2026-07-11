@@ -1,5 +1,6 @@
 package com.geek.system.service;
 
+import java.util.List;
 import java.util.Date;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -26,21 +27,33 @@ public interface ISysFileInfoService extends IService<SysFileInfo> {
      * @return 结果
      */
     default public SysFileInfo buildSysFileInfo(MultipartFile file) {
+        String md5 = Md5Utils.getMd5(file);
+        return buildSysFileInfo(file.getOriginalFilename(), file.getSize(), md5);
+    }
+
+    default public SysFileInfo buildSysFileInfo(String fileName, Long fileSize, String md5) {
         String fileType = null;
-        if (file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")) {
-            fileType = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
+        if (fileName != null && fileName.contains(".")) {
+            fileType = fileName.substring(fileName.lastIndexOf('.') + 1);
         }
         SysFileInfo fileInfo = new SysFileInfo();
-        String md5 = Md5Utils.getMd5(file);
-        fileInfo.setFileName(file.getOriginalFilename());
+        fileInfo.setFileName(fileName);
         fileInfo.setFileType(fileType);
-        fileInfo.setFileSize(file.getSize());
+        fileInfo.setFileSize(fileSize);
         fileInfo.setMd5(md5);
         fileInfo.setCreateTime(new Date());
         fileInfo.setUpdateTime(new Date());
         fileInfo.setDelFlag(0);
         return fileInfo;
     }
+
+    SysFileInfo prepareReferenceFileInfo(SysFileInfo sysFileInfo);
+
+    SysFileInfo findReusableFileInfo(String bucketName, String storageType, String md5);
+
+    boolean shouldDeletePhysicalFile(SysFileInfo fileInfo);
+
+    boolean removeFileInfos(List<Long> fileIds);
 
     Page<SysFileInfo> page(SysFileInfo sysFileInfo, int pageNum, int pageSize);
 
