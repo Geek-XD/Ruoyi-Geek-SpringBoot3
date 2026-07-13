@@ -3,8 +3,13 @@ package com.geek.system.service.impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.geek.common.constant.CacheConstants;
+import com.geek.common.core.storage.StorageBucketKey;
+import com.geek.common.utils.CacheUtils;
 import com.geek.common.utils.poi.ExcelUtil;
+import com.geek.common.utils.sign.Md5Utils;
 import com.geek.system.domain.SysFileInfo;
 import com.geek.system.mapper.SysFileInfoMapper;
 import com.geek.system.service.ISysFileInfoService;
@@ -13,6 +18,7 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 文件Service业务层处理
@@ -20,6 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author geek
  * @date 2025-04-25
  */
+@Slf4j
 @Service
 public class SysFileInfoServiceImpl extends ServiceImpl<SysFileInfoMapper, SysFileInfo> implements ISysFileInfoService {
 
@@ -50,5 +57,62 @@ public class SysFileInfoServiceImpl extends ServiceImpl<SysFileInfoMapper, SysFi
         List<SysFileInfo> list = this.selectSysFileInfoList(sysFileInfo).list();
         ExcelUtil<SysFileInfo> util = new ExcelUtil<>(SysFileInfo.class);
         util.exportExcel(response, list, "文件数据");
+    }
+
+    /**
+     * 新增文件
+     * 
+     * @param file
+     * @return 结果
+     */
+    @Override
+    public SysFileInfo buildSysFileInfo(MultipartFile file, String bucketName) {
+        if (bucketName == null) {
+            bucketName = StorageBucketKey.get();
+        }
+        String fileType = null;
+        if (file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")) {
+            fileType = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
+        }
+        SysFileInfo fileInfo = new SysFileInfo();
+        String md5 = Md5Utils.getMd5(file);
+        fileInfo.setFileName(file.getOriginalFilename());
+        fileInfo.setFileType(fileType);
+        fileInfo.setFileSize(file.getSize());
+        fileInfo.setMd5(md5);
+        fileInfo.setStorageName(bucketName);
+        fileInfo.setDelFlag(0);
+        return fileInfo;
+    }
+
+    @Override
+    public SysFileInfo enableFastUpload(MultipartFile file, String bucketName) {
+        if (bucketName == null) {
+            bucketName = StorageBucketKey.get();
+        }
+        SysFileInfo sysFileInfo = buildSysFileInfo(file, bucketName);
+        CacheUtils.put(CacheConstants.FILE_INFO, bucketName + sysFileInfo.getMd5(), sysFileInfo);
+        return sysFileInfo;
+    }
+
+    @Override
+    public SysFileInfo canFastUpload(MultipartFile file, String bucketName) {
+        String md5 = Md5Utils.getMd5(file);
+        if (bucketName == null) {
+            bucketName = StorageBucketKey.get();
+        }
+        SysFileInfo sysFileInfo = CacheUtils.get(CacheConstants.FILE_INFO, bucketName + md5, SysFileInfo.class);
+        if (sysFileInfo == null) {
+            sysFileInfo = this.queryChain().from(SysFileInfo.class).eq(SysFileInfo::getMd5, md5).one();
+            if (sysFileInfo != null) {
+                CacheUtils.put(CacheConstants.FILE_INFO, bucketName + md5, sysFileInfo);
+            }
+        }
+        return sysFileInfo;
+    }
+
+    @Override
+    public void clearFastUploadCache(String md5, String bucketName) {
+        CacheUtils.remove(CacheConstants.FILE_INFO, bucketName + md5);
     }
 }

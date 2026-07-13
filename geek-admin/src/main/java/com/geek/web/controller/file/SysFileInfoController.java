@@ -20,11 +20,9 @@ import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
 import com.geek.common.core.page.TableSupport;
 import com.geek.common.enums.BusinessType;
-import com.geek.framework.storage.StorageService;
 import com.geek.system.domain.SysFileInfo;
 import com.geek.system.service.ISysFileInfoService;
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryWrapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,9 +40,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SysFileInfoController extends BaseController {
     @Autowired
     private ISysFileInfoService sysFileInfoService;
-
-    @Autowired
-    private StorageService storageService;
 
     /**
      * 查询文件列表
@@ -110,10 +105,9 @@ public class SysFileInfoController extends BaseController {
     @Log(title = "文件", businessType = BusinessType.DELETE)
     @DeleteMapping("/{fileIds}")
     public AjaxResult remove(@PathVariable(name = "fileIds") List<Long> fileIds) {
-        sysFileInfoService.list(QueryWrapper.create().in(SysFileInfo::getFileId, fileIds))
-                .stream()
-                .map(SysFileInfo::getFilePath)
-                .forEach(storageService::clearFileCache);
+        sysFileInfoService.queryChain().in(SysFileInfo::getFileId, fileIds).list().forEach(fileInfo -> {
+            sysFileInfoService.clearFastUploadCache(fileInfo.getMd5(), fileInfo.getStorageName());
+        });
         return toAjax(sysFileInfoService.removeByIds(fileIds));
     }
 }

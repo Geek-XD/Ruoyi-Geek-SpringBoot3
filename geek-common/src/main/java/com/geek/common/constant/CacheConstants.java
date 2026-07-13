@@ -36,11 +36,8 @@ public class CacheConstants {
     /** 邮箱验证码 email codes */
     public static final String EMAIL_CODES = "email_codes";
 
-    /** 文件的md5 cache key */
-    public static final String FILE_MD5_PATH_KEY = "file_md5_path";
-
-    /** 文件路径 cache key */
-    public static final String FILE_PATH_MD5_KEY = "file_path_md5";
+    /** 文件信息 cache key */
+    public static final String FILE_INFO = "file_info";
 
     public static final String WEBSOCKET_NODE_KEY = "websocket_node";
 

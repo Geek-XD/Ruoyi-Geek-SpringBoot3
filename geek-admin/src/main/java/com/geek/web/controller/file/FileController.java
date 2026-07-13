@@ -74,8 +74,7 @@ public class FileController extends BaseController {
         try {
             String filePath = DEFAULT_DIR + "/" + file.getOriginalFilename();
             bucketName = StringUtils.isEmpty(bucketName) ? geekStorageBucket.getDefaultStorageBucketKey() : bucketName;
-
-            SysFileInfo sysFileInfo = sysFileInfoService.buildSysFileInfo(file, bucketName);
+            SysFileInfo sysFileInfo = sysFileInfoService.enableFastUpload(file, bucketName);
             AjaxResult ajax = AjaxResult.success();
             try {
                 StorageBucketKey.use(bucketName);

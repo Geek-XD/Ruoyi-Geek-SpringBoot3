@@ -4,30 +4,33 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.poi.EmptyFileException;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.geek.common.config.GeekConfig;
+import com.geek.common.core.storage.base.MultipartUploadable;
 import com.geek.common.core.storage.domain.StorageEntity;
 import com.geek.common.core.storage.domain.SysFilePartETag;
-import com.geek.common.core.storage.service.IStorageService;
+import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.file.FileUtils;
 import com.geek.common.utils.file.MimeTypeUtils;
-import com.geek.common.utils.spring.SpringUtils;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 文件操作工具类
  *
  * @author geek
  */
+@Slf4j
 public class Sb {
 
-    public static IStorageService getStorageService() {
-        return SpringUtils.getBean(IStorageService.class);
-    }
+    private static Long MAX_FILE_SIZE = 500 * 1024 * 1024L;
 
     /**
      * 以默认配置进行文件上传
@@ -87,7 +90,11 @@ public class Sb {
     public static String upload(String filePath, MultipartFile file, String[] allowedExtension) {
         try {
             FileUtils.assertAllowed(file, allowedExtension);
-            return getStorageService().upload(filePath, file);
+            if (file.getSize() > MAX_FILE_SIZE) {
+                throw new IllegalArgumentException("文件过大");
+            }
+            GeekConfig.getGeekStorageBucket().put(filePath, file);
+            return filePath;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -103,7 +110,7 @@ public class Sb {
      */
     public static InputStream downLoad(String filePath) {
         try {
-            return getStorageService().getFile(filePath).getInputStream();
+            return GeekConfig.getGeekStorageBucket().get(filePath).getInputStream();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -136,7 +143,7 @@ public class Sb {
      */
     public static void downLoad(String filePath, HttpServletResponse response) {
         try {
-            StorageEntity fileEntity = getStorageService().getFile(filePath);
+            StorageEntity fileEntity = GeekConfig.getGeekStorageBucket().get(filePath);
             InputStream inputStream = fileEntity.getInputStream();
             OutputStream outputStream = response.getOutputStream();
             FileUtils.setAttachmentResponseHeader(response, FileUtils.getName(fileEntity.getFilePath()));
@@ -155,8 +162,7 @@ public class Sb {
      */
     public static void deleteFile(String filePath) {
         try {
-            IStorageService fileService = getStorageService();
-            fileService.deleteFile(filePath);
+            GeekConfig.getGeekStorageBucket().remove(filePath);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -171,9 +177,15 @@ public class Sb {
      * @throws Exception
      */
     public static String getURL(String filePath) {
-        IStorageService fileService = getStorageService();
         try {
-            return fileService.generateUrl(filePath);
+            if (filePath == null || filePath.startsWith("http")) {
+                return filePath;
+            }
+            if ("public".equals(GeekConfig.getGeekStorageBucket().getPermission())) {
+                return GeekConfig.getGeekStorageBucket().generatePublicUrl(filePath).toString();
+            } else {
+                return GeekConfig.getGeekStorageBucket().generatePresignedUrl(filePath, 3600).toString();
+            }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -188,9 +200,15 @@ public class Sb {
      * @throws Exception
      */
     public static String initMultipartUpload(String filePath, Long fileSize) {
-        IStorageService fileService = getStorageService();
         try {
-            return fileService.initMultipartUpload(filePath, fileSize);
+            if (fileSize > MAX_FILE_SIZE) {
+                throw new IllegalArgumentException("文件过大");
+            }
+            if (GeekConfig.getGeekStorageBucket() instanceof MultipartUploadable msb) {
+                return msb.initMultipartUpload(filePath);
+            } else {
+                throw new UnsupportedOperationException("当前存储桶不支持分片上传");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -207,7 +225,6 @@ public class Sb {
      * @throws Exception
      */
     public static String uploadPart(String filePath, String uploadId, int partNumber, MultipartFile chunk) {
-        IStorageService fileService = getStorageService();
         try {
             if (chunk == null || chunk.isEmpty())
                 throw new EmptyFileException();
@@ -217,7 +234,22 @@ public class Sb {
                     .taskId(uploadId)
                     .filePath(filePath)
                     .build();
-            return fileService.uploadPart(partETag, chunk.getInputStream());
+            if (GeekConfig.getGeekStorageBucket() instanceof MultipartUploadable msb) {
+                try {
+                    return msb.uploadPart(
+                            partETag.getFilePath(),
+                            partETag.getTaskId(),
+                            partETag.getPartNumber(),
+                            partETag.getPartSize(),
+                            chunk.getInputStream())
+                            .getETag();
+                } catch (Exception e) {
+                    log.error("分片上传失败: 文件={}, 分片={}, 错误={}", partETag.getFilePath(), partETag.getPartNumber(), e);
+                    throw new ServiceException("上传分片失败");
+                }
+            } else {
+                throw new UnsupportedOperationException("当前存储桶不支持分片上传");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -233,9 +265,29 @@ public class Sb {
      * @throws Exception
      */
     public static String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags) {
-        IStorageService fileService = getStorageService();
         try {
-            return fileService.completeMultipartUpload(filePath, uploadId, partETags);
+            if (GeekConfig.getGeekStorageBucket() instanceof MultipartUploadable msb) {
+                if (partETags == null || partETags.isEmpty()) {
+                    throw new IllegalArgumentException("分片标识列表不能为空");
+                }
+                List<SysFilePartETag> validParts = partETags.stream()
+                        .filter(part -> part != null && part.getPartNumber() != null && part.getETag() != null)
+                        .peek(part -> {
+                            if (part.getPartNumber() <= 0 || StringUtils.isEmpty(part.getETag())) {
+                                throw new ServiceException("分片序号或ETag无效");
+                            }
+                        })
+                        .collect(Collectors.toList());
+                if (validParts.size() != partETags.size()) {
+                    throw new ServiceException("分片信息格式不正确");
+                }
+                partETags.sort(Comparator.comparingInt(p -> p.getPartNumber()));
+                String resultFilePath = msb.completeMultipartUpload(filePath, uploadId, partETags);
+                log.info("分片合并完成: 文件={}, uploadId={}, 分片数={}", resultFilePath, uploadId, partETags.size());
+                return resultFilePath;
+            } else {
+                throw new UnsupportedOperationException("当前存储桶不支持分片上传");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
