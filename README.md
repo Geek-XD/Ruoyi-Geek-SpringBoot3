@@ -112,17 +112,17 @@ command:
 修改项目根pom
 
 ```xml
-        <module>geek-plugins/geek-plugin-aliyun-oss</module>
-        <module>geek-plugins/geek-plugin-minio</module>
-        <module>geek-plugins/geek-plugin-netty</module>
-        <module>geek-plugins/geek-plugin-rabbitmq</module>
-        <module>geek-plugins/geek-plugin-redis</module>
-        <module>geek-modules/geek-module-flowable</module>
-        <module>geek-modules/geek-module-form</module>
-        <module>geek-modules/geek-module-generator</module>
-        <module>geek-modules/geek-module-message</module>
-        <module>geek-modules/geek-module-online</module>
-        <module>geek-modules/geek-module-quartz</module>
+        <module>geek-plugins/Geek-Plugin-Aliyun-OSS</module>
+        <module>geek-plugins/Geek-Plugin-Minio</module>
+        <module>geek-plugins/Geek-Plugin-Netty</module>
+        <module>geek-plugins/Geek-Plugin-RabbitMQ</module>
+        <module>geek-plugins/Geek-Plugin-Redis</module>
+        <module>geek-modules/Geek-Module-Flowable</module>
+        <module>geek-modules/Geek-Module-Form</module>
+        <module>geek-modules/Geek-Module-Generator</module>
+        <module>geek-modules/Geek-Module-Message</module>
+        <module>geek-modules/Geek-Module-Online</module>
+        <module>geek-modules/Geek-Module-Quartz</module>
         <module>geek-scenes/Geek-Scene-Auth</module>
         <module>geek-scenes/Geek-Scene-Pay</module>
 ```
