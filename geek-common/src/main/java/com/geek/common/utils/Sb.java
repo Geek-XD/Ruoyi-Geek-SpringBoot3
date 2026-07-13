@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.poi.EmptyFileException;
-import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.geek.common.core.storage.domain.StorageEntity;
@@ -87,9 +86,24 @@ public class Sb {
      */
     public static String upload(String filePath, MultipartFile file, String[] allowedExtension) {
         try {
-            IStorageService fileService = getStorageService();
             FileUtils.assertAllowed(file, allowedExtension);
-            return fileService.upload(filePath, file);
+            return getStorageService().upload(filePath, file);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 根据文件路径下载
+     *
+     * @param fileUrl      下载文件路径
+     * @param outputStream 需要输出到的输出流
+     * @return 文件名称
+     * @throws IOException
+     */
+    public static InputStream downLoad(String filePath) {
+        try {
+            return getStorageService().getFile(filePath).getInputStream();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -104,8 +118,8 @@ public class Sb {
      * @throws IOException
      */
     public static void downLoad(String filePath, OutputStream outputStream) {
-        IStorageService fileService = getStorageService();
-        try (InputStream inputStream = fileService.downLoad(filePath)) {
+        try {
+            InputStream inputStream = downLoad(filePath);
             FileUtils.writeBytes(inputStream, outputStream);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -115,21 +129,18 @@ public class Sb {
     /**
      * 根据文件路径下载
      *
-     * @param filepath 下载文件路径
-     * @param response 响应
+     * @param fileUrl      下载文件路径
+     * @param outputStream 需要输出到的输出流
      * @return 文件名称
      * @throws IOException
      */
     public static void downLoad(String filePath, HttpServletResponse response) {
-        IStorageService fileService = getStorageService();
-        StorageEntity fileEntity;
         try {
-            fileEntity = fileService.getFile(filePath);
+            StorageEntity fileEntity = getStorageService().getFile(filePath);
             InputStream inputStream = fileEntity.getInputStream();
             OutputStream outputStream = response.getOutputStream();
             FileUtils.setAttachmentResponseHeader(response, FileUtils.getName(fileEntity.getFilePath()));
             response.setContentLengthLong(fileEntity.getByteCount());
-            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.writeBytes(inputStream, outputStream);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);

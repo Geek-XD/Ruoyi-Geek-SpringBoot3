@@ -1,8 +1,6 @@
 package com.geek.framework.storage;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +21,6 @@ import com.geek.common.utils.file.FileUtils;
 import com.geek.common.utils.file.MimeTypeUtils;
 import com.geek.common.utils.sign.Md5Utils;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -76,48 +73,6 @@ public class StorageService {
             getStorageBucket().put(filePath, file);
         }
         return filePath;
-    }
-
-    /**
-     * 下载文件
-     *
-     * @param filePath 文件路径
-     * @return 返回文件输入流
-     * @throws Exception 比如读写文件出错时
-     *
-     */
-    public InputStream downLoad(String filePath) throws Exception {
-        return getStorageBucket().get(filePath).getInputStream();
-    }
-
-    /**
-     * 根据文件路径下载
-     *
-     * @param fileUrl      下载文件路径
-     * @param outputStream 需要输出到的输出流
-     * @return 文件名称
-     * @throws IOException
-     */
-    public void downLoad(String filePath, OutputStream outputStream) throws Exception {
-        InputStream inputStream = downLoad(filePath);
-        FileUtils.writeBytes(inputStream, outputStream);
-    }
-
-    /**
-     * 下载文件
-     *
-     * @param filePath 文件路径
-     * @return 返回文件输入流
-     * @throws Exception 比如读写文件出错时
-     *
-     */
-    public void downLoad(String filePath, HttpServletResponse response) throws Exception {
-        StorageEntity fileEntity = getStorageBucket().get(filePath);
-        InputStream inputStream = fileEntity.getInputStream();
-        OutputStream outputStream = response.getOutputStream();
-        FileUtils.setAttachmentResponseHeader(response, FileUtils.getName(fileEntity.getFilePath()));
-        response.setContentLengthLong(fileEntity.getByteCount());
-        FileUtils.writeBytes(inputStream, outputStream);
     }
 
     /**
