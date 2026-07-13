@@ -1,8 +1,6 @@
 package com.geek.common.core.storage.service;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -11,8 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.geek.common.core.storage.base.StorageBucket;
 import com.geek.common.core.storage.domain.StorageEntity;
 import com.geek.common.core.storage.domain.SysFilePartETag;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 存储操作业务
@@ -32,36 +28,6 @@ public interface IStorageService {
      *
      */
     public String upload(String filePath, MultipartFile file) throws Exception;
-
-    /**
-     * 下载文件
-     *
-     * @param filePath 文件路径
-     * @return 返回文件输入流
-     * @throws Exception 比如读写文件出错时
-     *
-     */
-    public InputStream downLoad(String filePath) throws Exception;
-
-    /**
-     * 根据文件路径下载
-     *
-     * @param fileUrl      下载文件路径
-     * @param outputStream 需要输出到的输出流
-     * @return 文件名称
-     * @throws IOException
-     */
-    public void downLoad(String filePath, OutputStream outputStream) throws Exception;
-
-    /**
-     * 下载文件
-     *
-     * @param filePath 文件路径
-     * @return 返回文件输入流
-     * @throws Exception 比如读写文件出错时
-     *
-     */
-    public void downLoad(String filePath, HttpServletResponse response) throws Exception;
 
     /**
      * 获取文件实体对象

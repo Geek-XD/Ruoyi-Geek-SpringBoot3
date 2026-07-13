@@ -14,6 +14,7 @@ import com.geek.common.core.storage.base.MultipartUploadable;
 import com.geek.common.core.storage.base.StorageBucket;
 import com.geek.common.core.storage.domain.StorageEntity;
 import com.geek.common.core.storage.domain.SysFilePartETag;
+import com.geek.common.core.storage.service.IStorageService;
 import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.CacheUtils;
 import com.geek.common.utils.StringUtils;
@@ -34,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StorageService {
+public class StorageService implements IStorageService {
 
     private String[] allowedExtension = MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION;
     private Boolean fastUpload = true;
