@@ -62,3 +62,9 @@ effective-pom.xml
 
 !dependency-list.txt
 !dependency-tree.txt
+
+.codegraph
+.serena
+.omo
+
+test/
