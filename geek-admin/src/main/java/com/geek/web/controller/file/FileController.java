@@ -34,7 +34,6 @@ import com.geek.common.utils.Sb;
 import com.geek.common.utils.SecurityUtils;
 import com.geek.common.utils.StringUtils;
 import com.geek.common.utils.file.FileUtils;
-import com.geek.framework.storage.StorageService;
 import com.geek.system.domain.SysFileInfo;
 import com.geek.system.service.ISysFileInfoService;
 
@@ -54,9 +53,6 @@ public class FileController extends BaseController {
 
     @Autowired
     private GeekStorageBucket geekStorageBucket;
-
-    @Autowired
-    private StorageService storageService;
 
     private static final String DEFAULT_DIR = "upload";
 
@@ -129,7 +125,7 @@ public class FileController extends BaseController {
         try {
             SysFileInfo fileInfo = sysFileInfoService.getById(fileId);
             StorageBucketKey.use(fileInfo.getStorageName());
-            InputStream inputStream = storageService.downLoad(fileInfo.getFilePath());
+            InputStream inputStream = Sb.downLoad(fileInfo.getFilePath());
             String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(fileInfo.getFilePath()));
             if (contentType == null) {
                 contentType = "application/octet-stream";
