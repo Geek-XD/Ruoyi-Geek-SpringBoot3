@@ -27,10 +27,10 @@ public interface ISysFileInfoService extends IService<SysFileInfo> {
         return buildSysFileInfo(file, StorageBucketKey.get());
     }
 
-    SysFileInfo enableFastUpload(MultipartFile file, String bucketName);
+    void enableFastUpload(SysFileInfo file, String bucketName);
 
-    default SysFileInfo enableFastUpload(MultipartFile file) {
-        return enableFastUpload(file, StorageBucketKey.get());
+    default void enableFastUpload(SysFileInfo file) {
+        enableFastUpload(file, StorageBucketKey.get());
     }
 
     SysFileInfo canFastUpload(MultipartFile file, String bucketName);

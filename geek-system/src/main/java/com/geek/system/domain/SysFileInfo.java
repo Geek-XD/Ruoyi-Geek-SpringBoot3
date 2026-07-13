@@ -55,8 +55,4 @@ public class SysFileInfo extends BaseEntity {
     @Excel(name = "文件MD5")
     private String md5;
 
-    /** 删除标志（0代表存在 2代表删除） */
-    @Schema(title = "删除标志（0代表存在 2代表删除）")
-    private Integer delFlag;
-
 }

@@ -20,6 +20,7 @@ import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
 import com.geek.common.core.page.TableSupport;
 import com.geek.common.enums.BusinessType;
+import com.geek.common.utils.Sb;
 import com.geek.system.domain.SysFileInfo;
 import com.geek.system.service.ISysFileInfoService;
 import com.mybatisflex.core.paginate.Page;
@@ -106,7 +107,10 @@ public class SysFileInfoController extends BaseController {
     @DeleteMapping("/{fileIds}")
     public AjaxResult remove(@PathVariable(name = "fileIds") List<Long> fileIds) {
         sysFileInfoService.queryChain().in(SysFileInfo::getFileId, fileIds).list().forEach(fileInfo -> {
-            sysFileInfoService.clearFastUploadCache(fileInfo.getMd5(), fileInfo.getStorageName());
+            if (!sysFileInfoService.queryChain().eq(SysFileInfo::getMd5, fileInfo.getMd5()).exists()) {
+                sysFileInfoService.clearFastUploadCache(fileInfo.getMd5(), fileInfo.getStorageName());
+                Sb.deleteFile(fileInfo.getFilePath());
+            }
         });
         return toAjax(sysFileInfoService.removeByIds(fileIds));
     }

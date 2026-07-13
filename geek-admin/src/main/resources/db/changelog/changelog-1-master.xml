@@ -107,7 +107,6 @@
             <column defaultValue="" name="update_by" remarks="更新者" type="VARCHAR(64)"/>
             <column name="update_time" remarks="更新时间" type="datetime(0)"/>
             <column name="remark" remarks="备注" type="VARCHAR(255)"/>
-            <column defaultValue="0" name="del_flag" remarks="删除标志（0代表存在 1代表删除）" type="SMALLINT"/>
         </createTable>
     </changeSet>
     <changeSet author="Administrator (generated)" id="1764223194862-34">

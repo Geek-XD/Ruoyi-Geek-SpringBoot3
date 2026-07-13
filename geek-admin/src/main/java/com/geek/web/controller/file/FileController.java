@@ -74,16 +74,23 @@ public class FileController extends BaseController {
         try {
             String filePath = DEFAULT_DIR + "/" + file.getOriginalFilename();
             bucketName = StringUtils.isEmpty(bucketName) ? geekStorageBucket.getDefaultStorageBucketKey() : bucketName;
-            SysFileInfo sysFileInfo = sysFileInfoService.enableFastUpload(file, bucketName);
+            SysFileInfo sysFileInfo = sysFileInfoService.canFastUpload(file, bucketName);
             AjaxResult ajax = AjaxResult.success();
-            try {
-                StorageBucketKey.use(bucketName);
-                sysFileInfo.setFilePath(Sb.upload(filePath, file));
-                ajax.put("url", Sb.getURL(filePath));
-            } finally {
-                StorageBucketKey.clear();
+            if (sysFileInfo != null) {
+                sysFileInfoService.save(sysFileInfo);
+                ajax.put("url", Sb.getURL(sysFileInfo.getFilePath()));
+            } else {
+                sysFileInfo = sysFileInfoService.buildSysFileInfo(file, bucketName);
+                try {
+                    StorageBucketKey.use(bucketName);
+                    sysFileInfo.setFilePath(Sb.upload(filePath, file));
+                    sysFileInfoService.enableFastUpload(sysFileInfo);
+                    ajax.put("url", Sb.getURL(sysFileInfo.getFilePath()));
+                } finally {
+                    StorageBucketKey.clear();
+                }
+                sysFileInfoService.save(sysFileInfo);
             }
-            sysFileInfoService.save(sysFileInfo);
             ajax.put("info", sysFileInfo);
             ajax.put("fileName", sysFileInfo.getFileName());
             return ajax;
@@ -244,7 +251,6 @@ public class FileController extends BaseController {
             fileInfo.setCreateTime(new Date());
             fileInfo.setUpdateBy(userName);
             fileInfo.setUpdateTime(new Date());
-            fileInfo.setDelFlag(0);
             sysFileInfoService.save(fileInfo);
             return AjaxResult.success(fileInfo);
         } catch (Exception e) {

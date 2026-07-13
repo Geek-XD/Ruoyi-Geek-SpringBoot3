@@ -81,18 +81,19 @@ public class SysFileInfoServiceImpl extends ServiceImpl<SysFileInfoMapper, SysFi
         fileInfo.setFileSize(file.getSize());
         fileInfo.setMd5(md5);
         fileInfo.setStorageName(bucketName);
-        fileInfo.setDelFlag(0);
         return fileInfo;
     }
 
     @Override
-    public SysFileInfo enableFastUpload(MultipartFile file, String bucketName) {
-        if (bucketName == null) {
-            bucketName = StorageBucketKey.get();
+    public void enableFastUpload(SysFileInfo file, String bucketName) {
+        if (file.getFilePath() == null) {
+            throw new IllegalArgumentException("文件路径不能为空");
         }
-        SysFileInfo sysFileInfo = buildSysFileInfo(file, bucketName);
-        CacheUtils.put(CacheConstants.FILE_INFO, bucketName + sysFileInfo.getMd5(), sysFileInfo);
-        return sysFileInfo;
+        if (file.getMd5() == null) {
+            throw new IllegalArgumentException("文件MD5不能为空");
+        }
+        file.setFileId(null);
+        CacheUtils.put(CacheConstants.FILE_INFO, bucketName + file.getMd5(), file);
     }
 
     @Override
@@ -103,8 +104,13 @@ public class SysFileInfoServiceImpl extends ServiceImpl<SysFileInfoMapper, SysFi
         }
         SysFileInfo sysFileInfo = CacheUtils.get(CacheConstants.FILE_INFO, bucketName + md5, SysFileInfo.class);
         if (sysFileInfo == null) {
-            sysFileInfo = this.queryChain().from(SysFileInfo.class).eq(SysFileInfo::getMd5, md5).one();
+            sysFileInfo = this.queryChain()
+                    .from(SysFileInfo.class)
+                    .eq(SysFileInfo::getMd5, md5)
+                    .eq(SysFileInfo::getStorageName, bucketName)
+                    .one();
             if (sysFileInfo != null) {
+                sysFileInfo.setFileId(null);
                 CacheUtils.put(CacheConstants.FILE_INFO, bucketName + md5, sysFileInfo);
             }
         }
