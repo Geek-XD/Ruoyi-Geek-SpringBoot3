@@ -25,7 +25,7 @@ public interface ISysFileInfoService extends IService<SysFileInfo> {
      * @param file
      * @return 结果
      */
-    default public SysFileInfo buildSysFileInfo(MultipartFile file) {
+    default public SysFileInfo buildSysFileInfo(MultipartFile file, String bucketName) {
         String fileType = null;
         if (file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")) {
             fileType = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
@@ -36,6 +36,7 @@ public interface ISysFileInfoService extends IService<SysFileInfo> {
         fileInfo.setFileType(fileType);
         fileInfo.setFileSize(file.getSize());
         fileInfo.setMd5(md5);
+        fileInfo.setStorageName(bucketName);
         fileInfo.setCreateTime(new Date());
         fileInfo.setUpdateTime(new Date());
         fileInfo.setDelFlag(0);

@@ -36,10 +36,9 @@ public class SysFileInfo extends BaseEntity {
     @Excel(name = "统一逻辑路径")
     private String filePath;
 
-    /** 存储类型（local/minio/oss） */
-    @Schema(title = "存储类型（local/minio/oss）")
+    @Schema(title = "存储通名称")
     @Excel(name = "存储类型")
-    private String storageType;
+    private String storageName;
 
     /** 文件类型/后缀 */
     @Schema(title = "文件类型/后缀")

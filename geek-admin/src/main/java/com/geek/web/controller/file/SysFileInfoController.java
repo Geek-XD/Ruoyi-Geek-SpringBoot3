@@ -19,9 +19,8 @@ import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.core.page.PageDomain;
 import com.geek.common.core.page.TableDataInfo;
 import com.geek.common.core.page.TableSupport;
-import com.geek.common.core.storage.GeekStorageBucket;
-import com.geek.common.core.storage.service.StorageService;
 import com.geek.common.enums.BusinessType;
+import com.geek.framework.storage.StorageService;
 import com.geek.system.domain.SysFileInfo;
 import com.geek.system.service.ISysFileInfoService;
 import com.mybatisflex.core.paginate.Page;
@@ -45,7 +44,7 @@ public class SysFileInfoController extends BaseController {
     private ISysFileInfoService sysFileInfoService;
 
     @Autowired
-    private GeekStorageBucket geekStorageBucket;
+    private StorageService storageService;
 
     /**
      * 查询文件列表
@@ -111,11 +110,10 @@ public class SysFileInfoController extends BaseController {
     @Log(title = "文件", businessType = BusinessType.DELETE)
     @DeleteMapping("/{fileIds}")
     public AjaxResult remove(@PathVariable(name = "fileIds") List<Long> fileIds) {
-        StorageService fileService = new StorageService(geekStorageBucket);
         sysFileInfoService.list(QueryWrapper.create().in(SysFileInfo::getFileId, fileIds))
-            .stream()
-            .map(SysFileInfo::getFilePath)
-            .forEach(fileService::clearFileCache);
+                .stream()
+                .map(SysFileInfo::getFilePath)
+                .forEach(storageService::clearFileCache);
         return toAjax(sysFileInfoService.removeByIds(fileIds));
     }
 }

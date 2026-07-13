@@ -10,12 +10,12 @@ import org.apache.poi.EmptyFileException;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.geek.common.config.GeekConfig;
 import com.geek.common.core.storage.domain.StorageEntity;
 import com.geek.common.core.storage.domain.SysFilePartETag;
-import com.geek.common.core.storage.service.StorageService;
+import com.geek.common.core.storage.service.IStorageService;
 import com.geek.common.utils.file.FileUtils;
 import com.geek.common.utils.file.MimeTypeUtils;
+import com.geek.common.utils.spring.SpringUtils;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -25,6 +25,10 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author geek
  */
 public class Sb {
+
+    public static IStorageService getStorageService() {
+        return SpringUtils.getBean(IStorageService.class);
+    }
 
     /**
      * 以默认配置进行文件上传
@@ -83,8 +87,8 @@ public class Sb {
      */
     public static String upload(String filePath, MultipartFile file, String[] allowedExtension) {
         try {
-            StorageService fileService = new StorageService(GeekConfig.getGeekStorageBucket());
-            fileService.setAllowedExtension(allowedExtension);
+            IStorageService fileService = getStorageService();
+            FileUtils.assertAllowed(file, allowedExtension);
             return fileService.upload(filePath, file);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -100,7 +104,7 @@ public class Sb {
      * @throws IOException
      */
     public static void downLoad(String filePath, OutputStream outputStream) {
-        StorageService fileService = new StorageService(GeekConfig.getGeekStorageBucket());
+        IStorageService fileService = getStorageService();
         try (InputStream inputStream = fileService.downLoad(filePath)) {
             FileUtils.writeBytes(inputStream, outputStream);
         } catch (Exception e) {
@@ -117,7 +121,7 @@ public class Sb {
      * @throws IOException
      */
     public static void downLoad(String filePath, HttpServletResponse response) {
-        StorageService fileService = new StorageService(GeekConfig.getGeekStorageBucket());
+        IStorageService fileService = getStorageService();
         StorageEntity fileEntity;
         try {
             fileEntity = fileService.getFile(filePath);
@@ -140,7 +144,7 @@ public class Sb {
      */
     public static void deleteFile(String filePath) {
         try {
-            StorageService fileService = new StorageService(GeekConfig.getGeekStorageBucket());
+            IStorageService fileService = getStorageService();
             fileService.deleteFile(filePath);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -156,7 +160,7 @@ public class Sb {
      * @throws Exception
      */
     public static String getURL(String filePath) {
-        StorageService fileService = new StorageService(GeekConfig.getGeekStorageBucket());
+        IStorageService fileService = getStorageService();
         try {
             return fileService.generateUrl(filePath);
         } catch (Exception e) {
@@ -173,7 +177,7 @@ public class Sb {
      * @throws Exception
      */
     public static String initMultipartUpload(String filePath, Long fileSize) {
-        StorageService fileService = new StorageService(GeekConfig.getGeekStorageBucket());
+        IStorageService fileService = getStorageService();
         try {
             return fileService.initMultipartUpload(filePath, fileSize);
         } catch (Exception e) {
@@ -192,7 +196,7 @@ public class Sb {
      * @throws Exception
      */
     public static String uploadPart(String filePath, String uploadId, int partNumber, MultipartFile chunk) {
-        StorageService fileService = new StorageService(GeekConfig.getGeekStorageBucket());
+        IStorageService fileService = getStorageService();
         try {
             if (chunk == null || chunk.isEmpty())
                 throw new EmptyFileException();
@@ -218,7 +222,7 @@ public class Sb {
      * @throws Exception
      */
     public static String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags) {
-        StorageService fileService = new StorageService(GeekConfig.getGeekStorageBucket());
+        IStorageService fileService = getStorageService();
         try {
             return fileService.completeMultipartUpload(filePath, uploadId, partETags);
         } catch (Exception e) {

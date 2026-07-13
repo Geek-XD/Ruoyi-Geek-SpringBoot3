@@ -96,7 +96,7 @@
             <column name="file_path" remarks="统一逻辑路径（/开头）" type="VARCHAR(500)">
                 <constraints nullable="false"/>
             </column>
-            <column name="storage_type" remarks="存储类型（local/minio/oss）" type="VARCHAR(32)">
+            <column name="storage_name" remarks="存储名称" type="VARCHAR(32)">
                 <constraints nullable="false"/>
             </column>
             <column name="file_type" remarks="文件类型/后缀" type="VARCHAR(50)"/>

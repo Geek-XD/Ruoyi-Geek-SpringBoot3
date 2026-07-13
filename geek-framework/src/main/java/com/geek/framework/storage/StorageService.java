@@ -1,4 +1,4 @@
-package com.geek.common.core.storage.service;
+package com.geek.framework.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,8 +7,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.geek.common.config.GeekConfig;
 import com.geek.common.constant.CacheConstants;
 import com.geek.common.core.storage.base.MultipartUploadable;
 import com.geek.common.core.storage.base.StorageBucket;
@@ -23,6 +25,7 @@ import com.geek.common.utils.sign.Md5Utils;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,16 +35,17 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @Slf4j
+@Service
+@RequiredArgsConstructor
 public class StorageService {
 
-    private StorageBucket storageBucket;
     private String[] allowedExtension = MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION;
     private Boolean fastUpload = true;
     private Integer expireTime = 3600;
     private Long MAX_FILE_SIZE = 500 * 1024 * 1024L;
 
-    public StorageService(StorageBucket storageBucket) {
-        this.storageBucket = storageBucket;
+    public StorageBucket getStorageBucket() {
+        return GeekConfig.getGeekStorageBucket();
     }
 
     /**
@@ -64,12 +68,12 @@ public class StorageService {
             if (StringUtils.isNotEmpty(pathForMd5)) {
                 filePath = pathForMd5;
             } else {
-                this.storageBucket.put(filePath, file);
+                getStorageBucket().put(filePath, file);
                 CacheUtils.put(CacheConstants.FILE_MD5_PATH_KEY, md5, filePath);
                 CacheUtils.put(CacheConstants.FILE_PATH_MD5_KEY, filePath, md5);
             }
         } else {
-            this.storageBucket.put(filePath, file);
+            getStorageBucket().put(filePath, file);
         }
         return filePath;
     }
@@ -83,7 +87,7 @@ public class StorageService {
      *
      */
     public InputStream downLoad(String filePath) throws Exception {
-        return this.storageBucket.get(filePath).getInputStream();
+        return getStorageBucket().get(filePath).getInputStream();
     }
 
     /**
@@ -108,7 +112,7 @@ public class StorageService {
      *
      */
     public void downLoad(String filePath, HttpServletResponse response) throws Exception {
-        StorageEntity fileEntity = this.storageBucket.get(filePath);
+        StorageEntity fileEntity = getStorageBucket().get(filePath);
         InputStream inputStream = fileEntity.getInputStream();
         OutputStream outputStream = response.getOutputStream();
         FileUtils.setAttachmentResponseHeader(response, FileUtils.getName(fileEntity.getFilePath()));
@@ -124,7 +128,7 @@ public class StorageService {
      * @throws Exception
      */
     public StorageEntity getFile(String filePath) throws Exception {
-        return this.storageBucket.get(filePath);
+        return getStorageBucket().get(filePath);
     }
 
     /**
@@ -136,7 +140,7 @@ public class StorageService {
      *
      */
     public void deleteFile(String filePath) throws Exception {
-        this.storageBucket.remove(filePath);
+        getStorageBucket().remove(filePath);
         clearFileCache(filePath);
     }
 
@@ -162,10 +166,10 @@ public class StorageService {
         if (filePath == null || filePath.startsWith("http")) {
             return filePath;
         }
-        if ("public".equals(this.storageBucket.getPermission())) {
-            return this.storageBucket.generatePublicUrl(filePath).toString();
+        if ("public".equals(getStorageBucket().getPermission())) {
+            return getStorageBucket().generatePublicUrl(filePath).toString();
         } else {
-            return this.storageBucket.generatePresignedUrl(filePath, expireTime).toString();
+            return getStorageBucket().generatePresignedUrl(filePath, expireTime).toString();
         }
     }
 
@@ -179,7 +183,7 @@ public class StorageService {
         if (fileSize > MAX_FILE_SIZE) {
             throw new IllegalArgumentException("文件过大");
         }
-        if (this.storageBucket instanceof MultipartUploadable msb) {
+        if (getStorageBucket() instanceof MultipartUploadable msb) {
             return msb.initMultipartUpload(filePath);
         } else {
             throw new UnsupportedOperationException("当前存储桶不支持分片上传");
@@ -198,7 +202,7 @@ public class StorageService {
      */
     public String uploadPart(SysFilePartETag partETag, InputStream inputStream)
             throws Exception {
-        if (this.storageBucket instanceof MultipartUploadable msb) {
+        if (getStorageBucket() instanceof MultipartUploadable msb) {
             try {
                 return msb
                         .uploadPart(
@@ -227,7 +231,7 @@ public class StorageService {
      */
     public String completeMultipartUpload(String filePath, String uploadId, List<SysFilePartETag> partETags)
             throws Exception {
-        if (this.storageBucket instanceof MultipartUploadable msb) {
+        if (getStorageBucket() instanceof MultipartUploadable msb) {
             if (partETags == null || partETags.isEmpty()) {
                 throw new IllegalArgumentException("分片标识列表不能为空");
             }

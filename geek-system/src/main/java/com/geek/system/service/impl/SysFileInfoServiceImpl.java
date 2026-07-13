@@ -34,7 +34,7 @@ public class SysFileInfoServiceImpl extends ServiceImpl<SysFileInfoMapper, SysFi
                 .from(SysFileInfo.class)
                 .like(SysFileInfo::getFileName, sysFileInfo.getFileName())
                 .eq(SysFileInfo::getFilePath, sysFileInfo.getFilePath())
-                .eq(SysFileInfo::getStorageType, sysFileInfo.getStorageType())
+                .eq(SysFileInfo::getStorageName, sysFileInfo.getStorageName())
                 .eq(SysFileInfo::getFileType, sysFileInfo.getFileType())
                 .eq(SysFileInfo::getFileSize, sysFileInfo.getFileSize())
                 .eq(SysFileInfo::getMd5, sysFileInfo.getMd5());

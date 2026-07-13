@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLConnection;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,13 +28,13 @@ import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.core.storage.GeekStorageBucket;
 import com.geek.common.core.storage.StorageBucketKey;
 import com.geek.common.core.storage.domain.SysFilePartETag;
-import com.geek.common.core.storage.service.StorageService;
 import com.geek.common.core.text.CharsetKit;
 import com.geek.common.exception.ServiceException;
 import com.geek.common.utils.Sb;
 import com.geek.common.utils.SecurityUtils;
 import com.geek.common.utils.StringUtils;
 import com.geek.common.utils.file.FileUtils;
+import com.geek.framework.storage.StorageService;
 import com.geek.system.domain.SysFileInfo;
 import com.geek.system.service.ISysFileInfoService;
 
@@ -56,6 +55,11 @@ public class FileController extends BaseController {
     @Autowired
     private GeekStorageBucket geekStorageBucket;
 
+    @Autowired
+    private StorageService storageService;
+
+    private static final String DEFAULT_DIR = "upload";
+
     /**
      * 获取所有可用存储渠道及其client列表
      */
@@ -72,22 +76,17 @@ public class FileController extends BaseController {
             @PathVariable(name = "bucketName", required = false) String bucketName,
             @RequestParam("file") MultipartFile file) {
         try {
-            String filePath = "upload/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            SysFileInfo sysFileInfo = sysFileInfoService.buildSysFileInfo(file);
+            String filePath = DEFAULT_DIR + "/" + file.getOriginalFilename();
+            bucketName = StringUtils.isEmpty(bucketName) ? geekStorageBucket.getDefaultStorageBucketKey() : bucketName;
+
+            SysFileInfo sysFileInfo = sysFileInfoService.buildSysFileInfo(file, bucketName);
             AjaxResult ajax = AjaxResult.success();
-            if (StringUtils.isEmpty(bucketName)) {
-                sysFileInfo.setStorageType(geekStorageBucket.getDefaultSbType());
+            try {
+                StorageBucketKey.use(bucketName);
                 sysFileInfo.setFilePath(Sb.upload(filePath, file));
                 ajax.put("url", Sb.getURL(filePath));
-            } else {
-                sysFileInfo.setStorageType(geekStorageBucket.getSbType(bucketName));
-                try {
-                    StorageBucketKey.use(bucketName);
-                    sysFileInfo.setFilePath(Sb.upload(filePath, file));
-                    ajax.put("url", Sb.getURL(filePath));
-                } finally {
-                    StorageBucketKey.clear();
-                }
+            } finally {
+                StorageBucketKey.clear();
             }
             sysFileInfoService.save(sysFileInfo);
             ajax.put("info", sysFileInfo);
@@ -101,13 +100,15 @@ public class FileController extends BaseController {
     /**
      * 统一下载接口：/file/{storageType}/{bucketName}/download?filePath=xxx
      */
-    @GetMapping({ "/download", "/{bucketName}/download" })
+    @GetMapping({ "/download/{fileId}" })
     public void downloadUnified(
-            @PathVariable(name = "bucketName", required = false) String bucketName,
-            @RequestParam("filePath") String filePath,
+            @PathVariable(name = "fileId") Long fileId,
             HttpServletResponse response) throws IOException {
         try {
             response.setContentType("application/octet-stream");
+            SysFileInfo fileInfo = sysFileInfoService.getById(fileId);
+            String filePath = fileInfo.getFilePath();
+            String bucketName = fileInfo.getStorageName();
             if (StringUtils.isEmpty(bucketName)) {
                 Sb.downLoad(filePath, response);
             } else {
@@ -123,20 +124,13 @@ public class FileController extends BaseController {
      * 统一预览接口：/file/{storageType}/{bucketName}/preview?filePath=xxx
      */
     @Anonymous
-    @GetMapping({ "/preview", "/{bucketName}/preview" })
-    public void preview(
-            @PathVariable(name = "storageType", required = false) String storageType,
-            @PathVariable(name = "bucketName", required = false) String bucketName,
-            @RequestParam("filePath") String filePath,
-            HttpServletResponse response) throws Exception {
+    @GetMapping({ "/preview/{fileId}" })
+    public void preview(@PathVariable(name = "fileId") Long fileId, HttpServletResponse response) throws Exception {
         try {
-            if (StringUtils.isEmpty(bucketName)) {
-                StorageBucketKey.use(bucketName);
-            }
-            StorageService storageService = new StorageService(geekStorageBucket);
-            filePath = URLDecoder.decode(filePath, CharsetKit.UTF_8);
-            InputStream inputStream = storageService.downLoad(filePath);
-            String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(filePath));
+            SysFileInfo fileInfo = sysFileInfoService.getById(fileId);
+            StorageBucketKey.use(fileInfo.getStorageName());
+            InputStream inputStream = storageService.downLoad(fileInfo.getFilePath());
+            String contentType = URLConnection.guessContentTypeFromName(FileUtils.getName(fileInfo.getFilePath()));
             if (contentType == null) {
                 contentType = "application/octet-stream";
             }
@@ -147,9 +141,7 @@ public class FileController extends BaseController {
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("预览失败: " + e.getMessage());
         } finally {
-            if(StorageBucketKey.get() != null){
-                StorageBucketKey.clear();
-            }
+            StorageBucketKey.clear();
         }
     }
 
@@ -157,12 +149,14 @@ public class FileController extends BaseController {
      * 本地资源通用下载
      */
     @Operation(summary = "本地资源通用下载")
-    @GetMapping("/resource")
+    @GetMapping("/resource/{fileId}")
     @Anonymous
     public void resourceDownload(
-            @RequestParam String filePath,
+            @PathVariable(name = "fileId") Long fileId,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
+        SysFileInfo fileInfo = sysFileInfoService.getById(fileId);
+        String filePath = fileInfo.getFilePath();
         OutputStream outputStream = response.getOutputStream();
         try {
             if (!FileUtils.checkAllowDownload(filePath)) {
@@ -250,8 +244,8 @@ public class FileController extends BaseController {
             fileInfo.setFilePath(finalPath);
             fileInfo.setFileSize(fileSize);
             fileInfo.setFileType(dotIndex >= 0 ? fileName.substring(dotIndex + 1) : "");
-            fileInfo.setStorageType(geekStorageBucket.getDefaultSbType());
             fileInfo.setCreateBy(userName);
+            fileInfo.setStorageName(geekStorageBucket.getDefaultStorageBucketKey());
             fileInfo.setCreateTime(new Date());
             fileInfo.setUpdateBy(userName);
             fileInfo.setUpdateTime(new Date());
