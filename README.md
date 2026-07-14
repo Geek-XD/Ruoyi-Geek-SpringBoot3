@@ -47,8 +47,6 @@ RuoYi-Geek不仅仅是一个简单的升级版本，更是对于RuoYi生态的�
 * 提供了多个常见业务模块简化开发，如：第三方认证模块、支付模块
 * 提供了多个常见的服务模块集成开发，如：websocket模块、minio模块
 * 特别鸣谢：[element](https://github.com/ElemeFE/element)，[vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)，[eladmin-web](https://github.com/elunez/eladmin-web)。
-* 阿里云折扣场：[点我进入](http://aly.ruoyi.vip)，腾讯云秒杀场：[点我进入](http://txy.ruoyi.vip)&nbsp;&nbsp;
-* 阿里云优惠券：[点我领取](https://www.aliyun.com/minisite/goods?userCode=brki8iof&share_source=copy_link)，腾讯云优惠券：[点我领取](https://cloud.tencent.com/redirect.php?redirect=1025&cps_key=198c8df2ed259157187173bc7f4f32fd&from=console)&nbsp;&nbsp;
 
 ## 本项目与原项目的区别
 
@@ -96,7 +94,6 @@ com.geek
 
 command:
   list                 列出 .gitmodules 中的所有子模块 (name / path / url)
-  status               查看当前索引中的子模块（gitlink，已载入模块）
   add <name>           根据 .gitmodules 中的 name 添加一个子模块（git submodule add）
   remove <name>        根据 .gitmodules 中的 name 删除一个子模块（git rm + 清理 .git/modules）
   sync-all             按 geek-modules.yml 中的配置，依次执行 add，同步/拉取所有模块
@@ -104,7 +101,6 @@ command:
 
 示例：
   ./geek.sh list
-  ./geek.sh status
   ./geek.sh add Geek-Plugin-Redis
   ./geek.sh remove Geek-Plugin-Redis
 ```
