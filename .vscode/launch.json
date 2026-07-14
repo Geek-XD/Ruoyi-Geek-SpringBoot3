@@ -10,7 +10,7 @@
             "request": "launch",
             "mainClass": "com.geek.GeekApplication",
             "projectName": "geek-admin",
-            "vmArgs": "-Dfile.encoding=GBK "
+            "vmArgs": "-Dfile.encoding=UTF-8 "
         }
     ]
 }

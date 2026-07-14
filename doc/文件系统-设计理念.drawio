@@ -1,59 +1,48 @@
 <mxfile host="65bd71144e">
     <diagram id="Ls2xZRtRnCpVtahIddyW" name="第 1 页">
-        <mxGraphModel dx="748" dy="649" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1029" dy="779" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="46" style="edgeStyle=none;html=1;" edge="1" parent="1" source="44" target="49">
+                <mxCell id="46" style="edgeStyle=none;html=1;" parent="1" source="44" target="49" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="123.56521739130449" y="270" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="51" style="edgeStyle=none;html=1;" edge="1" parent="1" source="44" target="45">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="154" y="245" as="sourcePoint"/>
-                    </mxGeometry>
+                <mxCell id="44" value="工具" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="10" y="335" width="100" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="44" value="工具" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="50" y="220" width="100" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="48" style="edgeStyle=none;html=1;" edge="1" parent="1" source="45" target="47">
+                <mxCell id="58" style="edgeStyle=none;html=1;" parent="1" source="47" target="56" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="45" value="存储桶业务" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="294" y="220" width="100" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="58" style="edgeStyle=none;html=1;" edge="1" parent="1" source="47" target="56">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="47" value="多存储桶" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="47" value="多存储桶" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="294" y="335" width="100" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="50" style="edgeStyle=none;html=1;" edge="1" parent="1" source="49" target="47">
+                <mxCell id="50" style="edgeStyle=none;html=1;" parent="1" source="49" target="47" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="49" value="配置文件" style="shape=providedRequiredInterface;html=1;verticalLabelPosition=bottom;sketch=0;" vertex="1" parent="1">
+                <mxCell id="49" value="配置文件" style="shape=providedRequiredInterface;html=1;verticalLabelPosition=bottom;sketch=0;" parent="1" vertex="1">
                     <mxGeometry x="184" y="350" width="20" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="53" style="edgeStyle=none;html=1;" edge="1" parent="1" source="52" target="47">
+                <mxCell id="53" style="edgeStyle=none;html=1;" parent="1" source="52" target="47" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="55" style="edgeStyle=none;html=1;" edge="1" parent="1" source="52" target="54">
+                <mxCell id="55" style="edgeStyle=none;html=1;" parent="1" source="52" target="54" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="52" value="存储桶管理器" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="52" value="存储桶管理器" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="504" y="335" width="100" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="57" style="edgeStyle=none;html=1;" edge="1" parent="1" source="54" target="56">
+                <mxCell id="57" style="edgeStyle=none;html=1;" parent="1" source="54" target="56" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="54" value="存储桶工厂" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="54" value="存储桶工厂" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="504" y="460" width="100" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="56" value="存储桶" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="56" value="存储桶" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="294" y="460" width="100" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="59" value="注意事项：&lt;div&gt;FilePath在系统中代表相对于某服务下的文件路径。&lt;/div&gt;&lt;div&gt;URL在系统中代表可直接访问的文件链接。&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                <mxCell id="59" value="注意事项：&lt;div&gt;FilePath在系统中代表相对于某服务下的文件路径。&lt;/div&gt;&lt;div&gt;URL在系统中代表可直接访问的文件链接。&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="310" y="530" width="300" height="60" as="geometry"/>
                 </mxCell>
             </root>
