@@ -73,8 +73,8 @@ public class SysDept extends BaseEntity {
     @Schema(title = "部门表", description = "0正常,1停用")
     private String status;
 
-    /** 删除标志（0代表存在 2代表删除） */
-    @Schema(title = "删除标志", description = "0代表存在 2代表删除")
+    /** 删除标志（0代表存在 1代表删除） */
+    @Schema(title = "删除标志", description = "0代表存在 1代表删除")
     private Integer delFlag;
 
     /** 父部门名称 */

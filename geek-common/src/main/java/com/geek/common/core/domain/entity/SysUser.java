@@ -94,8 +94,8 @@ public class SysUser extends BaseEntity {
     @Excel(name = "账号状态", readConverterExp = "0=正常,1=停用")
     private String status;
 
-    /** 删除标志（0代表存在 2代表删除） */
-    @Schema(title = "删除标志", description = "0代表存在 2代表删除")
+    /** 删除标志（0代表存在 1代表删除） */
+    @Schema(title = "删除标志", description = "0代表存在 1代表删除")
     private Integer delFlag;
 
     /** 最后登录IP */
