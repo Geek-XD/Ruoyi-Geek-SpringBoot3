@@ -20,8 +20,8 @@ import com.google.code.kaptcha.util.Config;
 public abstract class AbstractKaptchaService extends AbstractBaseCaptchaService {
     protected Logger logger = LoggerFactory.getLogger(getClass());
     protected DefaultKaptcha defaultKaptcha;
-    protected static String REDIS_CAPTCHA_KEY = "RUNNING:CAPTCHA:%s";
-    protected static String REDIS_SECOND_CAPTCHA_KEY = "RUNNING:CAPTCHA:second-%s";
+    protected static String CAPTCHA_CODE_KEY = "RUNNING:CAPTCHA:%s";
+    protected static String CAPTCHA_VERIFICATION_KEY = "RUNNING:CAPTCHA:second-%s";
     protected static Long EXPIRESIN_SECONDS = 2 * 60L;
     protected static Long EXPIRESIN_THREE = 3 * 60L;
 
@@ -49,7 +49,7 @@ public abstract class AbstractKaptchaService extends AbstractBaseCaptchaService 
         dataVO.setOriginalImageBase64(ImageUtils.getImageToBase64Str(image).replaceAll("\r|\n", ""));
         dataVO.setToken(RandomUtils.getUUID());
         dataVO.setSecretKey(secretKey);
-        String codeKey = String.format(REDIS_CAPTCHA_KEY, dataVO.getToken());
+        String codeKey = String.format(CAPTCHA_CODE_KEY, dataVO.getToken());
         CaptchaServiceFactory.getCache(cacheType).set(codeKey, code, EXPIRESIN_SECONDS);
         return ResponseModel.successData(dataVO);
     }
@@ -60,7 +60,7 @@ public abstract class AbstractKaptchaService extends AbstractBaseCaptchaService 
         if (!validatedReq(r)) {
             return r;
         }
-        String codeKey = String.format(REDIS_CAPTCHA_KEY, captchaVO.getToken());
+        String codeKey = String.format(CAPTCHA_CODE_KEY, captchaVO.getToken());
         if (!CaptchaServiceFactory.getCache(cacheType).exists(codeKey)) {
             return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
         }
@@ -81,7 +81,7 @@ public abstract class AbstractKaptchaService extends AbstractBaseCaptchaService 
         String secretKey = captchaVO.getSecretKey();
         try {
             String value = AESUtil.aesEncrypt(captchaVO.getToken().concat("---").concat(v), secretKey);
-            String secondKey = String.format(REDIS_SECOND_CAPTCHA_KEY, value);
+            String secondKey = String.format(CAPTCHA_VERIFICATION_KEY, value);
             CaptchaServiceFactory.getCache(cacheType).set(secondKey, captchaVO.getToken(), EXPIRESIN_THREE);
         } catch (Exception e) {
             logger.error("AES加密失败", e);
@@ -98,7 +98,7 @@ public abstract class AbstractKaptchaService extends AbstractBaseCaptchaService 
         if (!validatedReq(r)) {
             return r;
         }
-        String codeKey = String.format(REDIS_SECOND_CAPTCHA_KEY, captchaVO.getCaptchaVerification());
+        String codeKey = String.format(CAPTCHA_VERIFICATION_KEY, captchaVO.getCaptchaVerification());
         if (!CaptchaServiceFactory.getCache(cacheType).exists(codeKey)) {
             return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
         }
