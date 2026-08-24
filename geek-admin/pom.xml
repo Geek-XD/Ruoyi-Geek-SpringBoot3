@@ -35,6 +35,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Mysql驱动包 -->
         <!-- druid 的 xa暂时不支持 mysql 9.0.0+ 连接速度:8.3.0>8.2.0>8.4.0 -->
         <dependency>
