@@ -1,6 +1,5 @@
 package com.geek.web.controller.monitor;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,13 +14,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alicp.jetcache.support.CacheStat;
 import com.geek.common.core.domain.AjaxResult;
 import com.geek.common.core.text.Convert;
 import com.geek.common.utils.CacheUtils;
 import com.geek.common.utils.StringUtils;
 import com.geek.framework.cache.GeekJetCacheManager;
-import com.geek.framework.cache.GeekJetCacheReport;
+import com.geek.framework.cache.GeekCacheReportService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,17 +40,13 @@ public class CacheController {
     private GeekJetCacheManager cacheManager;
 
     @Autowired
-    private GeekJetCacheReport cacheReport;
+    private GeekCacheReportService cacheReportService;
 
     @Operation(summary = "获取 JetCache 监控概览")
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
     @GetMapping()
     public AjaxResult getInfo() {
-        List<Map<String, Object>> cacheStats = buildCacheStats();
-        Map<String, Object> result = new LinkedHashMap<>(2);
-        result.put("summary", buildSummary(cacheStats));
-        result.put("caches", cacheStats);
-        return AjaxResult.success(result);
+        return AjaxResult.success(cacheReportService.collect());
     }
 
     @Operation(summary = "获取缓存名列表")
@@ -142,99 +136,4 @@ public class CacheController {
         return cacheCatalog;
     }
 
-    private List<Map<String, Object>> buildCacheStats() {
-        List<Map<String, Object>> stats = new ArrayList<>();
-        List<String> cacheNames = new ArrayList<>(cacheManager.getCacheNames());
-        cacheNames.sort(String::compareTo);
-        for (String cacheName : cacheNames) {
-            CacheStat cacheStat = cacheReport.getCacheStat(cacheName);
-            Map<String, Object> item = new LinkedHashMap<>();
-            item.put("cacheName", cacheName);
-            item.put("keyCount", cacheReport.getRegisteredKeyCount(cacheName));
-            item.put("cacheType", cacheReport.getCacheType().name());
-            item.put("defaultExpire", formatDuration(cacheReport.getDefaultExpire()));
-            item.put("localExpire", formatDuration(cacheReport.getLocalExpire()));
-            item.put("qps", round(cacheStat == null ? 0D : cacheStat.qps()));
-            item.put("hitRate", round((cacheStat == null ? 0D : cacheStat.hitRate()) * 100));
-            item.put("getCount", cacheStat == null ? 0L : cacheStat.getGetCount());
-            item.put("hitCount", cacheStat == null ? 0L : cacheStat.getGetHitCount());
-            item.put("missCount", cacheStat == null ? 0L : cacheStat.getGetMissCount());
-            item.put("expireCount", cacheStat == null ? 0L : cacheStat.getGetExpireCount());
-            item.put("putCount", cacheStat == null ? 0L : cacheStat.getPutCount());
-            item.put("removeCount", cacheStat == null ? 0L : cacheStat.getRemoveCount());
-            item.put("loadCount", cacheStat == null ? 0L : cacheStat.getLoadCount());
-            stats.add(item);
-        }
-        return stats;
-    }
-
-    private Map<String, Object> buildSummary(List<Map<String, Object>> cacheStats) {
-        long totalKeys = sumLong(cacheStats, "keyCount");
-        long totalGets = sumLong(cacheStats, "getCount");
-        long totalHits = sumLong(cacheStats, "hitCount");
-        long totalMisses = sumLong(cacheStats, "missCount");
-        long totalPuts = sumLong(cacheStats, "putCount");
-        long totalRemoves = sumLong(cacheStats, "removeCount");
-        long totalLoads = sumLong(cacheStats, "loadCount");
-        double totalQps = cacheStats.stream()
-                .mapToDouble(item -> ((Number) item.get("qps")).doubleValue())
-                .sum();
-
-        Map<String, Object> summary = new LinkedHashMap<>();
-        summary.put("area", cacheReport.getArea());
-        summary.put("cacheType", cacheReport.getCacheType().name());
-        summary.put("localProvider", cacheReport.getLocalProvider());
-        summary.put("remoteProvider", cacheReport.getRemoteProvider());
-        summary.put("multiLevelEnabled", cacheReport.isMultiLevelEnabled());
-        summary.put("syncLocal", cacheReport.isSyncLocal());
-        summary.put("penetrationProtect", cacheReport.isPenetrationProtect());
-        summary.put("defaultExpire", formatDuration(cacheReport.getDefaultExpire()));
-        summary.put("localExpire", formatDuration(cacheReport.getLocalExpire()));
-        summary.put("localLimit", cacheReport.getLocalLimit());
-        summary.put("statIntervalMinutes", cacheReport.getStatIntervalMinutes());
-        summary.put("cacheCount", cacheStats.size());
-        summary.put("activeCacheCount", cacheManager.getCacheNames().size());
-        summary.put("keyCount", totalKeys);
-        summary.put("getCount", totalGets);
-        summary.put("hitCount", totalHits);
-        summary.put("missCount", totalMisses);
-        summary.put("putCount", totalPuts);
-        summary.put("removeCount", totalRemoves);
-        summary.put("loadCount", totalLoads);
-        summary.put("hitRate", totalGets == 0 ? 0D : round((double) totalHits * 100 / totalGets));
-        summary.put("qps", round(totalQps));
-        return summary;
-    }
-
-    private long sumLong(List<Map<String, Object>> cacheStats, String key) {
-        return cacheStats.stream()
-                .map(item -> item.get(key))
-                .filter(Number.class::isInstance)
-                .map(Number.class::cast)
-                .mapToLong(Number::longValue)
-                .sum();
-    }
-
-    private double round(double value) {
-        return Math.round(value * 100D) / 100D;
-    }
-
-    private String formatDuration(Duration duration) {
-        if (duration == null || duration.isZero() || duration.isNegative()) {
-            return "0s";
-        }
-        if (duration.toDaysPart() == 0 && duration.toDays() > 0) {
-            return duration.toDays() + "d";
-        }
-        if (duration.toDays() > 0) {
-            return duration.toDays() + "d";
-        }
-        if (duration.toHours() > 0) {
-            return duration.toHours() + "h";
-        }
-        if (duration.toMinutes() > 0) {
-            return duration.toMinutes() + "m";
-        }
-        return duration.toSeconds() + "s";
-    }
 }
