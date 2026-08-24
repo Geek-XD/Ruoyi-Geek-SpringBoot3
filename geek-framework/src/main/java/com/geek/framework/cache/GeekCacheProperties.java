@@ -25,4 +25,12 @@ public class GeekCacheProperties {
     private boolean useAreaInPrefix = false;
     /** 是否启用缓存穿透保护 */
     private boolean penetrationProtect = false;
+    /** 可选远程缓存提供者 */
+    private Remote remote = new Remote();
+
+    @Data
+    public static class Remote {
+        /** 已选择的远程缓存提供者标识 */
+        private String provider;
+    }
 }

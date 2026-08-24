@@ -10,8 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.annotation.PostConstruct;
+
 import org.jspecify.annotations.Nullable;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -23,6 +24,8 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.template.QuickConfig;
 import com.geek.common.core.cache.GeekCacheManager;
+import com.geek.common.core.cache.GeekRemoteCacheProvider;
+import com.geek.common.core.cache.GeekRemoteCacheProviderRegistry;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +37,7 @@ public class GeekJetCacheManager implements GeekCacheManager {
 
     private final CacheManager cacheManager;
     private final GeekCacheProperties properties;
-    private final Environment environment;
+    private final GeekRemoteCacheProviderRegistry remoteCacheProviders;
 
     @Getter
     private final ConcurrentMap<String, Cache<String, Object>> caches = new ConcurrentHashMap<>();
@@ -178,14 +181,37 @@ public class GeekJetCacheManager implements GeekCacheManager {
     }
 
     public CacheType resolveCacheType() {
-        if (properties.isMultiLevelEnabled() && environment.containsProperty("jetcache.remote.default.type")) {
+        GeekRemoteCacheProvider provider = selectedRemoteProvider();
+        if (provider == null) {
+            return CacheType.LOCAL;
+        }
+        if (properties.isMultiLevelEnabled()) {
             return CacheType.BOTH;
         }
-        return CacheType.LOCAL;
+        return CacheType.REMOTE;
     }
 
     CacheType getCacheType() {
         return resolveCacheType();
+    }
+
+    @PostConstruct
+    void validateSelectedRemoteProvider() {
+        selectedRemoteProvider();
+    }
+
+    private GeekRemoteCacheProvider selectedRemoteProvider() {
+        String providerId = properties.getRemote().getProvider();
+        if (providerId == null || providerId.isBlank()) {
+            return null;
+        }
+        GeekRemoteCacheProvider provider = remoteCacheProviders.findById(providerId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Selected remote cache provider is not registered: " + providerId));
+        if (!provider.isReady()) {
+            throw new IllegalStateException("Selected remote cache provider is not ready: " + providerId);
+        }
+        return provider;
     }
 
     private void registerKey(String cacheName, String key) {
