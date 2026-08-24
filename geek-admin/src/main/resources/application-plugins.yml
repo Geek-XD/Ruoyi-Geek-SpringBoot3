@@ -1,5 +1,4 @@
 spring:
-  data:
   #配置rabbitMq 服务器
   rabbitmq:
     enable: false
